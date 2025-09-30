@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleEnum {
+  ADMIN
+  STAFF
+  GUEST
+}
+
+model Branch {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique          // เช่น BR001, BR002
+  name      String                    // ชื่อสาขา
+  address   String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ความสัมพันธ์
+  users     User[]
+  systemLogs SystemLog[]
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  password     String
+
+  role         RoleEnum     @default(GUEST) 
+
+  branchId     Int?
+  branch       Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  staffLevelId Int?                          
+  staffLevel   StaffLevel?  @relation(fields: [staffLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  isActive     Boolean      @default(true)
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([role])
+  @@index([branchId])
+  @@index([staffLevelId])                  
+
+  systemLogs SystemLog[]
+}
+
+model StaffLevel {
+  id           Int                @id @default(autoincrement())
+  name         String
+  description  String?
+  isActive     Boolean            @default(true)  
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  permissions  StaffPermission[]
+  users        User[]
+}
+
+model StaffPermission {
+  id              Int         @id @default(autoincrement())
+  staffLevelId    Int
+  permissionCode  String      // เช่น "VIEW_USER", "CREATE_USER"
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  staffLevel      StaffLevel  @relation(fields: [staffLevelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([staffLevelId, permissionCode])
+}
+
+
+
+model SystemLog {
+  id          Int       @id @default(autoincrement())
+  action      String                     // ชื่อ action เช่น CREATE_USER, APPROVE_USER, UPDATE_LEVEL
+  details     Json?                       // เก็บรายละเอียดเพิ่มเติม เช่น { "userId": 12, "before": {}, "after": {} }
+  userId      Int?                        // ใครเป็นคนทำ (nullable กรณีระบบทำ)
+  user        User?      @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  branchId    Int?                        // ถ้ามีหลายสาขา
+  branch      Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
+  createdAt   DateTime  @default(now())
+
+  
+  @@index([branchId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
