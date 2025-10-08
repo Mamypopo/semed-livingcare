@@ -3,8 +3,12 @@ import { ENV } from "./env.js";
 
 // Create Prisma client instance
 export const prisma = new PrismaClient({
-  log: ENV.NODE_ENV === "development" ? ["query", "info", "warn", "error"] : ["error"],
+  // log: ENV.NODE_ENV === "development" ? ["query", "info", "warn", "error"] : ["error"],
+  log: ENV.NODE_ENV === "development" ? ["error"] : ["error"],
   errorFormat: "pretty",
+  transactionOptions: {
+    timeout: 300000 // 5 นาที (300,000 มิลลิวินาที)
+  }
 });
 
 // Database connection function
