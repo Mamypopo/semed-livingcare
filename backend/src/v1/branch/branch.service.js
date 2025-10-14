@@ -6,7 +6,7 @@ import { prisma } from "../config/db.js";
  * @returns {Array} List of branches
  */
 export const getAllBranches = async (filters = {}) => {
-  const { isActive, search } = filters;
+  const { isActive, search, page = 1, pageSize = 10, sort = 'createdAt', order = 'desc' } = filters;
   
   const where = {};
   
@@ -22,20 +22,25 @@ export const getAllBranches = async (filters = {}) => {
     ];
   }
 
-  const branches = await prisma.branch.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      _count: {
-        select: {
-          users: true,
-          systemLogs: true
+  const [branches, total] = await Promise.all([
+    prisma.branch.findMany({
+      where,
+      orderBy: { [sort]: order },
+      include: {
+        _count: {
+          select: {
+            users: true,
+            systemLogs: true
+          }
         }
-      }
-    }
-  });
+      },
+      skip: (Number(page) - 1) * Number(pageSize),
+      take: Number(pageSize)
+    }),
+    prisma.branch.count({ where })
+  ]);
 
-  return branches;
+  return { branches, total };
 };
 
 /**

@@ -10,4 +10,5 @@ export const ENV = {
   PORT: parseInt(process.env.PORT || "8000", 10),
   DATABASE_URL: process.env.DATABASE_URL,
   JWT_SECRET: process.env.JWT_SECRET,
+  REGISTRATION_CODE: process.env.REGISTRATION_CODE || "DEV888",
 };

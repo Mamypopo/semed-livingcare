@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { config } from '@/config/env'
 
 // Create axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
+  baseURL: config.API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -61,5 +62,6 @@ export const apiClient = {
   delete: (url) => api.delete(url),
 }
 
-export default api
+// Export api instance for direct use
+export { api }
 

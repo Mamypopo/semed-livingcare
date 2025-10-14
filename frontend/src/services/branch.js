@@ -4,7 +4,7 @@ export const branchService = {
   // Get all branches
   async getAll(filters = {}) {
     const response = await apiClient.get('/branches', filters)
-    return response.data.data
+    return { data: response.data.data, meta: response.data.meta }
   },
 
   // Get branch by ID

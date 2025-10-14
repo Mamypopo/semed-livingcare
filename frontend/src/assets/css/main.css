@@ -2,11 +2,54 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* Set default font */
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Prompt', sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Tippy.js theme - Simple & Clean */
+.tippy-box[data-theme~='custom'] {
+  background-color: #374151;
+  color: #f9fafb;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #4b5563;
+}
+
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: #374151;
+}
+
+.tippy-box[data-theme~='custom'] .tippy-content {
+  padding: 4px 8px;
+  line-height: 1.3;
+}
+
+/* Simple animation */
+.tippy-box[data-animation~='scale'][data-state~='hidden'] {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.tippy-box[data-animation~='scale'][data-state~='visible'] {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Prevent tooltips from showing automatically */
+.tippy-box[data-state~='hidden'] {
+  pointer-events: none;
+}
+
+/* Ensure tooltips don't interfere with modals */
+.tippy-box {
+  pointer-events: auto;
 }
 

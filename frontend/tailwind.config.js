@@ -4,6 +4,15 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
-  plugins: [require('daisyui')],
+  theme: {
+    extend: {
+      fontFamily: {
+        'sans': ['Prompt', 'sans-serif'],
+        'prompt': ['Prompt', 'sans-serif'],
+        'display': ['Prompt', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
 }
 

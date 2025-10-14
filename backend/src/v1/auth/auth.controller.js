@@ -7,13 +7,13 @@ import { createSystemLog } from "../utils/logger.js";
  */
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role, branchId, staffLevelId } = req.body;
+    const { name, email, password, registrationCode, role, branchId, staffLevelId } = req.body;
 
     // Basic validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !registrationCode) {
       return res.status(400).json({
         success: false,
-        message: "กรุณากรอกข้อมูลที่จำเป็น (ชื่อ, อีเมล, รหัสผ่าน)"
+        message: "กรุณากรอกข้อมูลที่จำเป็น (ชื่อ, อีเมล, รหัสผ่าน, รหัสสมัครสมาชิก)"
       });
     }
 
@@ -39,6 +39,7 @@ export const register = async (req, res) => {
       name,
       email,
       password,
+      registrationCode,
       role,
       branchId,
       staffLevelId

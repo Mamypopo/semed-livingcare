@@ -1,51 +1,42 @@
-import { apiClient } from './api'
+import { api } from './api'
 
 export const authService = {
-  // Login
+  // Login user
   async login(credentials) {
-    const response = await apiClient.post('/auth/login', credentials)
-    
-    if (response.data.success && response.data.data) {
-      // Store token and user data
-      localStorage.setItem('token', response.data.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.data.user))
+    try {
+      const response = await api.post('/auth/login', credentials)
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || 
+        'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
+      )
     }
-    
-    return response.data.data
   },
 
-  // Register
+  // Register user
   async register(userData) {
-    const response = await apiClient.post('/auth/register', userData)
-    return response.data.data
+    try {
+      const response = await api.post('/auth/register', userData)
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || 
+        'เกิดข้อผิดพลาดในการสมัครสมาชิก'
+      )
+    }
   },
 
-  // Get current user profile
+  // Get user profile
   async getProfile() {
-    const response = await apiClient.get('/auth/me')
-    return response.data.data
-  },
-
-  // Logout
-  logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-  },
-
-  // Check if user is authenticated
-  isAuthenticated() {
-    return !!localStorage.getItem('token')
-  },
-
-  // Get stored user data
-  getStoredUser() {
-    const userData = localStorage.getItem('user')
-    return userData ? JSON.parse(userData) : null
-  },
-
-  // Get stored token
-  getToken() {
-    return localStorage.getItem('token')
+    try {
+      const response = await api.get('/auth/me')
+      return response.data
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || 
+        'ไม่สามารถดึงข้อมูลผู้ใช้ได้'
+      )
+    }
   }
 }
-

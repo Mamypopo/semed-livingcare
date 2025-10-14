@@ -9,7 +9,16 @@ import { ENV } from "../config/env.js";
  * @returns {Object} Created user data (without password)
  */
 export const registerUser = async (userData) => {
-  const { name, email, password, role = "GUEST", branchId, staffLevelId } = userData;
+  const { name, email, password, registrationCode, role = "GUEST", branchId, staffLevelId } = userData;
+
+  // Validate registration code
+  if (!registrationCode) {
+    throw new Error("กรุณากรอกรหัสสมัครสมาชิก");
+  }
+
+  if (registrationCode !== ENV.REGISTRATION_CODE) {
+    throw new Error("รหัสสมัครสมาชิกไม่ถูกต้อง");
+  }
 
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({

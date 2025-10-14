@@ -7,20 +7,27 @@ import { createSystemLog } from "../utils/logger.js";
  */
 export const getAllBranches = async (req, res) => {
   try {
-    const { isActive, search } = req.query;
+    const { isActive, search, page, pageSize, sort, order } = req.query;
     
     const filters = {
       ...(isActive !== undefined && { isActive: isActive === 'true' }),
-      ...(search && { search })
+      ...(search && { search }),
+      ...(page && { page: Number(page) }),
+      ...(pageSize && { pageSize: Number(pageSize) }),
+      ...(sort && { sort }),
+      ...(order && { order })
     };
 
-    const branches = await branchService.getAllBranches(filters);
+    const { branches, total } = await branchService.getAllBranches(filters);
 
     res.status(200).json({
       success: true,
-      data: {
-        branches,
-        count: branches.length
+      data: branches,
+      meta: {
+        total,
+        page: Number(page) || 1,
+        pageSize: Number(pageSize) || 10,
+        totalPages: Math.max(1, Math.ceil(total / (Number(pageSize) || 10)))
       }
     });
 
