@@ -13,6 +13,9 @@ router.use(authenticateToken);
 // Get all branches
 router.get("/", branchController.getAllBranches);
 
+// Get latest branch code
+router.get("/latest-code", branchController.getLatestCode);
+
 // Get branch statistics
 router.get("/stats", branchController.getBranchStats);
 
@@ -25,7 +28,7 @@ router.post("/", authorizeRoles(['ADMIN']), branchController.createBranch);
 // Update branch (Admin only)
 router.put("/:id", authorizeRoles(['ADMIN']), branchController.updateBranch);
 
-// Delete branch (Admin only)
-router.delete("/:id", authorizeRoles(['ADMIN']), branchController.deleteBranch);
+// Update active status only (Admin only)
+router.patch("/:id/active", authorizeRoles(['ADMIN']), branchController.updateBranchActive);
 
 export default router;

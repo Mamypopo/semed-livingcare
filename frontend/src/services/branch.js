@@ -25,9 +25,9 @@ export const branchService = {
     return response.data.data
   },
 
-  // Delete branch
-  async delete(id) {
-    const response = await apiClient.delete(`/branches/${id}`)
+  // Update only active flag
+  async updateActive(id, isActive) {
+    const response = await apiClient.patch(`/branches/${id}/active`, { isActive })
     return response.data.data
   },
 
@@ -35,6 +35,12 @@ export const branchService = {
   async getStats() {
     const response = await apiClient.get('/branches/stats')
     return response.data.data
+  },
+
+  // Get latest branch code
+  async getLatestCode() {
+    const response = await apiClient.get('/branches/latest-code')
+    return response.data.data.code
   }
 }
 

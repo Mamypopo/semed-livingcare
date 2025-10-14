@@ -152,12 +152,12 @@
 </template>
 
 <script>
-import { Heart, X, Building2, Building, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users } from 'lucide-vue-next'
+import { Heart, X, Building2, Building, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users,Settings } from 'lucide-vue-next'
 
 export default {
   name: 'Sidebar',
   components: {
-    Heart, X, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Building2, Building
+    Heart, X, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Building2, Building,Settings
   },
   props: {
     sidebarOpen: {
@@ -194,10 +194,10 @@ export default {
           ]
         },
         { 
-          name: 'รายงาน', 
-          icon: 'BarChart3',
+          name: 'จัดการ', 
+          icon: 'Settings',
           submenu: [
-            { name: 'รายงานยอดขาย', href: '/main/reports/sales' },
+            { name: 'ผู้ใช้งาน', href: '/main/users' },
           ]
         }
       ]
@@ -212,6 +212,25 @@ export default {
         // เปิด submenu นี้ และปิดอันอื่น
         this.openSubmenu = index
       }
+    },
+    ensureOpenSubmenuForRoute() {
+      // หาก route ปัจจุบันอยู่ใน submenu ใด ให้เปิดเมนูนั้นไว้
+      const path = this.$route.path
+      const idx = this.navigation.findIndex(item =>
+        Array.isArray(item.submenu) && item.submenu.some(sub => sub.href === path)
+      )
+      if (idx !== -1) {
+        this.openSubmenu = idx
+      }
+    }
+  }
+  ,
+  mounted() {
+    this.ensureOpenSubmenuForRoute()
+  },
+  watch: {
+    '$route.path'() {
+      this.ensureOpenSubmenuForRoute()
     }
   }
 }

@@ -165,49 +165,6 @@ export const updateBranch = async (id, updateData) => {
   return updatedBranch;
 };
 
-/**
- * Delete branch (soft delete)
- * @param {Number} id - Branch ID
- * @returns {Object} Deleted branch
- */
-export const deleteBranch = async (id) => {
-  // Check if branch exists
-  const existingBranch = await prisma.branch.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      _count: {
-        select: {
-          users: true
-        }
-      }
-    }
-  });
-
-  if (!existingBranch) {
-    throw new Error("ไม่พบสาขาที่ระบุ");
-  }
-
-  // Check if branch has users
-  if (existingBranch._count.users > 0) {
-    throw new Error("ไม่สามารถลบสาขาที่มีผู้ใช้งานได้");
-  }
-
-  // Soft delete (set isActive to false)
-  const deletedBranch = await prisma.branch.update({
-    where: { id: parseInt(id) },
-    data: { isActive: false },
-    include: {
-      _count: {
-        select: {
-          users: true,
-          systemLogs: true
-        }
-      }
-    }
-  });
-
-  return deletedBranch;
-};
 
 /**
  * Get branch statistics
@@ -238,4 +195,41 @@ export const getBranchStats = async () => {
     branchesWithUsers,
     emptyBranches: stats._count.id - branchesWithUsers
   };
+};
+
+/**
+ * Get latest branch code in pattern like BR001, BR002 ...
+ */
+export const getLatestCode = async () => {
+  const last = await prisma.branch.findFirst({
+    orderBy: { createdAt: 'desc' }
+  });
+  if (!last || !last.code) {
+    return 'S001';
+  }
+  const match = last.code.match(/^(\D*)(\d+)$/);
+  if (!match) return 'S001';
+  const prefix = match[1] || 'S';
+  const num = String(parseInt(match[2] || '0', 10) + 1).padStart(match[2].length, '0');
+  return `${prefix}${num}`;
+};
+
+/**
+ * Update only active status
+ * @param {Number} id
+ * @param {Boolean} isActive
+ */
+export const updateBranchActive = async (id, isActive) => {
+  const existingBranch = await prisma.branch.findUnique({ where: { id: parseInt(id) } });
+  if (!existingBranch) {
+    throw new Error("ไม่พบสาขาที่ระบุ");
+  }
+  const updated = await prisma.branch.update({
+    where: { id: parseInt(id) },
+    data: { isActive },
+    include: {
+      _count: { select: { users: true, systemLogs: true } }
+    }
+  });
+  return updated;
 };

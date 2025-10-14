@@ -62,9 +62,15 @@
                         </a>
                       </MenuItem>
                       <MenuItem v-slot="{ active }">
-                        <a :class="[ 'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer', active ? 'bg-emerald-50' : '' ]">
+                        <a :class="[ 'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer', active ? 'bg-yellow-50' : '' ]">
                           <Settings class="w-4 h-4" />
                           <span>การตั้งค่า</span>
+                        </a>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <a @click="goLobby" :class="[ 'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer', active ? 'bg-sky-50' : '' ]">
+                          <Building2 class="w-4 h-4" />
+                          <span>เลือกสาขา</span>
                         </a>
                       </MenuItem>
                       <div class="my-2 border-t border-gray-200"></div>
@@ -108,7 +114,7 @@ import { useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import Swal from 'sweetalert2'
 import { 
-  Menu, ChevronDown, User, Settings, LogOut
+  Menu, ChevronDown, User, Settings, LogOut, Building2
 } from 'lucide-vue-next'
 import { Menu as HMenu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
@@ -116,7 +122,7 @@ export default {
   name: 'MainLayout',
   components: {
     Sidebar,
-    Menu, ChevronDown, User, Settings, LogOut,
+    Menu, ChevronDown, User, Settings, LogOut, Building2,
     HMenu, MenuButton, MenuItems, MenuItem
   },
   setup() {
@@ -178,6 +184,9 @@ export default {
         })
       }
     }, 
+    goLobby() {
+      this.router.push('/main/lobby')
+    },
         checkSelectedBranch() {
           // ถ้าอยู่ในหน้า lobby หรือผู้ใช้ไม่มีสาขา ให้ซ่อน sidebar เสมอ
           if (this.$route.path === '/main/lobby' || this.authStore.needsBranchAssignment) {

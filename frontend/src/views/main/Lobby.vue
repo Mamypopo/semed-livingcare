@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 w-full max-w-7xl mx-auto">
     <!-- Navigation Tabs -->
     <div class="mb-8">
       <nav class="flex space-x-1 bg-gray-100 p-1 rounded-lg">

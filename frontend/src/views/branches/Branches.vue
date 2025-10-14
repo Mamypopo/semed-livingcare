@@ -31,7 +31,7 @@
         <!-- Page size (Headless UI Listbox) merged into filter row -->
         <Listbox v-model="pageSizeOption" as="div" class="relative ">
           <div>
-            <ListboxButton class="px-4 py-2 text-sm bg-white border border-gray-200 rounded flex items-center gap-2">
+            <ListboxButton class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2">
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
             </ListboxButton>
@@ -59,23 +59,19 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">รหัส</th>
-              <th @click="toggleSort('name')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none" :class="sort==='name' ? 'text-emerald-700' : 'text-gray-600'">
+              <th @click="toggleSort('name')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600">
                 <span class="inline-flex items-center">ชื่อสาขา
-                  <svg v-if="sort==='name'" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path v-if="order==='asc'" fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                    <path v-else fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.83l-3.71 3.94a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
-                  </svg>
+                  <ChevronUp v-if="sort==='name' && order==='asc'" class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
                 </span>
               </th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ที่อยู่</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">โทร</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
-              <th @click="toggleSort('createdAt')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none" :class="sort==='createdAt' ? 'text-emerald-700' : 'text-gray-600'">
+              <th @click="toggleSort('createdAt')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600">
                 <span class="inline-flex items-center">วันที่สร้าง
-                  <svg v-if="sort==='createdAt'" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path v-if="order==='asc'" fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                    <path v-else fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.83l-3.71 3.94a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
-                  </svg>
+                  <ChevronUp v-if="sort==='createdAt' && order==='asc'" class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
                 </span>
               </th>
               <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
@@ -105,28 +101,70 @@
               </td>
               <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">{{ formatDate(b.createdAt) }}</td>
               <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
-                <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200" @click="openEdit(b)">แก้ไข</button>
-                <button class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 ml-2" @click="remove(b)">ลบ</button>
+                <template v-if="isAdmin">
+                  <button
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-sky-200 text-sky-700 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    @click="openEdit(b)"
+                    v-tooltip:top="'แก้ไข'"
+                  >
+                    <Pencil class="w-3.5 h-3.5" />
+                    แก้ไข
+                  </button>
+                  <button
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md ml-2 transition-colors"
+                    :class="b.isActive 
+                      ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500' 
+                      : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'"
+                    @click="toggleActive(b)"
+                    v-tooltip:top="b.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
+                  >
+                    <ToggleRight v-if="b.isActive" class="w-3.5 h-3.5" />
+                    <ToggleLeft v-else class="w-3.5 h-3.5" />
+                    {{ b.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
+                  </button>
+                </template>
               </td>
             </tr>
 
             <!-- Empty state -->
             <tr v-if="!loading && branches.length === 0">
-              <td colspan="6" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="7" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Footer: pagination -->
-      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm text-gray-600">
-        <div>
-          แสดง {{ from }} - {{ to }} จากทั้งหมด {{ meta.total }} รายการ
+      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm">
+        <div class="text-gray-600">
+          แสดง
+          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+          -
+          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+          จากทั้งหมด
+          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+          รายการ
         </div>
         <div class="flex items-center gap-2">
-          <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="meta.page<=1 || loading" @click="go(meta.page-1)">ก่อนหน้า</button>
-          <span>หน้า {{ meta.page }} / {{ meta.totalPages }}</span>
-          <button class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="meta.page>=meta.totalPages || loading" @click="go(meta.page+1)">ถัดไป</button>
+          <button
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none  disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="meta.page<=1 || loading"
+            @click="go(meta.page-1)"
+          >
+            <ChevronLeft class="w-3.5 h-3.5" />
+            ก่อนหน้า
+          </button>
+          <span class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700">
+            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+          </span>
+          <button
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="meta.page>=totalPages || loading"
+            @click="go(meta.page+1)"
+          >
+            ถัดไป
+            <ChevronRight class="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>
@@ -143,14 +181,19 @@
 
 <script>
 import { branchService } from '@/services/branch'
-import { ChevronDown } from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import BranchModal from '@/views/branches/components/modals/BranchModal.vue'
 import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'Branches',
-  components: { ChevronDown, Listbox, ListboxButton, ListboxOptions, ListboxOption, BranchModal },
+  components: { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, Trash2, ToggleLeft, ToggleRight, Listbox, ListboxButton, ListboxOptions, ListboxOption, BranchModal },
+  setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
   data() {
     return {
       loading: false,
@@ -188,8 +231,15 @@ export default {
     to() {
       return Math.min(this.meta.page * this.pageSize, this.meta.total)
     },
+    totalPages() {
+      if (this.pageSize <= 0) return 1
+      return Math.max(1, Math.ceil(this.meta.total / this.pageSize))
+    },
     isActive() {
       return this.statusOption.value
+    },
+    isAdmin() {
+      return this.authStore && this.authStore.userRole === 'ADMIN'
     }
   },
   methods: {
@@ -238,12 +288,19 @@ export default {
       this.reload()
     },
     go(p) {
-      if (p < 1 || p > this.meta.totalPages) return
+      if (p < 1 || p > this.totalPages) return
       this.meta.page = p
       this.reload()
     },
-    openCreate() {
+    async openCreate() {
       this.editingBranch = null
+      // ดึงรหัสล่าสุดจาก service แล้วส่งเข้า modal เป็นค่าเริ่มต้น
+      try {
+        const code = await branchService.getLatestCode()
+        this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true }
+      } catch (e) {
+        this.editingBranch = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
+      }
       this.modalOpen = true
     },
     openEdit(b) {
@@ -251,63 +308,66 @@ export default {
       this.modalOpen = true
     },
     async handleSave(data) {
-      this.modalLoading = true
-      try {
-        if (data.id) {
-          // TODO: await branchService.update(data.id, data)
-          this.branches = this.branches.map(x => x.id === data.id ? { ...x, ...data } : x)
-          await Swal.fire({
-            icon: 'success',
-            title: 'แก้ไขสาขาสำเร็จ',
-            timer: 1600,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-          })
-        } else {
-          // TODO: const created = await branchService.create(data)
-          const created = { id: Math.random().toString(36).slice(2), createdAt: new Date().toISOString(), ...data }
-          this.branches = [created, ...this.branches]
-          this.meta.total += 1
-          await Swal.fire({
-            icon: 'success',
-            title: 'สร้างสาขาสำเร็จ',
-            timer: 1600,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
-          })
-        }
-        this.modalOpen = false
-      } finally {
-        this.modalLoading = false
-      }
-    },
-    async remove(b) {
-      const res = await Swal.fire({
-        title: 'ลบสาขา?',
-        text: `คุณต้องการลบ "${b.name}" หรือไม่`,
-        icon: 'warning',
+      // Confirm before action
+      const isEdit = !!data.id
+      const confirm = await Swal.fire({
+        title: isEdit ? 'ยืนยันการแก้ไขสาขา?' : 'ยืนยันการสร้างสาขาใหม่?',
+        text: isEdit ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${data.name}" หรือไม่` : `ต้องการสร้างสาขา "${data.name}" หรือไม่`,
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'ลบ',
+        confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
         reverseButtons: true
       })
-      if (res.isConfirmed) {
-        // TODO: await branchService.remove(b.id)
-        this.branches = this.branches.filter(x => x.id !== b.id)
-        this.meta.total = Math.max(0, this.meta.total - 1)
-        if (this.branches.length === 0 && this.meta.page > 1) this.go(this.meta.page - 1)
-        await Swal.fire({
-          icon: 'success',
-          title: 'ลบสาขาสำเร็จ',
-          timer: 1400,
-          showConfirmButton: false,
-          toast: true,
-          position: 'top-end'
-        })
+      if (!confirm.isConfirmed) return
+
+      this.modalLoading = true
+      try {
+        if (isEdit) {
+          const res = await branchService.update(data.id, data)
+          const updated = res.branch || res
+          this.branches = this.branches.map(x => x.id === updated.id ? { ...x, ...updated } : x)
+          this.modalOpen = false
+          this.modalLoading = false
+          Swal.fire({ icon: 'success', title: 'แก้ไขสาขาสำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+        } else {
+          const res = await branchService.create(data)
+          const created = res.branch || res
+          this.branches = [created, ...this.branches]
+          this.meta.total += 1
+          this.modalOpen = false
+          this.modalLoading = false
+          Swal.fire({ icon: 'success', title: 'สร้างสาขาสำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+        }
+      } catch (e) {
+        this.modalLoading = false
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้' })
+      }
+    },
+ 
+    async toggleActive(b) {
+      const desired = !b.isActive
+      // แสดงยืนยันแบบย่อ
+      const res = await Swal.fire({
+        title: desired ? 'เปิดใช้งานสาขา?' : 'ปิดใช้งานสาขา?',
+        text: `${desired ? 'เปิดให้ใช้งาน' : 'ปิดการใช้งาน'} "${b.name}" หรือไม่`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
+        cancelButtonText: 'ยกเลิก',
+        reverseButtons: true
+      })
+      if (!res.isConfirmed) return
+
+      try {
+        const updated = await branchService.updateActive(b.id, desired)
+        // อัปเดตในตารางทันที
+        const newVal = updated.branch || updated
+        const idx = this.branches.findIndex(x => x.id === b.id)
+        if (idx !== -1) this.$set ? this.$set(this.branches, idx, { ...b, ...newVal }) : (this.branches[idx] = { ...b, ...newVal })
+        Swal.fire({ icon: 'success', title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว', timer: 1200, showConfirmButton: false, toast: true, position: 'top-end' })
+      } catch (e) {
+        Swal.fire({ icon: 'error', title: 'อัปเดตสถานะไม่สำเร็จ', text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง' })
       }
     }
   },

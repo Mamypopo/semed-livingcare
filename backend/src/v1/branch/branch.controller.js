@@ -42,6 +42,20 @@ export const getAllBranches = async (req, res) => {
 };
 
 /**
+ * Get latest branch code
+ * GET /api/v1/branches/latest-code
+ */
+export const getLatestCode = async (req, res) => {
+  try {
+    const latest = await branchService.getLatestCode();
+    res.status(200).json({ success: true, data: { code: latest } });
+  } catch (error) {
+    console.error("Get latest branch code error:", error);
+    res.status(500).json({ success: false, message: error.message || 'ไม่สามารถดึงรหัสสาขาล่าสุดได้' });
+  }
+};
+
+/**
  * Get branch by ID
  * GET /api/v1/branches/:id
  */
@@ -93,11 +107,11 @@ export const createBranch = async (req, res) => {
       });
     }
 
-    // Code format validation
-    if (!/^[A-Z]{2}\d{3}$/.test(code)) {
+    // Code format validation (S + 3 digits, e.g., S001)
+    if (!/^S\d{3}$/.test(code)) {
       return res.status(400).json({
         success: false,
-        message: "รหัสสาขาต้องเป็นรูปแบบ BR001 (ตัวอักษร 2 ตัว + ตัวเลข 3 ตัว)"
+        message: "รหัสสาขาต้องเป็นรูปแบบ SXXX (ตัวอักษร S + ตัวเลข 3 ตัว)"
       });
     }
 
@@ -152,10 +166,10 @@ export const updateBranch = async (req, res) => {
     }
 
     // Code format validation (if provided)
-    if (code && !/^[A-Z]{2}\d{3}$/.test(code)) {
+    if (code && !/^S\d{3}$/.test(code)) {
       return res.status(400).json({
         success: false,
-        message: "รหัสสาขาต้องเป็นรูปแบบ BR001 (ตัวอักษร 2 ตัว + ตัวเลข 3 ตัว)"
+        message: "รหัสสาขาต้องเป็นรูปแบบ SXXX (ตัวอักษร S + ตัวเลข 3 ตัว)"
       });
     }
 
@@ -197,48 +211,37 @@ export const updateBranch = async (req, res) => {
 };
 
 /**
- * Delete branch (soft delete)
- * DELETE /api/v1/branches/:id
+ * Update only active status
+ * PATCH /api/v1/branches/:id/active
  */
-export const deleteBranch = async (req, res) => {
+export const updateBranchActive = async (req, res) => {
   try {
     const { id } = req.params;
+    const { isActive } = req.body;
 
     if (!id || isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID สาขาไม่ถูกต้อง"
-      });
+      return res.status(400).json({ success: false, message: "ID สาขาไม่ถูกต้อง" });
+    }
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({ success: false, message: "isActive ต้องเป็นค่า boolean" });
     }
 
-    const deletedBranch = await branchService.deleteBranch(id);
+    const updated = await branchService.updateBranchActive(id, isActive);
 
-    // Log system action
-    await createSystemLog(req, "DELETE_BRANCH", {
-      branchId: deletedBranch.id,
-      code: deletedBranch.code,
-      name: deletedBranch.name
+    // Log
+    await createSystemLog(req, isActive ? "ACTIVATE_BRANCH" : "DEACTIVATE_BRANCH", {
+      branchId: updated.id,
+      code: updated.code,
+      name: updated.name,
+      isActive
     });
 
-    res.status(200).json({
-      success: true,
-      message: "ลบสาขาสำเร็จ",
-      data: {
-        branch: deletedBranch
-      }
-    });
-
+    res.status(200).json({ success: true, message: "อัปเดตสถานะสาขาสำเร็จ", data: { branch: updated } });
   } catch (error) {
-    console.error("Delete branch error:", error);
-    
+    console.error("Update active error:", error);
     let statusCode = 500;
     if (error.message === "ไม่พบสาขาที่ระบุ") statusCode = 404;
-    if (error.message === "ไม่สามารถลบสาขาที่มีผู้ใช้งานได้") statusCode = 409;
-    
-    res.status(statusCode).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการลบสาขา"
-    });
+    res.status(statusCode).json({ success: false, message: error.message || "เกิดข้อผิดพลาดในการอัปเดตสถานะ" });
   }
 };
 
