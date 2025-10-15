@@ -208,6 +208,7 @@
     :initialData="editingUser"
     :loading="modalLoading"
     @save="handleSave"
+    @passwordChanged="handlePasswordChanged"
   />
 </template>
 
@@ -419,6 +420,10 @@ export default {
         'GUEST': 'bg-gray-50 text-gray-700'
       }
       return classes[role] || 'bg-gray-50 text-gray-700'
+    },
+    handlePasswordChanged() {
+      // Password was changed successfully
+      // Could reload user data or show additional notifications if needed
     }
   },
   mounted() {

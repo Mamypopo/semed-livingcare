@@ -41,6 +41,18 @@
                     <p v-if="errors.password" class="text-xs text-red-600 mt-1">{{ errors.password }}</p>
                   </div>
 
+                  <!-- Change Password Button (for existing users) -->
+                  <div v-if="isEdit" class="md:col-span-2">
+                    <button
+                      type="button"
+                      @click="openChangePasswordModal"
+                      class="inline-flex items-center px-3 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <Key class="w-4 h-4 mr-2" />
+                      เปลี่ยนรหัสผ่าน
+                    </button>
+                  </div>
+
                   <!-- Role -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700">บทบาท *</label>
@@ -85,6 +97,17 @@
                       </div>
                       <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                         <ListboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
+                          <!-- Search input -->
+                          <div class="px-3 py-2 border-b border-gray-200">
+                            <input 
+                              v-model="branchSearchQuery" 
+                              type="text" 
+                              placeholder="ค้นหาสาขา..." 
+                              class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none hover:border-emerald-300"
+                              @click.stop
+                            />
+                          </div>
+                          
                           <ListboxOption :value="null" v-slot="{ active, selected }">
                             <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
                               <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
@@ -95,7 +118,13 @@
                               </span>
                             </li>
                           </ListboxOption>
-                          <ListboxOption v-for="branch in branches" :key="branch.id" :value="branch.id" v-slot="{ active, selected }">
+                          
+                          <ListboxOption 
+                            v-for="branch in filteredBranches" 
+                            :key="branch.id" 
+                            :value="branch.id" 
+                            v-slot="{ active, selected }"
+                          >
                             <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
                               <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
                                 {{ branch.name }} ({{ branch.code }})
@@ -105,6 +134,11 @@
                               </span>
                             </li>
                           </ListboxOption>
+                          
+                          <!-- No results message -->
+                          <div v-if="filteredBranches.length === 0 && branchSearchQuery" class="px-3 py-2 text-sm text-gray-500 text-center">
+                            ไม่พบสาขาที่ค้นหา
+                          </div>
                         </ListboxOptions>
                       </transition>
                     </Listbox>
@@ -124,6 +158,17 @@
                       </div>
                       <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                         <ListboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
+                          <!-- Search input -->
+                          <div class="px-3 py-2 border-b border-gray-200">
+                            <input 
+                              v-model="staffLevelSearchQuery" 
+                              type="text" 
+                              placeholder="ค้นหาระดับพนักงาน..." 
+                              class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none hover:border-emerald-300"
+                              @click.stop
+                            />
+                          </div>
+                          
                           <ListboxOption :value="null" v-slot="{ active, selected }">
                             <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
                               <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
@@ -134,7 +179,13 @@
                               </span>
                             </li>
                           </ListboxOption>
-                          <ListboxOption v-for="level in staffLevels" :key="level.id" :value="level.id" v-slot="{ active, selected }">
+                          
+                          <ListboxOption 
+                            v-for="level in filteredStaffLevels" 
+                            :key="level.id" 
+                            :value="level.id" 
+                            v-slot="{ active, selected }"
+                          >
                             <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
                               <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
                                 {{ level.name }}
@@ -144,6 +195,11 @@
                               </span>
                             </li>
                           </ListboxOption>
+                          
+                          <!-- No results message -->
+                          <div v-if="filteredStaffLevels.length === 0 && staffLevelSearchQuery" class="px-3 py-2 text-sm text-gray-500 text-center">
+                            ไม่พบระดับพนักงานที่ค้นหา
+                          </div>
                         </ListboxOptions>
                       </transition>
                     </Listbox>
@@ -185,12 +241,67 @@
       </div>
     </DialogModal>
   </TransitionRoot>
+
+  <!-- Change Password Modal -->
+  <TransitionRoot appear :show="changePasswordModalOpen" as="template">
+    <DialogModal as="div" class="relative z-[60]" @close="closeChangePasswordModal">
+      <TransitionChild as="template" enter="ease-out duration-200" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-150" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-black/40" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <TransitionChild as="template" enter="ease-out duration-200" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="ease-in duration-150" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
+            <DialogPanel class="w-full max-w-md transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+              <!-- Header -->
+              <div class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white">
+                <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold">เปลี่ยนรหัสผ่าน</DialogTitle>
+                <button @click="closeChangePasswordModal" class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors">
+                  <X class="w-5 h-5" />
+                </button>
+              </div>
+
+              <div class="px-6 py-5 space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">รหัสผ่านใหม่ *</label>
+                  <input 
+                    ref="newPasswordInput"
+                    v-model.trim="newPassword" 
+                    type="password" 
+                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none" 
+                    autofocus
+                  />
+                  <p v-if="passwordError" class="text-xs text-red-600 mt-1">{{ passwordError }}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่านใหม่ *</label>
+                  <input 
+                    v-model.trim="confirmPassword" 
+                    type="password" 
+                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none" 
+                  />
+                  <p v-if="confirmPasswordError" class="text-xs text-red-600 mt-1">{{ confirmPasswordError }}</p>
+                </div>
+              </div>
+
+              <div class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl">
+                <button type="button" class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50" @click="closeChangePasswordModal">ยกเลิก</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm" :disabled="passwordLoading" @click="handleChangePassword">
+                  {{ passwordLoading ? 'กำลังบันทึก...' : 'บันทึก' }}
+                </button>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </DialogModal>
+  </TransitionRoot>
 </template>
 
 <script>
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, CheckIcon, X } from 'lucide-vue-next'
+import { ChevronDown, CheckIcon, X, Key } from 'lucide-vue-next'
 import ConfirmClosePopover from '@/views/branches/components/modals/ConfirmClosePopover.vue'
 import { userService } from '@/services/user'
 
@@ -209,6 +320,7 @@ export default {
     ChevronDown, 
     CheckIcon, 
     X, 
+    Key,
     ConfirmClosePopover 
   },
   props: {
@@ -216,7 +328,7 @@ export default {
     initialData: { type: Object, default: null },
     loading: { type: Boolean, default: false }
   },
-  emits: ['update:modelValue', 'save'],
+  emits: ['update:modelValue', 'save', 'passwordChanged'],
   data() {
     return {
       form: { 
@@ -234,6 +346,14 @@ export default {
       showConfirmClose: false,
       branches: [],
       staffLevels: [],
+      branchSearchQuery: '',
+      staffLevelSearchQuery: '',
+      changePasswordModalOpen: false,
+      newPassword: '',
+      confirmPassword: '',
+      passwordError: '',
+      confirmPasswordError: '',
+      passwordLoading: false,
       roleOptions: [
         { label: 'ผู้เยี่ยมชม', value: 'GUEST' },
         { label: 'พนักงาน', value: 'STAFF' },
@@ -242,7 +362,20 @@ export default {
     }
   },
   computed: {
-    isEdit() { return !!(this.form && this.form.id) }
+    isEdit() { return !!(this.form && this.form.id) },
+    filteredBranches() {
+      if (!this.branchSearchQuery) return this.branches
+      return this.branches.filter(branch => 
+        branch.name.toLowerCase().includes(this.branchSearchQuery.toLowerCase()) ||
+        branch.code.toLowerCase().includes(this.branchSearchQuery.toLowerCase())
+      )
+    },
+    filteredStaffLevels() {
+      if (!this.staffLevelSearchQuery) return this.staffLevels
+      return this.staffLevels.filter(level => 
+        level.name.toLowerCase().includes(this.staffLevelSearchQuery.toLowerCase())
+      )
+    },
   },
   watch: {
     initialData: {
@@ -293,6 +426,11 @@ export default {
       }
     },
     async onClose() {
+      // Don't close main modal if password modal is open
+      if (this.changePasswordModalOpen) {
+        return
+      }
+      
       const isDirty = JSON.stringify(this.form) !== this.originalSnapshot
       if (isDirty) {
         this.showConfirmClose = true
@@ -334,6 +472,9 @@ export default {
         }
       }
       this.originalSnapshot = JSON.stringify(this.form)
+      // Reset search queries
+      this.branchSearchQuery = ''
+      this.staffLevelSearchQuery = ''
     },
     validate() {
       const e = {}
@@ -381,6 +522,84 @@ export default {
       if (!staffLevelId) return 'ไม่ระบุระดับ'
       const level = this.staffLevels.find(l => l.id === staffLevelId)
       return level ? level.name : 'ไม่ระบุระดับ'
+    },
+    openChangePasswordModal() {
+      // Blur current focused element first
+      if (document.activeElement) {
+        document.activeElement.blur()
+      }
+      
+      this.changePasswordModalOpen = true
+      this.newPassword = ''
+      this.confirmPassword = ''
+      this.passwordError = ''
+      this.confirmPasswordError = ''
+      
+      // Focus on input after modal opens
+      this.$nextTick(() => {
+        setTimeout(() => {
+          if (this.$refs.newPasswordInput) {
+            this.$refs.newPasswordInput.focus()
+          }
+        }, 200)
+      })
+    },
+    validatePasswordChange() {
+      this.passwordError = ''
+      this.confirmPasswordError = ''
+      
+      if (!this.newPassword) {
+        this.passwordError = 'กรุณากรอกรหัสผ่านใหม่'
+        return false
+      }
+      
+      if (this.newPassword.length < 6) {
+        this.passwordError = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'
+        return false
+      }
+      
+      if (!this.confirmPassword) {
+        this.confirmPasswordError = 'กรุณายืนยันรหัสผ่าน'
+        return false
+      }
+      
+      if (this.newPassword !== this.confirmPassword) {
+        this.confirmPasswordError = 'รหัสผ่านไม่ตรงกัน'
+        return false
+      }
+      
+      return true
+    },
+    async handleChangePassword() {
+      if (!this.validatePasswordChange()) return
+      
+      this.passwordLoading = true
+      try {
+        await userService.updatePassword(this.form.id, this.newPassword)
+        this.closeChangePasswordModal()
+        this.$emit('passwordChanged')
+        // Show success message
+        const Swal = (await import('sweetalert2')).default
+        Swal.fire({ 
+          icon: 'success', 
+          title: 'เปลี่ยนรหัสผ่านสำเร็จ', 
+          timer: 1600, 
+          showConfirmButton: false, 
+          toast: true, 
+          position: 'top-end' 
+        })
+      } catch (error) {
+        this.passwordError = error?.response?.data?.message || error.message || 'เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน'
+      } finally {
+        this.passwordLoading = false
+      }
+    },
+    closeChangePasswordModal() {
+      this.changePasswordModalOpen = false
+      this.newPassword = ''
+      this.confirmPassword = ''
+      this.passwordError = ''
+      this.confirmPasswordError = ''
     }
   }
 }
