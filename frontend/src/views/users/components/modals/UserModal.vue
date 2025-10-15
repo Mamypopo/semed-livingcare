@@ -89,7 +89,12 @@
                     <Listbox v-model="form.branchId" as="div" class="relative">
                       <div>
                         <ListboxButton class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none">
-                          <span class="block truncate">{{ getBranchName(form.branchId) }}</span>
+                          <div class="flex items-center gap-2">
+                            <span class="block truncate">{{ getBranchName(form.branchId) }}</span>
+                            <span v-if="getBranchCode(form.branchId)" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+                              {{ getBranchCode(form.branchId) }}
+                            </span>
+                          </div>
                           <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                             <ChevronDown class="w-4 h-4 text-gray-400" />
                           </span>
@@ -101,6 +106,7 @@
                           <div class="px-3 py-2 border-b border-gray-200">
                             <input 
                               v-model="branchSearchQuery" 
+                              @input="onBranchSearchInput"
                               type="text" 
                               placeholder="ค้นหาสาขา..." 
                               class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none hover:border-emerald-300"
@@ -126,9 +132,14 @@
                             v-slot="{ active, selected }"
                           >
                             <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
-                              <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
-                                {{ branch.name }} ({{ branch.code }})
-                              </span>
+                              <div class="flex items-center gap-2">
+                                <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
+                                  {{ branch.name }}
+                                </span>
+                                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+                                  {{ branch.code }}
+                                </span>
+                              </div>
                               <span v-if="selected" :class="[ active ? 'text-emerald-600' : 'text-emerald-600', 'absolute inset-y-0 right-0 flex items-center pr-4' ]">
                                 <CheckIcon class="w-4 h-4" />
                               </span>
@@ -144,66 +155,6 @@
                     </Listbox>
                   </div>
 
-                  <!-- Staff Level -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700">ระดับพนักงาน</label>
-                    <Listbox v-model="form.staffLevelId" as="div" class="relative">
-                      <div>
-                        <ListboxButton class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none">
-                          <span class="block truncate">{{ getStaffLevelName(form.staffLevelId) }}</span>
-                          <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <ChevronDown class="w-4 h-4 text-gray-400" />
-                          </span>
-                        </ListboxButton>
-                      </div>
-                      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                        <ListboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
-                          <!-- Search input -->
-                          <div class="px-3 py-2 border-b border-gray-200">
-                            <input 
-                              v-model="staffLevelSearchQuery" 
-                              type="text" 
-                              placeholder="ค้นหาระดับพนักงาน..." 
-                              class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none hover:border-emerald-300"
-                              @click.stop
-                            />
-                          </div>
-                          
-                          <ListboxOption :value="null" v-slot="{ active, selected }">
-                            <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
-                              <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
-                                ไม่ระบุระดับ
-                              </span>
-                              <span v-if="selected" :class="[ active ? 'text-emerald-600' : 'text-emerald-600', 'absolute inset-y-0 right-0 flex items-center pr-4' ]">
-                                <CheckIcon class="w-4 h-4" />
-                              </span>
-                            </li>
-                          </ListboxOption>
-                          
-                          <ListboxOption 
-                            v-for="level in filteredStaffLevels" 
-                            :key="level.id" 
-                            :value="level.id" 
-                            v-slot="{ active, selected }"
-                          >
-                            <li :class="[ active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900', 'cursor-pointer select-none relative py-2 pl-3 pr-9' ]">
-                              <span :class="[ selected ? 'font-semibold' : 'font-normal', 'block truncate' ]">
-                                {{ level.name }}
-                              </span>
-                              <span v-if="selected" :class="[ active ? 'text-emerald-600' : 'text-emerald-600', 'absolute inset-y-0 right-0 flex items-center pr-4' ]">
-                                <CheckIcon class="w-4 h-4" />
-                              </span>
-                            </li>
-                          </ListboxOption>
-                          
-                          <!-- No results message -->
-                          <div v-if="filteredStaffLevels.length === 0 && staffLevelSearchQuery" class="px-3 py-2 text-sm text-gray-500 text-center">
-                            ไม่พบระดับพนักงานที่ค้นหา
-                          </div>
-                        </ListboxOptions>
-                      </transition>
-                    </Listbox>
-                  </div>
 
                   <!-- Active Status -->
                   <div class="md:col-span-2">
@@ -304,6 +255,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headless
 import { ChevronDown, CheckIcon, X, Key } from 'lucide-vue-next'
 import ConfirmClosePopover from '@/views/branches/components/modals/ConfirmClosePopover.vue'
 import { userService } from '@/services/user'
+import { branchService } from '@/services/branch'
 
 export default {
   name: 'UserModalComponent',
@@ -338,16 +290,15 @@ export default {
         password: '', 
         role: 'GUEST', 
         branchId: null, 
-        staffLevelId: null, 
         isActive: true 
       },
       errors: {},
       originalSnapshot: null,
       showConfirmClose: false,
       branches: [],
-      staffLevels: [],
+      filteredBranches: [],
       branchSearchQuery: '',
-      staffLevelSearchQuery: '',
+      branchSearchTimer: null,
       changePasswordModalOpen: false,
       newPassword: '',
       confirmPassword: '',
@@ -363,19 +314,6 @@ export default {
   },
   computed: {
     isEdit() { return !!(this.form && this.form.id) },
-    filteredBranches() {
-      if (!this.branchSearchQuery) return this.branches
-      return this.branches.filter(branch => 
-        branch.name.toLowerCase().includes(this.branchSearchQuery.toLowerCase()) ||
-        branch.code.toLowerCase().includes(this.branchSearchQuery.toLowerCase())
-      )
-    },
-    filteredStaffLevels() {
-      if (!this.staffLevelSearchQuery) return this.staffLevels
-      return this.staffLevels.filter(level => 
-        level.name.toLowerCase().includes(this.staffLevelSearchQuery.toLowerCase())
-      )
-    },
   },
   watch: {
     initialData: {
@@ -389,7 +327,6 @@ export default {
             password: '', 
             role: v.role || 'GUEST', 
             branchId: v.branchId || null, 
-            staffLevelId: v.staffLevelId || null, 
             isActive: v.isActive ?? true 
           }
         } else {
@@ -400,27 +337,33 @@ export default {
             password: '', 
             role: 'GUEST', 
             branchId: null, 
-            staffLevelId: null, 
             isActive: true 
           }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
       }
+    },
+    branchSearchQuery() {
+      // Trigger search when query changes
+      this.onBranchSearchInput()
     }
   },
   async mounted() {
     await this.loadData()
   },
+  beforeUnmount() {
+    // Cleanup timer
+    if (this.branchSearchTimer) {
+      clearTimeout(this.branchSearchTimer)
+    }
+  },
   methods: {
     async loadData() {
       try {
-        const [branchesData, staffLevelsData] = await Promise.all([
-          userService.getBranches(),
-          userService.getStaffLevels()
-        ])
+        const branchesData = await branchService.getAllForDropdown('', 20)
         this.branches = branchesData
-        this.staffLevels = staffLevelsData
+        this.filteredBranches = branchesData
       } catch (error) {
         console.error('Error loading data:', error)
       }
@@ -467,14 +410,12 @@ export default {
           password: '', 
           role: 'GUEST', 
           branchId: null, 
-          staffLevelId: null, 
           isActive: true 
         }
       }
       this.originalSnapshot = JSON.stringify(this.form)
       // Reset search queries
       this.branchSearchQuery = ''
-      this.staffLevelSearchQuery = ''
     },
     validate() {
       const e = {}
@@ -516,12 +457,12 @@ export default {
     getBranchName(branchId) {
       if (!branchId) return 'ไม่ระบุสาขา'
       const branch = this.branches.find(b => b.id === branchId)
-      return branch ? `${branch.name} (${branch.code})` : 'ไม่ระบุสาขา'
+      return branch ? branch.name : 'ไม่ระบุสาขา'
     },
-    getStaffLevelName(staffLevelId) {
-      if (!staffLevelId) return 'ไม่ระบุระดับ'
-      const level = this.staffLevels.find(l => l.id === staffLevelId)
-      return level ? level.name : 'ไม่ระบุระดับ'
+    getBranchCode(branchId) {
+      if (!branchId) return null
+      const branch = this.branches.find(b => b.id === branchId)
+      return branch ? branch.code : null
     },
     openChangePasswordModal() {
       // Blur current focused element first
@@ -600,6 +541,22 @@ export default {
       this.confirmPassword = ''
       this.passwordError = ''
       this.confirmPasswordError = ''
+    },
+    async onBranchSearchInput() {
+      // Clear previous timer
+      if (this.branchSearchTimer) {
+        clearTimeout(this.branchSearchTimer)
+      }
+      
+      // Set new timer
+      this.branchSearchTimer = setTimeout(async () => {
+        try {
+          const branches = await branchService.getAllForDropdown(this.branchSearchQuery, 20)
+          this.filteredBranches = branches
+        } catch (error) {
+          console.error('Error searching branches:', error)
+        }
+      }, 300) // 300ms delay
     }
   }
 }

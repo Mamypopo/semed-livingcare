@@ -9,7 +9,7 @@ import { ENV } from "../config/env.js";
  * @returns {Object} Created user data (without password)
  */
 export const registerUser = async (userData) => {
-  const { name, email, password, registrationCode, role = "GUEST", branchId, staffLevelId } = userData;
+  const { name, email, password, registrationCode, role = "GUEST", branchId } = userData;
 
   // Validate registration code
   if (!registrationCode) {
@@ -41,7 +41,6 @@ export const registerUser = async (userData) => {
       password: hashedPassword,
       role,
       branchId: branchId || null,
-      staffLevelId: staffLevelId || null,
     },
     select: {
       id: true,
@@ -49,7 +48,6 @@ export const registerUser = async (userData) => {
       email: true,
       role: true,
       branchId: true,
-      staffLevelId: true,
       isActive: true,
       createdAt: true,
       updatedAt: true,
@@ -78,13 +76,6 @@ export const loginUser = async (credentials) => {
           name: true
         }
       },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
-        }
-      }
     }
   });
 
@@ -105,7 +96,8 @@ export const loginUser = async (credentials) => {
   // Generate JWT token
   const token = jwt.sign(
     { 
-      userId: user.id, 
+      id: user.id, 
+      userId: user.id,  // Keep both for compatibility
       email: user.email, 
       role: user.role,
       branchId: user.branchId 
@@ -137,7 +129,6 @@ export const getUserProfile = async (userId) => {
       email: true,
       role: true,
       branchId: true,
-      staffLevelId: true,
       isActive: true,
       createdAt: true,
       updatedAt: true,
@@ -148,13 +139,6 @@ export const getUserProfile = async (userId) => {
           name: true
         }
       },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
-        }
-      }
     }
   });
 

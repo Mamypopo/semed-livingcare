@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -11,6 +6,11 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum TreatmentType {
+  IPD
+  OPD
 }
 
 enum RoleEnum {
@@ -31,6 +31,8 @@ model Branch {
 
   // ความสัมพันธ์
   users     User[]
+  patients  Patient[]
+  files     File[]
   systemLogs SystemLog[]
 }
 
@@ -45,47 +47,208 @@ model User {
   branchId     Int?
   branch       Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  staffLevelId Int?                          
-  staffLevel   StaffLevel?  @relation(fields: [staffLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-
   isActive     Boolean      @default(true)
+  createdBy    Int?         // ใครสร้าง
+  createdByUser User?       @relation("UserCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy    Int?         // ใครอัปเดตล่าสุด
+  updatedByUser User?       @relation("UserUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
 
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   @@index([role])
   @@index([branchId])
-  @@index([staffLevelId])                  
+  @@index([createdBy])
+  @@index([updatedBy])
 
+  // Relations for audit fields
   systemLogs SystemLog[]
+  patientGroupsCreated PatientGroup[] @relation("PatientGroupCreatedBy")
+  patientGroupsUpdated PatientGroup[] @relation("PatientGroupUpdatedBy")
+  insuranceTypesCreated InsuranceType[] @relation("InsuranceTypeCreatedBy")
+  insuranceTypesUpdated InsuranceType[] @relation("InsuranceTypeUpdatedBy")
+  tagsCreated Tag[] @relation("TagCreatedBy")
+  tagsUpdated Tag[] @relation("TagUpdatedBy")
+  usersCreated User[] @relation("UserCreatedBy")
+  usersUpdated User[] @relation("UserUpdatedBy")
 }
 
-model StaffLevel {
-  id           Int                @id @default(autoincrement())
-  name         String
-  description  String?
-  isActive     Boolean            @default(true)  
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+model Patient {
+  id                 Int               @id @default(autoincrement())
+  hn                 String            @unique  
+  prefix             String?
+  first_name         String
+  last_name          String
+  nickname           String?
+  first_name_en      String?
+  last_name_en       String?
+  gender             String
+  birth_date         DateTime
+  national_id        String?
+  passport_no        String?
+  nationality        String?
+  religion           String?
+  marital_status     String?
+  education_level    String?
+  blood_group        String?
+  note               String?
 
-  permissions  StaffPermission[]
-  users        User[]
+  //  ข้อมูลติดต่อ
+  phone_1            String?
+  phone_2            String?
+  email              String?
+
+  //  ที่อยู่ผู้ป่วย
+  address            String?
+  sub_district       String?
+  district           String?
+  province           String?
+  postal_code        String?
+
+  //  ข้อมูลบริษัท / ออกใบเสร็จ
+  company_name       String?
+  company_tax_id     String?
+  company_phone      String?
+  company_email      String?
+  company_address    String?
+  company_subdistrict String?
+  company_district   String?
+  company_province   String?
+  company_postal_code String?
+
+  //  ข้อมูลสุขภาพ
+  weight             Float?
+  height             Float?
+  waist              Float?
+  chest              Float?
+  allergy_history    String?
+  mental_health      String?
+  underlying_disease String?
+  health_note        String?
+
+  //  ข้อมูลการรักษา
+  treatment_type     TreatmentType
+  insurance_type_id  Int?
+  insuranceType      InsuranceType? @relation(fields: [insurance_type_id], references: [id])
+  patient_group_id   Int?
+  patientGroup       PatientGroup?  @relation(fields: [patient_group_id], references: [id])
+
+  // สาขา
+  branchId           Int?
+  branch             Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  //  แต้มสะสม / วงเงิน
+  points             Int       @default(0)
+  balance            Float     @default(0.0)
+
+  //  ผู้ติดต่อและไฟล์แนบ
+  contactPersons     ContactPerson[]
+  files              File[]
+  patientTags        PatientTag[]
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([branchId])
 }
 
-model StaffPermission {
-  id              Int         @id @default(autoincrement())
-  staffLevelId    Int
-  permissionCode  String      // เช่น "VIEW_USER", "CREATE_USER"
-  isActive        Boolean     @default(true)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+model ContactPerson {
+  id             Int       @id @default(autoincrement())
+  full_name      String     // ชื่อ–นามสกุล
+  phone          String?    // เบอร์โทรศัพท์
+  relationship   String?    // ความสัมพันธ์ เช่น บิดา, มารดา, คู่สมรส
 
-  staffLevel      StaffLevel  @relation(fields: [staffLevelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  patient_id     Int
+  patient        Patient   @relation(fields: [patient_id], references: [id])
 
-  @@unique([staffLevelId, permissionCode])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
+model PatientGroup {
+  id               Int       @id @default(autoincrement())
+  name             String                     // เช่น Walk-in, Corporate, VIP
+  note             String?
+  color            String?                    // สีของกลุ่ม เช่น '#22C55E'
+  discount_type    String?                    // 'percent' หรือ 'amount'
+  discount_amount  Float?                     // เช่น 10% หรือ 100 บาท
+  isActive         Boolean   @default(true)   // เปิด/ปิดใช้งาน
+  createdBy        Int?                       // ใครสร้าง
+  createdByUser    User?     @relation("PatientGroupCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy        Int?                       // ใครอัปเดตล่าสุด
+  updatedByUser    User?     @relation("PatientGroupUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  patients         Patient[]
+  
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
 
+model InsuranceType {
+  id       Int       @id @default(autoincrement())
+  code     String     @unique                  // เช่น SMK, TSK, AIOIC
+  name     String                              // เช่น สินมั่นคงประกันภัย จำกัด (มหาชน)
+  note     String?
+  isActive Boolean   @default(true)            // เปิด/ปิดใช้งาน
+  createdBy Int?                               // ใครสร้าง
+  createdByUser User? @relation("InsuranceTypeCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy Int?                               // ใครอัปเดตล่าสุด
+  updatedByUser User? @relation("InsuranceTypeUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  patients Patient[]
+  
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Tag {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  color     String?    // สีของแท็ก เช่น '#22C55E'
+  note      String?
+  isActive  Boolean    @default(true)   // เปิด/ปิดใช้งาน
+  createdBy Int?                        // ใครสร้าง
+  createdByUser User? @relation("TagCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy Int?                        // ใครอัปเดตล่าสุด
+  updatedByUser User? @relation("TagUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  patients  PatientTag[]
+  
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model PatientTag {
+  id         Int      @id @default(autoincrement())
+  patient_id Int
+  tag_id     Int
+  patient    Patient  @relation(fields: [patient_id], references: [id])
+  tag        Tag      @relation(fields: [tag_id], references: [id])
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  url         String
+  type        String?   // เช่น profile, id_card, lab_result
+  description String?
+  uploadedBy  String?
+  patient_id  Int
+  patient     Patient   @relation(fields: [patient_id], references: [id])
+  
+  // สาขา
+  branchId    Int?
+  branch      Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
+  createdAt   DateTime  @default(now())
+
+  @@index([branchId])
+}
 
 model SystemLog {
   id          Int       @id @default(autoincrement())

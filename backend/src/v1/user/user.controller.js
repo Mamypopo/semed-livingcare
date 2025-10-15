@@ -12,7 +12,6 @@ export const getAllUsers = async (req, res) => {
       isActive, 
       role, 
       branchId, 
-      staffLevelId,
       search, 
       page, 
       pageSize, 
@@ -24,7 +23,6 @@ export const getAllUsers = async (req, res) => {
       ...(isActive !== undefined && { isActive: isActive === 'true' }),
       ...(role && { role }),
       ...(branchId && { branchId }),
-      ...(staffLevelId && { staffLevelId }),
       ...(search && { search }),
       ...(page && { page: Number(page) }),
       ...(pageSize && { pageSize: Number(pageSize) }),
@@ -97,7 +95,7 @@ export const getUserById = async (req, res) => {
  */
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, role, branchId, staffLevelId } = req.body;
+    const { name, email, password, role, branchId } = req.body;
 
     // Basic validation
     if (!name || !email || !password) {
@@ -143,7 +141,7 @@ export const createUser = async (req, res) => {
       password: hashedPassword,
       role,
       branchId,
-      staffLevelId
+      createdBy: req.user?.id
     });
 
     // Log system action
@@ -181,8 +179,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, role, branchId, staffLevelId, isActive } = req.body;
-
+    const { name, email, role, branchId, isActive } = req.body;
     if (!id || isNaN(id)) {
       return res.status(400).json({
         success: false,
@@ -217,8 +214,8 @@ export const updateUser = async (req, res) => {
       email,
       role,
       branchId,
-      staffLevelId,
-      isActive
+      isActive,
+      updatedBy: req.user?.id
     });
 
     // Log system action
@@ -274,7 +271,7 @@ export const updateUserActive = async (req, res) => {
       });
     }
 
-    const updated = await userService.updateUserActive(id, isActive);
+    const updated = await userService.updateUserActive(id, isActive, req.user?.id);
 
     // Log
     await createSystemLog(req, isActive ? "ACTIVATE_USER" : "DEACTIVATE_USER", {
@@ -387,48 +384,4 @@ export const getUserStats = async (req, res) => {
   }
 };
 
-/**
- * Get branches for user assignment
- * GET /api/v1/users/branches
- */
-export const getBranchesForUser = async (req, res) => {
-  try {
-    const branches = await userService.getBranchesForUser();
 
-    res.status(200).json({
-      success: true,
-      data: branches
-    });
-
-  } catch (error) {
-    console.error("Get branches for user error:", error);
-    
-    res.status(500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการดึงข้อมูลสาขา"
-    });
-  }
-};
-
-/**
- * Get staff levels for user assignment
- * GET /api/v1/users/staff-levels
- */
-export const getStaffLevelsForUser = async (req, res) => {
-  try {
-    const staffLevels = await userService.getStaffLevelsForUser();
-
-    res.status(200).json({
-      success: true,
-      data: staffLevels
-    });
-
-  } catch (error) {
-    console.error("Get staff levels for user error:", error);
-    
-    res.status(500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการดึงข้อมูลระดับพนักงาน"
-    });
-  }
-};

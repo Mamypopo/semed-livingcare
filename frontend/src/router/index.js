@@ -58,6 +58,25 @@ const router = createRouter({
               component: () => import('@/views/users/Users.vue'),
               meta: { requiresBranch: true, title: 'ผู้ใช้' }
             },
+            // Customer Management
+            {
+              path: 'customers/patient-groups',
+              name: 'PatientGroups',
+              component: () => import('@/views/customers/PatientGroups.vue'),
+              meta: { requiresBranch: true, title: 'กลุ่มลูกค้า' }
+            },
+            {
+              path: 'customers/tags',
+              name: 'Tags',
+              component: () => import('@/views/customers/Tags.vue'),
+              meta: { requiresBranch: true, title: 'แท็ก' }
+            },
+            {
+              path: 'customers/insurance-types',
+              name: 'InsuranceTypes',
+              component: () => import('@/views/customers/InsuranceTypes.vue'),
+              meta: { requiresBranch: true, title: 'ประเภทประกัน' }
+            },
             // {
             //   path: 'packages',
             //   name: 'Packages',

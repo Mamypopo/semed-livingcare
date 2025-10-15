@@ -2,6 +2,70 @@ import * as branchService from "./branch.service.js";
 import { createSystemLog } from "../utils/logger.js";
 
 /**
+ * Get branches accessible by user
+ * GET /api/v1/branches/user-branches
+ */
+export const getUserBranches = async (req, res) => {
+  try {
+    const user = req.user; // User from auth middleware
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'ไม่พบข้อมูลผู้ใช้'
+      });
+    }
+
+    const branches = await branchService.getUserBranches(user);
+
+    res.status(200).json({
+      success: true,
+      message: 'ดึงข้อมูลสาขาสำเร็จ',
+      data: branches
+    });
+
+  } catch (error) {
+    console.error('Get user branches error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลสาขา'
+    });
+  }
+};
+
+/**
+ * Get all branches for dropdown
+ * GET /api/v1/branches/dropdown
+ */
+export const getAllBranchesForDropdown = async (req, res) => {
+  try {
+    const { search, limit } = req.query;
+    
+    const filters = {
+      ...(search && { search }),
+      ...(limit && { limit: Number(limit) })
+    };
+
+    const branches = await branchService.getAllBranchesForDropdown(filters);
+
+    res.status(200).json({
+      success: true,
+      message: 'ดึงข้อมูลสาขาสำเร็จ',
+      data: branches
+    });
+
+  } catch (error) {
+    console.error('Get branches for dropdown error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลสาขา'
+    });
+  }
+};
+
+/**
  * Get all branches
  * GET /api/v1/branches
  */

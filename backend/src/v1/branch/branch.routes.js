@@ -13,8 +13,14 @@ router.use(authenticateToken);
 // Get all branches
 router.get("/", branchController.getAllBranches);
 
+// Get all branches for dropdown
+router.get("/dropdown", branchController.getAllBranchesForDropdown);
+
 // Get latest branch code
 router.get("/latest-code", branchController.getLatestCode);
+
+// Get branches accessible by user
+router.get("/user-branches", branchController.getUserBranches);
 
 // Get branch statistics
 router.get("/stats", branchController.getBranchStats);

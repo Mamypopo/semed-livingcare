@@ -90,6 +90,7 @@
 <script>
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { branchService } from '@/services/branch'
 import { 
   Building2, MessageSquare, Plus, Settings, ArrowRight,
   BarChart3,  Mail, FileText, Users, Calendar, Shield
@@ -149,57 +150,30 @@ export default {
     },
 
     async loadBranches() {
-      // ตรวจสอบว่าผู้ใช้มีสาขาหรือไม่
-      if (this.authStore.needsBranchAssignment) {
-        // ผู้ใช้ที่ยังไม่มีสาขา
+      try {
+        // เรียก API จริงเพื่อดึงสาขาตามสิทธิ์ผู้ใช้
+        this.branches = await branchService.getUserBranches()
+        
+        // ตรวจสอบว่าผู้ใช้มีสาขาหรือไม่
+        if (this.branches.length === 0) {
+          this.maxBranches = 0
+        } else {
+          this.maxBranches = this.branches.length
+        }
+      } catch (error) {
+        console.error('Error loading branches:', error)
+        
+        // Fallback to empty array if API fails
         this.branches = []
         this.maxBranches = 0
-        return
-      }
-
-      // Mock data - ในอนาคตจะเรียก API จริง
-      if (this.authStore.userRole === 'ADMIN') {
-        // Admin เห็นทุกสาขา
-        this.branches = [
-          {
-            id: 1,
-            name: 'โรงพยาบาลซีเมดลีฟวิ่งแคร์',
-            code: 'S00858',
-            isMain: true,
-            remainingDays: 86,
-            expiryDate: '08 ม.ค. 2569'
-          },
-          {
-            id: 2,
-            name: 'สาขาเชียงใหม่',
-            code: 'S00859',
-            isMain: false,
-            remainingDays: 45,
-            expiryDate: '15 ก.พ. 2569'
-          },
-          {
-            id: 3,
-            name: 'สาขาขอนแก่น',
-            code: 'S00860',
-            isMain: false,
-            remainingDays: 30,
-            expiryDate: '20 ก.พ. 2569'
-          }
-        ]
-        this.maxBranches = 5
-      } else {
-        // User ธรรมดาเห็นแค่สาขาของตัวเอง
-        this.branches = [
-          {
-            id: 1,
-            name: 'โรงพยาบาลซีเมดลีฟวิ่งแคร์',
-            code: 'S00858',
-            isMain: true,
-            remainingDays: 86,
-            expiryDate: '08 ม.ค. 2569'
-          }
-        ]
-        this.maxBranches = 1
+        
+        // Show error message to user
+        this.$swal({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถโหลดข้อมูลสาขาได้ กรุณาลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง'
+        })
       }
     }
   }

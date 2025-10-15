@@ -10,7 +10,6 @@ export const getAllUsers = async (filters = {}) => {
     isActive, 
     role, 
     branchId, 
-    staffLevelId,
     search, 
     page = 1, 
     pageSize = 10, 
@@ -32,9 +31,6 @@ export const getAllUsers = async (filters = {}) => {
     where.branchId = parseInt(branchId);
   }
   
-  if (staffLevelId) {
-    where.staffLevelId = parseInt(staffLevelId);
-  }
   
   if (search) {
     where.OR = [
@@ -53,13 +49,6 @@ export const getAllUsers = async (filters = {}) => {
             id: true,
             code: true,
             name: true
-          }
-        },
-        staffLevel: {
-          select: {
-            id: true,
-            name: true,
-            description: true
           }
         },
         _count: {
@@ -95,22 +84,6 @@ export const getUserById = async (id) => {
           phone: true
         }
       },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
-        },
-        include: {
-          permissions: {
-            select: {
-              id: true,
-              permissionCode: true,
-              isActive: true
-            }
-          }
-        }
-      },
       _count: {
         select: {
           systemLogs: true
@@ -134,7 +107,7 @@ export const getUserById = async (id) => {
  * @returns {Object} Created user
  */
 export const createUser = async (userData) => {
-  const { name, email, password, role, branchId, staffLevelId } = userData;
+  const { name, email, password, role, branchId, createdBy } = userData;
 
   // Check if email already exists
   const existingUser = await prisma.user.findUnique({
@@ -155,16 +128,6 @@ export const createUser = async (userData) => {
     }
   }
 
-  // Validate staff level exists (if provided)
-  if (staffLevelId) {
-    const staffLevel = await prisma.staffLevel.findUnique({
-      where: { id: parseInt(staffLevelId) }
-    });
-    if (!staffLevel) {
-      throw new Error("ไม่พบระดับพนักงานที่ระบุ");
-    }
-  }
-
   const newUser = await prisma.user.create({
     data: {
       name,
@@ -172,7 +135,7 @@ export const createUser = async (userData) => {
       password,
       role: role || 'GUEST',
       branchId: branchId ? parseInt(branchId) : null,
-      staffLevelId: staffLevelId ? parseInt(staffLevelId) : null,
+      createdBy,
     },
     include: {
       branch: {
@@ -180,13 +143,6 @@ export const createUser = async (userData) => {
           id: true,
           code: true,
           name: true
-        }
-      },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
         }
       },
       _count: {
@@ -209,7 +165,7 @@ export const createUser = async (userData) => {
  * @returns {Object} Updated user
  */
 export const updateUser = async (id, updateData) => {
-  const { name, email, role, branchId, staffLevelId, isActive } = updateData;
+  const { name, email, role, branchId, isActive, updatedBy } = updateData;
 
   // Check if user exists
   const existingUser = await prisma.user.findUnique({
@@ -241,15 +197,6 @@ export const updateUser = async (id, updateData) => {
     }
   }
 
-  // Validate staff level exists (if provided)
-  if (staffLevelId) {
-    const staffLevel = await prisma.staffLevel.findUnique({
-      where: { id: parseInt(staffLevelId) }
-    });
-    if (!staffLevel) {
-      throw new Error("ไม่พบระดับพนักงานที่ระบุ");
-    }
-  }
 
   const updatedUser = await prisma.user.update({
     where: { id: parseInt(id) },
@@ -258,8 +205,8 @@ export const updateUser = async (id, updateData) => {
       ...(email && { email }),
       ...(role && { role }),
       ...(branchId !== undefined && { branchId: branchId ? parseInt(branchId) : null }),
-      ...(staffLevelId !== undefined && { staffLevelId: staffLevelId ? parseInt(staffLevelId) : null }),
       ...(isActive !== undefined && { isActive }),
+      ...(updatedBy && { updatedBy }),
     },
     include: {
       branch: {
@@ -267,13 +214,6 @@ export const updateUser = async (id, updateData) => {
           id: true,
           code: true,
           name: true
-        }
-      },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
         }
       },
       _count: {
@@ -294,7 +234,7 @@ export const updateUser = async (id, updateData) => {
  * @param {Number} id
  * @param {Boolean} isActive
  */
-export const updateUserActive = async (id, isActive) => {
+export const updateUserActive = async (id, isActive, updatedBy) => {
   const existingUser = await prisma.user.findUnique({ 
     where: { id: parseInt(id) } 
   });
@@ -305,20 +245,16 @@ export const updateUserActive = async (id, isActive) => {
   
   const updated = await prisma.user.update({
     where: { id: parseInt(id) },
-    data: { isActive },
+    data: { 
+      isActive,
+      ...(updatedBy && { updatedBy })
+    },
     include: {
       branch: {
         select: {
           id: true,
           code: true,
           name: true
-        }
-      },
-      staffLevel: {
-        select: {
-          id: true,
-          name: true,
-          description: true
         }
       },
       _count: {
@@ -358,7 +294,6 @@ export const updateUserPassword = async (id, newPassword) => {
       email: true,
       role: true,
       branchId: true,
-      staffLevelId: true,
       isActive: true,
       createdAt: true,
       updatedAt: true
@@ -403,36 +338,4 @@ export const getUserStats = async () => {
     usersByBranch,
     usersWithoutBranch
   };
-};
-
-/**
- * Get all branches for user assignment
- * @returns {Array} List of active branches
- */
-export const getBranchesForUser = async () => {
-  return await prisma.branch.findMany({
-    where: { isActive: true },
-    select: {
-      id: true,
-      code: true,
-      name: true
-    },
-    orderBy: { name: 'asc' }
-  });
-};
-
-/**
- * Get all staff levels for user assignment
- * @returns {Array} List of active staff levels
- */
-export const getStaffLevelsForUser = async () => {
-  return await prisma.staffLevel.findMany({
-    where: { isActive: true },
-    select: {
-      id: true,
-      name: true,
-      description: true
-    },
-    orderBy: { name: 'asc' }
-  });
 };

@@ -44,6 +44,94 @@ export const getAllBranches = async (filters = {}) => {
 };
 
 /**
+ * Get all branches for dropdown (simple list with search and limit)
+ * @param {Object} filters - Filter options
+ * @returns {Array} List of branches for dropdown
+ */
+export const getAllBranchesForDropdown = async (filters = {}) => {
+  try {
+    const { search, limit = 20 } = filters;
+    
+    const where = { isActive: true };
+    
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { code: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const branches = await prisma.branch.findMany({
+      where,
+      select: {
+        id: true,
+        code: true,
+        name: true
+      },
+      orderBy: { name: 'asc' },
+      take: Number(limit)
+    });
+
+    return branches;
+  } catch (error) {
+    console.error('Error getting branches for dropdown:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get branches accessible by user based on role and branch assignment
+ * @param {Object} user - User object with role and branchId
+ * @returns {Array} List of accessible branches
+ */
+export const getUserBranches = async (user) => {
+  try {
+    let where = { isActive: true };
+
+    // ADMIN can see all branches
+    if (user.role === 'ADMIN') {
+      // No additional filter - show all active branches
+    } else {
+      // STAFF/GUEST can only see their assigned branch
+      if (user.branchId) {
+        where.id = user.branchId;
+      } else {
+        // User without branch assignment - return empty array
+        return [];
+      }
+    }
+
+    const branches = await prisma.branch.findMany({
+      where,
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        address: true,
+        phone: true,
+        isActive: true,
+        createdAt: true,
+        _count: {
+          select: {
+            users: true
+          }
+        }
+      },
+      orderBy: { name: 'asc' }
+    });
+
+    // Transform the data to include user count
+    return branches.map(branch => ({
+      ...branch,
+      userCount: branch._count.users
+    }));
+  } catch (error) {
+    console.error('Error getting user branches:', error);
+    throw error;
+  }
+};
+
+/**
  * Get branch by ID
  * @param {Number} id - Branch ID
  * @returns {Object} Branch data

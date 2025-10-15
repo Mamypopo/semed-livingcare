@@ -7,7 +7,7 @@ import { createSystemLog } from "../utils/logger.js";
  */
 export const register = async (req, res) => {
   try {
-    const { name, email, password, registrationCode, role, branchId, staffLevelId } = req.body;
+    const { name, email, password, registrationCode, role, branchId } = req.body;
 
     // Basic validation
     if (!name || !email || !password || !registrationCode) {
@@ -41,8 +41,7 @@ export const register = async (req, res) => {
       password,
       registrationCode,
       role,
-      branchId,
-      staffLevelId
+      branchId
     });
 
     // Log system action

@@ -43,15 +43,4 @@ export const userService = {
     return response.data.data
   },
 
-  // Get branches for user assignment
-  async getBranches() {
-    const response = await apiClient.get('/users/branches')
-    return response.data.data
-  },
-
-  // Get staff levels for user assignment
-  async getStaffLevels() {
-    const response = await apiClient.get('/users/staff-levels')
-    return response.data.data
-  }
 }

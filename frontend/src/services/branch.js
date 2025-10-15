@@ -41,6 +41,22 @@ export const branchService = {
   async getLatestCode() {
     const response = await apiClient.get('/branches/latest-code')
     return response.data.data.code
+  },
+
+  // Get branches accessible by user
+  async getUserBranches() {
+    const response = await apiClient.get('/branches/user-branches')
+    return response.data.data
+  },
+
+  // Get all branches for dropdown 
+  async getAllForDropdown(search = '', limit = 20) {
+    const params = new URLSearchParams()
+    if (search) params.append('search', search)
+    if (limit) params.append('limit', limit)
+    
+    const response = await apiClient.get(`/branches/dropdown?${params.toString()}`)
+    return response.data.data
   }
 }
 

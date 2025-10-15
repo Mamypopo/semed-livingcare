@@ -13,12 +13,6 @@ router.get("/", userController.getAllUsers);
 // Get user statistics
 router.get("/stats", userController.getUserStats);
 
-// Get branches for user assignment
-router.get("/branches", userController.getBranchesForUser);
-
-// Get staff levels for user assignment
-router.get("/staff-levels", userController.getStaffLevelsForUser);
-
 // Get user by ID
 router.get("/:id", userController.getUserById);
 

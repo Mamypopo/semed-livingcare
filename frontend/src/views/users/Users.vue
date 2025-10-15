@@ -48,6 +48,55 @@
           </transition>
         </Listbox>
 
+        <!-- Branch dropdown -->
+        <Listbox v-model="branchOption" as="div" class="relative">
+          <div>
+            <ListboxButton @click="onBranchDropdownOpen" class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full">
+              <div class="flex items-center gap-2">
+                <span>{{ branchOption.label }}</span>
+                <span v-if="branchOption.code" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+                  {{ branchOption.code }}
+                </span>
+              </div>
+              <ChevronDown class="w-4 h-4 opacity-60" />
+            </ListboxButton>
+          </div>
+          <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+            <ListboxOptions class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-64 focus:outline-none">
+              <!-- Search input -->
+              <div class="px-3 py-2 border-b border-gray-100">
+                <input 
+                  v-model="branchSearchQuery" 
+                  @input="onBranchSearchInput"
+                  type="text" 
+                  placeholder="ค้นหาสาขา..." 
+                  class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                />
+              </div>
+              
+              <!-- Branch options -->
+              <div class="max-h-48 overflow-y-auto">
+                <ListboxOption v-for="opt in filteredBranchOptions" :key="String(opt.value)" :value="opt" v-slot="{ active, selected }">
+                  <li :class="[ 'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between', active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700' ]">
+                    <div class="flex items-center gap-2">
+                      <span>{{ opt.label }}</span>
+                      <span v-if="opt.code" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+                        {{ opt.code }}
+                      </span>
+                    </div>
+                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  </li>
+                </ListboxOption>
+                
+                <!-- No results -->
+                <div v-if="filteredBranchOptions.length === 0" class="px-3 py-2 text-sm text-gray-500 text-center">
+                  ไม่พบสาขาที่ค้นหา
+                </div>
+              </div>
+            </ListboxOptions>
+          </transition>
+        </Listbox>
+
         <!-- Page size -->
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
@@ -87,7 +136,6 @@
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">อีเมล</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">บทบาท</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สาขา</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ระดับพนักงาน</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
               <th @click="toggleSort('createdAt')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600">
                 <span class="inline-flex items-center">วันที่สร้าง
@@ -106,7 +154,6 @@
               <td class="px-4 py-3"><div class="h-4 w-48 bg-gray-100 animate-pulse rounded"></div></td>
               <td class="px-4 py-3"><div class="h-4 w-20 bg-gray-100 animate-pulse rounded"></div></td>
               <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-28 bg-gray-100 animate-pulse rounded"></div></td>
               <td class="px-4 py-3"><div class="h-5 w-20 bg-gray-100 animate-pulse rounded-full"></div></td>
               <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
               <td class="px-4 py-3 text-right"><div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div></td>
@@ -124,7 +171,6 @@
                 </span>
               </td>
               <td class="px-4 py-2 text-sm text-gray-700">{{ user.branch?.name || '-' }}</td>
-              <td class="px-4 py-2 text-sm text-gray-700">{{ user.staffLevel?.name || '-' }}</td>
               <td class="px-4 py-2 text-sm">
                 <span :class="user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'" class="px-2 py-1 rounded-full text-xs font-medium">
                   {{ user.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
@@ -160,7 +206,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && users.length === 0">
-              <td colspan="8" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="7" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
@@ -214,6 +260,7 @@
 
 <script>
 import { userService } from '@/services/user'
+import { branchService } from '@/services/branch'
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, ToggleLeft, ToggleRight } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import UserModal from '@/views/users/components/modals/UserModal.vue'
@@ -249,6 +296,15 @@ export default {
         { label: 'ปิดใช้งาน', value: false }
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
+      // Branch options
+      branchOptions: [
+        { label: 'ทุกสาขา', value: '' }
+      ],
+      branchOption: { label: 'ทุกสาขา', value: '' },
+      branchSearchQuery: '',
+      filteredBranchOptions: [
+        { label: 'ทุกสาขา', value: '' }
+      ],
       // Page size options
       pageSize: 10,
       pageSizeOptions: [
@@ -260,6 +316,7 @@ export default {
       meta: { page: 1, totalPages: 1, total: 0 },
       users: [],
       typingTimer: null,
+      branchSearchTimer: null,
       sort: 'createdAt',
       order: 'desc',
       modalOpen: false,
@@ -285,6 +342,9 @@ export default {
     isActive() {
       return this.statusOption.value
     },
+    branchId() {
+      return this.branchOption.value
+    },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
     }
@@ -299,6 +359,7 @@ export default {
           search: this.query || undefined,
           role: this.role === '' ? undefined : this.role,
           isActive: this.isActive === '' ? undefined : this.isActive,
+          branchId: this.branchId === '' ? undefined : this.branchId,
           sort: this.sort,
           order: this.order
         })
@@ -361,19 +422,18 @@ export default {
       try {
         if (isEdit) {
           const res = await userService.update(data.id, data)
-          const updated = res.user || res
-          this.users = this.users.map(x => x.id === updated.id ? { ...x, ...updated } : x)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({ icon: 'success', title: 'แก้ไขผู้ใช้สำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+          // Reload data to get latest information
+          await this.reload()
         } else {
           const res = await userService.create(data)
-          const created = res.user || res
-          this.users = [created, ...this.users]
-          this.meta.total += 1
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({ icon: 'success', title: 'สร้างผู้ใช้สำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+          // Reload data to get latest information
+          await this.reload()
         }
       } catch (e) {
         this.modalLoading = false
@@ -394,13 +454,10 @@ export default {
       if (!res.isConfirmed) return
 
       try {
-        const updated = await userService.updateActive(user.id, desired)
-        const newVal = updated.user || updated
-        const idx = this.users.findIndex(x => x.id === user.id)
-        if (idx !== -1) {
-          this.users[idx] = { ...user, ...newVal }
-        }
+        await userService.updateActive(user.id, desired)
         Swal.fire({ icon: 'success', title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว', timer: 1200, showConfirmButton: false, toast: true, position: 'top-end' })
+        // Reload data to get latest information
+        await this.reload()
       } catch (e) {
         Swal.fire({ icon: 'error', title: 'อัปเดตสถานะไม่สำเร็จ', text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง' })
       }
@@ -424,10 +481,64 @@ export default {
     handlePasswordChanged() {
       // Password was changed successfully
       // Could reload user data or show additional notifications if needed
+    },
+    async loadBranches() {
+      try {
+        const branches = await branchService.getAllForDropdown('', 20)
+        this.branchOptions = [
+          { label: 'ทุกสาขา', value: '' },
+          ...branches.map(branch => ({
+            label: branch.name,
+            code: branch.code,
+            value: branch.id
+          }))
+        ]
+        this.filteredBranchOptions = this.branchOptions
+      } catch (error) {
+        console.error('Error loading branches:', error)
+      }
+    },
+    async onBranchSearchInput() {
+      // Clear previous timer
+      if (this.branchSearchTimer) {
+        clearTimeout(this.branchSearchTimer)
+      }
+      
+      // Set new timer
+      this.branchSearchTimer = setTimeout(async () => {
+        try {
+          const branches = await branchService.getAllForDropdown(this.branchSearchQuery, 20)
+          this.filteredBranchOptions = [
+            { label: 'ทุกสาขา', value: '' },
+            ...branches.map(branch => ({
+              label: branch.name,
+              code: branch.code,
+              value: branch.id
+            }))
+          ]
+        } catch (error) {
+          console.error('Error searching branches:', error)
+        }
+      }, 300)
+    },
+    async onBranchDropdownOpen() {
+      // Load branches only when dropdown is opened
+      if (this.branchOptions.length === 1) { // Only "ทุกสาขา" option
+        await this.loadBranches()
+      }
     }
   },
   mounted() {
     this.reload()
+  },
+  beforeUnmount() {
+    // Cleanup timers
+    if (this.typingTimer) {
+      clearTimeout(this.typingTimer)
+    }
+    if (this.branchSearchTimer) {
+      clearTimeout(this.branchSearchTimer)
+    }
   },
   watch: {
     roleOption() {
@@ -435,6 +546,10 @@ export default {
       this.reload()
     },
     statusOption() {
+      this.meta.page = 1
+      this.reload()
+    },
+    branchOption() {
       this.meta.page = 1
       this.reload()
     },
