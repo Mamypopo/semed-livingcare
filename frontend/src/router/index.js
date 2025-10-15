@@ -52,6 +52,12 @@ const router = createRouter({
               component: () => import('@/views/branches/Branches.vue'),
               meta: { requiresBranch: true, title: 'สาขา' }
             },
+            {
+              path: 'users',
+              name: 'Users',
+              component: () => import('@/views/users/Users.vue'),
+              meta: { requiresBranch: true, title: 'ผู้ใช้' }
+            },
             // {
             //   path: 'packages',
             //   name: 'Packages',
