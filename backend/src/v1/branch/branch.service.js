@@ -117,7 +117,7 @@ export const getUserBranches = async (user) => {
           }
         }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { code: 'asc' }
     });
 
     // Transform the data to include user count
