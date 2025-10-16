@@ -1,16 +1,7 @@
-import { apiClient } from '../api'
+import { createHttp } from '../api'
 
-// ใช้ API จาก GitHub ที่ทำงานได้จริง
 const BASE_URL = 'https://raw.githubusercontent.com/earthchie/jquery.Thailand.js/master/jquery.Thailand.js/database/raw_database'
-
-// สร้าง apiClient instance
-const addressApi = apiClient.create({
-  baseURL: BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  }
-})
+const addressApi = createHttp(BASE_URL)
 
 // Service functions
 export const addressService = {

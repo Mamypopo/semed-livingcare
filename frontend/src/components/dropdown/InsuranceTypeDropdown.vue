@@ -2,16 +2,22 @@
   <div class="relative">
     <Listbox v-model="selectedValue" @update:modelValue="handleSelection">
       <div class="relative">
-        <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400">
+        <ListboxButton 
+          class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+          @click="showDropdown = !showDropdown"
+        >
           <span class="block truncate">
             {{ selectedType ? selectedType.name : placeholder }}
           </span>
           <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronDown class="h-5 w-5 text-gray-400" />
+            <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showDropdown }" />
           </span>
         </ListboxButton>
         
-        <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+        <ListboxOptions 
+          class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+          @click-outside="showDropdown = false"
+        >
           <!-- Search Input -->
           <div class="px-3 py-2 border-b border-gray-200">
             <input
@@ -79,7 +85,8 @@ export default {
     return {
       searchQuery: '',
       insuranceTypes: [],
-      searchTimeout: null
+      searchTimeout: null,
+      showDropdown: false
     }
   },
   computed: {
@@ -131,6 +138,7 @@ export default {
     handleSelection(value) {
       this.selectedValue = value
       this.searchQuery = ''
+      this.showDropdown = false
     }
   }
 }

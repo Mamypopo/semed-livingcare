@@ -597,7 +597,7 @@
                         <!-- Row 4: 3 columns (ชื่อ, นามสกุล, ชื่อเล่น) -->
                         <div class="grid grid-cols-3 gap-4">
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ  <span class="text-red-500">*</span></label>
                             <input
                               v-model="form.first_name"
                               type="text"
@@ -610,7 +610,7 @@
                             />
                           </div>
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล  <span class="text-red-500">*</span></label>
                             <input
                               v-model="form.last_name"
                               type="text"
@@ -708,78 +708,240 @@
                           </div>
                         </div>
 
-                        <!-- Row 8: 2 columns (ที่อยู่, จังหวัด) -->
-                        <div class="grid grid-cols-2 gap-4">
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ที่อยู่ *</label>
-                            <textarea
-                              v-model="form.address"
-                              required
-                              rows="3"
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+                      <!-- Row 8: 2 columns (ที่อยู่, จังหวัด) -->
+<div class="grid grid-cols-2 gap-4">
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">ที่อยู่  <span class="text-red-500">*</span></label>
+    <textarea
+      v-model="form.address"
+      required
+      rows="3"
+      class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
        bg-white text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
        focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              placeholder="ระบุที่อยู่"
-                            />
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">จังหวัด *</label>
-                            <input
-                              v-model="form.province"
-                              type="text"
-                              required
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+      placeholder="ระบุที่อยู่"
+    />
+  </div>
+  <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">จังหวัด  <span class="text-red-500">*</span></label>
+      <Listbox v-model="selectedProvince" @update:modelValue="onProvinceChange">
+        <div class="relative">
+          <ListboxButton 
+            class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+            @click="showProvinceDropdown = !showProvinceDropdown"
+          >
+            <span class="block truncate">{{ selectedProvince?.name_th || 'เลือกจังหวัด' }}</span>
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showProvinceDropdown }" />
+            </span>
+          </ListboxButton>
+          
+          <ListboxOptions 
+            class="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+            @click-outside="showProvinceDropdown = false"
+          >
+            <!-- Search Input -->
+            <div class="px-3 py-2 border-b border-gray-200">
+              <input
+                v-model="provinceSearchQuery"
+                type="text"
+                placeholder="ค้นหาจังหวัด..."
+                class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm 
        bg-white text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
        focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              placeholder="ระบุจังหวัด"
-                            />
-                          </div>
-                        </div>
+                @click.stop
+              />
+            </div>
+            
+            <ListboxOption
+              v-for="province in filteredProvinces"
+              :key="province.id"
+              :value="province"
+              v-slot="{ active, selected }"
+            >
+              <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pr-4', selected ? 'pl-10' : 'pl-3']">
+                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
+                  {{ province.name_th }}
+                </span>
+                <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                  <Check class="h-5 w-5" />
+                </span>
+              </li>
+            </ListboxOption>
+          </ListboxOptions>
+        </div>
+      </Listbox>
+  </div>
+</div>
 
-                        <!-- Row 9: 3 columns (ตำบล/แขวง, อำเภอ/เขต, รหัสไปรษณีย์) -->
-                        <div class="grid grid-cols-3 gap-4">
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ตำบล/แขวง *</label>
-                            <input
-                              v-model="form.sub_district"
-                              type="text"
-                              required
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+<div class="grid grid-cols-3 gap-4">
+  <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">อำเภอ/เขต <span class="text-red-500">*</span></label>
+      <Listbox v-model="selectedDistrict" @update:modelValue="onDistrictChange" :disabled="!form.province">
+        <div class="relative">
+          <ListboxButton 
+            :class="[
+              'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+              form.district ? 'bg-white text-gray-700' : 'bg-white text-gray-400',
+              !form.province ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''
+            ]"
+            @click="showDistrictDropdown = !showDistrictDropdown"
+          >
+            <span class="block truncate">{{ form.district || 'เลือกอำเภอ/เขต' }}</span>
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showDistrictDropdown }" />
+            </span>
+          </ListboxButton>
+          
+          <ListboxOptions 
+            class="absolute z-[100] bottom-full mb-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+            @click-outside="showDistrictDropdown = false"
+          >
+            <!-- Search Input -->
+            <div class="px-3 py-2 border-b border-gray-200">
+              <input
+                v-model="districtSearchQuery"
+                type="text"
+                placeholder="ค้นหาอำเภอ/เขต..."
+                class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm 
        bg-white text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              placeholder="ระบุตำบล/แขวง"
-                            />
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">อำเภอ/เขต *</label>
-                            <input
-                              v-model="form.district"
-                              type="text"
-                              required
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"                @click.stop
+              />
+            </div>
+            
+            <ListboxOption
+              v-for="district in filteredDistricts"
+              :key="district.id"
+              :value="district"
+              v-slot="{ active, selected }"
+            >
+              <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pr-4', selected ? 'pl-10' : 'pl-3']">
+                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
+                  {{ district.name_th }}
+                </span>
+                <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                  <Check class="h-5 w-5" />
+                </span>
+              </li>
+            </ListboxOption>
+          </ListboxOptions>
+        </div>
+      </Listbox>
+  </div>
+  <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">ตำบล/แขวง  <span class="text-red-500">*</span></label>
+      <Listbox v-model="selectedSubDistrict" @update:modelValue="onSubDistrictChange" :disabled="!form.district">
+        <div class="relative">
+          <ListboxButton 
+            :class="[
+              'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+              form.sub_district ? 'bg-white text-gray-700' : 'bg-white text-gray-400',
+              !form.district ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''
+            ]"
+            @click="showSubDistrictDropdown = !showSubDistrictDropdown"
+          >
+            <span class="block truncate">{{ form.sub_district || 'เลือกตำบล/แขวง' }}</span>
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showSubDistrictDropdown }" />
+            </span>
+          </ListboxButton>
+          
+          <ListboxOptions 
+            class="absolute z-[100] bottom-full mb-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+            @click-outside="showSubDistrictDropdown = false"
+          >
+            <!-- Search Input -->
+            <div class="px-3 py-2 border-b border-gray-200">
+              <input
+                v-model="subDistrictSearchQuery"
+                type="text"
+                placeholder="ค้นหาตำบล/แขวง..."
+                class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm 
        bg-white text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              placeholder="ระบุอำเภอ/เขต"
-                            />
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">รหัสไปรษณีย์ *</label>
-                            <input
-                              v-model="form.postal_code"
-                              type="text"
-                              required
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"             
+          @click.stop
+              />
+            </div>
+            
+            <ListboxOption
+              v-for="subDistrict in filteredSubDistricts"
+              :key="subDistrict.id"
+              :value="subDistrict"
+              v-slot="{ active, selected }"
+            >
+              <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pr-4', selected ? 'pl-10' : 'pl-3']">
+                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
+                  {{ subDistrict.name_th }}
+                </span>
+                <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                  <Check class="h-5 w-5" />
+                </span>
+              </li>
+            </ListboxOption>
+          </ListboxOptions>
+        </div>
+      </Listbox>
+  </div>
+  <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">รหัสไปรษณีย์  <span class="text-red-500">*</span></label>
+      <Listbox v-model="selectedPostcode" @update:modelValue="onPostalCodeChange" :disabled="!form.sub_district">
+        <div class="relative">
+          <ListboxButton 
+            :class="[
+              'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+              form.postal_code ? 'bg-white text-gray-700' : 'bg-white text-gray-400',
+              !form.sub_district ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''
+            ]"
+            @click="showPostalCodeDropdown = !showPostalCodeDropdown"
+          >
+            <span class="block truncate">{{ form.postal_code || 'เลือกรหัสไปรษณีย์' }}</span>
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showPostalCodeDropdown }" />
+            </span>
+          </ListboxButton>
+          
+          <ListboxOptions 
+            class="absolute z-[100] bottom-full mb-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+            @click-outside="showPostalCodeDropdown = false"
+          >
+            <!-- Search Input -->
+            <div class="px-3 py-2 border-b border-gray-200">
+              <input
+                v-model="postalCodeSearchQuery"
+                type="text"
+                placeholder="ค้นหารหัสไปรษณีย์..."
+                class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm 
        bg-white text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              placeholder="ระบุรหัสไปรษณีย์"
-                            />
-                          </div>
-                        </div>
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"                
+       @click.stop
+              />
+            </div>
+            
+            <ListboxOption
+              v-for="postcode in filteredPostcodes"
+              :key="postcode.postcode"
+              :value="postcode"
+              v-slot="{ active, selected }"
+            >
+              <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pr-4', selected ? 'pl-10' : 'pl-3']">
+                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
+                  {{ postcode.postcode }}
+                </span>
+                <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
+                  <Check class="h-5 w-5" />
+                </span>
+              </li>
+            </ListboxOption>
+          </ListboxOptions>
+        </div>
+      </Listbox>
+  </div>
+</div>
 
                         <!-- Row 10: 1 column (หมายเหตุ) -->
                         <div class="grid grid-cols-1 gap-4">
@@ -862,16 +1024,22 @@
                       </div>
 
                       <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการรักษา *</label>
-                        <Listbox v-model="form.treatment_type">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการรักษา  <span class="text-red-500">*</span></label>
+                        <Listbox v-model="form.treatment_type" @update:modelValue="showTreatmentTypeDropdown = false">
                           <div class="relative">
-                            <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400">
+                            <ListboxButton 
+                              class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                              @click="showTreatmentTypeDropdown = !showTreatmentTypeDropdown"
+                            >
                               <span class="block truncate">{{ form.treatment_type || 'OPD ผู้ป่วยนอก' }}</span>
                               <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                <ChevronDown class="h-5 w-5 text-gray-400" />
+                                <ChevronDown class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showTreatmentTypeDropdown }" />
                               </span>
                             </ListboxButton>
-                            <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                            <ListboxOptions 
+                              class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+                              @click-outside="showTreatmentTypeDropdown = false"
+                            >
                               <ListboxOption
                                 v-for="type in treatmentTypeOptions"
                                 :key="type"
@@ -891,7 +1059,7 @@
                       </div>
 
                       <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทสิทธิ์การรักษา *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทสิทธิ์การรักษา  <span class="text-red-500">*</span></label>
                         <InsuranceTypeDropdown
                           v-model="form.insurance_type_id"
                           placeholder="เลือกประเภทสิทธิ์การรักษา..."
@@ -1155,6 +1323,7 @@ import InsuranceTypeDropdown from '@/components/dropdown/InsuranceTypeDropdown.v
 import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { addressService } from '@/services/external/address.service'
 
 export default {
   name: 'PatientModal',
@@ -1309,16 +1478,73 @@ export default {
       educationLevelOptions: ['ไม่ระบุ', 'ประถมศึกษา', 'มัธยมศึกษาตอนต้น', 'มัธยมศึกษาตอนปลาย', 'ประกาศนียบัตรวิชาชีพ', 'ประกาศนียบัตรวิชาชีพชั้นสูง', 'ปริญญาตรี', 'ปริญญาโท', 'ปริญญาเอก'],
       maritalStatusOptions: ['ไม่ระบุ', 'โสด', 'สมรส', 'หย่า', 'หม้าย'],
       bloodGroupOptions: ['ไม่ระบุ', 'A', 'B', 'AB', 'O'],
-      treatmentTypeOptions: ['OPD ผู้ป่วยนอก', 'IPD ผู้ป่วยใน']
+      treatmentTypeOptions: ['OPD ผู้ป่วยนอก', 'IPD ผู้ป่วยใน'],
+
+        // Address dropdown states
+        showProvinceDropdown: false,
+      showDistrictDropdown: false,
+      showSubDistrictDropdown: false,
+      showPostalCodeDropdown: false,
+      
+      // Address data
+      provinces: [],
+      districts: [],
+      subDistricts: [],
+      postcodes: [],
+      
+      // Selected values for Listbox
+      selectedProvince: null,
+      selectedDistrict: null,
+      selectedSubDistrict: null,
+      selectedPostcode: null,
+      
+      // Search queries
+      provinceSearchQuery: '',
+      districtSearchQuery: '',
+      subDistrictSearchQuery: '',
+      postalCodeSearchQuery: '',
+      
+      // Dropdown states for animation
+      showProvinceDropdown: false,
+      showTreatmentTypeDropdown: false,
     }
   },
   computed: {
     isEdit() {
       return !!this.initialData
     },
+
+    
+    filteredProvinces() {
+      if (!this.provinceSearchQuery) return this.provinces
+      return this.provinces.filter(province => 
+        province.name_th.toLowerCase().includes(this.provinceSearchQuery.toLowerCase())
+      )
+    },
+    
+    filteredDistricts() {
+      if (!this.districtSearchQuery) return this.districts
+      return this.districts.filter(district => 
+        district.name_th.toLowerCase().includes(this.districtSearchQuery.toLowerCase())
+      )
+    },
+    
+    filteredSubDistricts() {
+      if (!this.subDistrictSearchQuery) return this.subDistricts
+      return this.subDistricts.filter(subDistrict => 
+        subDistrict.name_th.toLowerCase().includes(this.subDistrictSearchQuery.toLowerCase())
+      )
+    },
+    
+    filteredPostcodes() {
+      if (!this.postalCodeSearchQuery) return this.postcodes
+      return this.postcodes.filter(postcode => 
+        postcode.postcode.includes(this.postalCodeSearchQuery)
+      )
+    }
   },
   mounted() {
-    // TagDropdown จัดการ API เอง
+    this.loadProvinces()
   },
   methods: {
     isTagSelected(tagId) {
@@ -1584,7 +1810,220 @@ export default {
       this.selectedTags = []
       this.activeTab = 'personal'
       this.originalSnapshot = JSON.stringify(this.form)
-    }
+    },
+
+     // Address methods
+     async loadProvinces() {
+      try {
+        const result = await addressService.getProvinces()
+        if (result.success) {
+          this.provinces = result.data
+        }
+      } catch (error) {
+        console.error('Error loading provinces:', error)
+      }
+    },
+    
+    async loadDistricts(provinceName) {
+      try {
+        const result = await addressService.getDistricts(provinceName)
+        if (result.success) {
+          this.districts = result.data
+        }
+      } catch (error) {
+        console.error('Error loading districts:', error)
+      }
+    },
+    
+    async loadSubDistricts(districtName) {
+      try {
+        const result = await addressService.getSubDistricts(districtName)
+        if (result.success) {
+          this.subDistricts = result.data
+        }
+      } catch (error) {
+        console.error('Error loading sub-districts:', error)
+      }
+    },
+    
+    async loadPostcodes(subDistrictName) {
+      try {
+        const result = await addressService.getPostcodes(subDistrictName)
+        if (result.success) {
+          this.postcodes = result.data
+        }
+      } catch (error) {
+        console.error('Error loading postcodes:', error)
+      }
+    },
+    
+    // Province methods
+    onProvinceChange(province) {
+      if (province) {
+        this.form.province = province.name_th
+        this.showProvinceDropdown = false
+        
+        // Clear dependent fields
+        this.form.district = ''
+        this.form.sub_district = ''
+        this.form.postal_code = ''
+        this.selectedDistrict = null
+        this.selectedSubDistrict = null
+        this.selectedPostcode = null
+        this.districts = []
+        this.subDistricts = []
+        this.postcodes = []
+        
+        // Load districts for selected province
+        this.loadDistricts(province.name_th)
+      }
+    },
+    
+    selectProvince(province) {
+      this.form.province = province.name_th
+      this.showProvinceDropdown = false
+      
+      // Clear dependent fields
+      this.form.district = ''
+      this.form.sub_district = ''
+      this.form.postal_code = ''
+      this.districts = []
+      this.subDistricts = []
+      this.postcodes = []
+      
+      // Load districts for selected province
+      this.loadDistricts(province.name_th)
+    },
+    
+    hideProvinceDropdown() {
+      setTimeout(() => {
+        this.showProvinceDropdown = false
+      }, 200)
+    },
+    
+    clearProvince() {
+      this.form.province = ''
+      this.form.district = ''
+      this.form.sub_district = ''
+      this.form.postal_code = ''
+      this.districts = []
+      this.subDistricts = []
+      this.postcodes = []
+      this.showProvinceDropdown = true
+    },
+    
+    // District methods
+    onDistrictChange(district) {
+      if (district) {
+        this.form.district = district.name_th
+        this.showDistrictDropdown = false
+        
+        // Clear dependent fields
+        this.form.sub_district = ''
+        this.form.postal_code = ''
+        this.selectedSubDistrict = null
+        this.selectedPostcode = null
+        this.subDistricts = []
+        this.postcodes = []
+        
+        // Load sub-districts for selected district
+        this.loadSubDistricts(district.name_th)
+      }
+    },
+    
+    selectDistrict(district) {
+      this.form.district = district.name_th
+      this.showDistrictDropdown = false
+      
+      // Clear dependent fields
+      this.form.sub_district = ''
+      this.form.postal_code = ''
+      this.subDistricts = []
+      this.postcodes = []
+      
+      // Load sub-districts for selected district
+      this.loadSubDistricts(district.name_th)
+    },
+    
+    hideDistrictDropdown() {
+      setTimeout(() => {
+        this.showDistrictDropdown = false
+      }, 200)
+    },
+    
+    clearDistrict() {
+      this.form.district = ''
+      this.form.sub_district = ''
+      this.form.postal_code = ''
+      this.subDistricts = []
+      this.postcodes = []
+      this.showDistrictDropdown = true
+    },
+    
+    // Sub-district methods
+    onSubDistrictChange(subDistrict) {
+      if (subDistrict) {
+        this.form.sub_district = subDistrict.name_th
+        this.showSubDistrictDropdown = false
+        
+        // Clear dependent fields
+        this.form.postal_code = ''
+        this.selectedPostcode = null
+        this.postcodes = []
+        
+        // Load postcodes for selected sub-district
+        this.loadPostcodes(subDistrict.name_th)
+      }
+    },
+    
+    selectSubDistrict(subDistrict) {
+      this.form.sub_district = subDistrict.name_th
+      this.showSubDistrictDropdown = false
+      
+      // Clear dependent fields
+      this.form.postal_code = ''
+      this.postcodes = []
+      
+      // Load postcodes for selected sub-district
+      this.loadPostcodes(subDistrict.name_th)
+    },
+    
+    hideSubDistrictDropdown() {
+      setTimeout(() => {
+        this.showSubDistrictDropdown = false
+      }, 200)
+    },
+    
+    clearSubDistrict() {
+      this.form.sub_district = ''
+      this.form.postal_code = ''
+      this.postcodes = []
+      this.showSubDistrictDropdown = true
+    },
+    
+    // Postal code methods
+    onPostalCodeChange(postcode) {
+      if (postcode) {
+        this.form.postal_code = postcode.postcode
+        this.showPostalCodeDropdown = false
+      }
+    },
+    
+    selectPostalCode(postcode) {
+      this.form.postal_code = postcode.postcode
+      this.showPostalCodeDropdown = false
+    },
+    
+    hidePostalCodeDropdown() {
+      setTimeout(() => {
+        this.showPostalCodeDropdown = false
+      }, 200)
+    },
+    
+    clearPostalCode() {
+      this.form.postal_code = ''
+      this.showPostalCodeDropdown = true
+    },
   },
   watch: {
     modelValue: {
@@ -1593,6 +2032,11 @@ export default {
           if (this.initialData) {
             this.form = { ...this.initialData }
             this.selectedTags = this.initialData.patientTags ? this.initialData.patientTags.map(pt => pt.tag) : []
+            
+            // Set selected values for Listbox
+            if (this.form.province) {
+              this.selectedProvince = this.provinces.find(p => p.name_th === this.form.province) || null
+            }
           } else {
             this.resetForm()
           }

@@ -62,6 +62,14 @@ export const apiClient = {
   delete: (url) => api.delete(url),
 }
 
+export const createHttp = (baseURL, extra = {}) =>
+  axios.create({
+    baseURL,
+    timeout: 10000,
+    headers: { 'Content-Type': 'application/json' },
+    ...extra,
+  })
+  
 // Export api instance for direct use
 export { api }
 
