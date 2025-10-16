@@ -37,6 +37,42 @@ export const getAllTags = async (filters = {}) => {
 };
 
 /**
+ * Get all tags for dropdown (simple list with search and limit)
+ * @param {Object} filters - Filter options
+ * @returns {Array} List of tags for dropdown
+ */
+export const getAllTagsForDropdown = async (filters = {}) => {
+  try {
+    const { search, limit = 20 } = filters;
+    
+    const where = { isActive: true };
+    
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { note: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const tags = await prisma.tag.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        color: true
+      },
+      orderBy: { name: 'asc' },
+      take: Number(limit)
+    });
+
+    return tags;
+  } catch (error) {
+    console.error('Error getting tags for dropdown:', error);
+    throw error;
+  }
+};
+
+/**
  * Get tag by ID
  * @param {Number} id - Tag ID
  * @returns {Object} Tag data

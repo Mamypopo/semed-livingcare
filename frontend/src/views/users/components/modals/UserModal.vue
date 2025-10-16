@@ -253,7 +253,7 @@
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { ChevronDown, CheckIcon, X, Key } from 'lucide-vue-next'
-import ConfirmClosePopover from '@/views/branches/components/modals/ConfirmClosePopover.vue'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import { userService } from '@/services/user'
 import { branchService } from '@/services/branch'
 

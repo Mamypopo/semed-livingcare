@@ -59,6 +59,42 @@ export const getAllInsuranceTypes = async (filters = {}) => {
 };
 
 /**
+ * Get all insurance types for dropdown (simple list with search and limit)
+ * @param {Object} filters - Filter options
+ * @returns {Array} List of insurance types for dropdown
+ */
+export const getAllInsuranceTypesForDropdown = async (filters = {}) => {
+  try {
+    const { search, limit = 20 } = filters;
+    
+    const where = { isActive: true };
+    
+    if (search) {
+      where.OR = [
+        { code: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const insuranceTypes = await prisma.insuranceType.findMany({
+      where,
+      select: {
+        id: true,
+        code: true,
+        name: true
+      },
+      orderBy: { name: 'asc' },
+      take: Number(limit)
+    });
+
+    return insuranceTypes;
+  } catch (error) {
+    console.error('Error getting insurance types for dropdown:', error);
+    throw error;
+  }
+};
+
+/**
  * Get insurance type by ID
  * @param {Number} id - Insurance Type ID
  * @returns {Object} Insurance type data

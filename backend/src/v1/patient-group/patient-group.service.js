@@ -44,6 +44,44 @@ export const getAllPatientGroups = async (filters = {}) => {
 };
 
 /**
+ * Get all patient groups for dropdown (simple list with search and limit)
+ * @param {Object} filters - Filter options
+ * @returns {Array} List of patient groups for dropdown
+ */
+export const getAllPatientGroupsForDropdown = async (filters = {}) => {
+  try {
+    const { search, limit = 20 } = filters;
+    
+    const where = { isActive: true };
+    
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { note: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const patientGroups = await prisma.patientGroup.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        color: true,
+        discount_type: true,
+        discount_amount: true
+      },
+      orderBy: { name: 'asc' },
+      take: Number(limit)
+    });
+
+    return patientGroups;
+  } catch (error) {
+    console.error('Error getting patient groups for dropdown:', error);
+    throw error;
+  }
+};
+
+/**
  * Get patient group by ID
  * @param {Number} id - Patient Group ID
  * @returns {Object} Patient Group data

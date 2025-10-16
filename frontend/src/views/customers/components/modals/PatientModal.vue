@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="modelValue">
-    <HeadlessDialog as="div" class="relative z-50" @close="$emit('update:modelValue', false)">
+    <HeadlessDialog as="div" class="relative z-50" @close="handleClose">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -47,7 +47,7 @@
                   </button>
                   <button
                     type="button"
-                    @click="$emit('update:modelValue', false)"
+                    @click="handleClose"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     ยกเลิก
@@ -110,10 +110,8 @@
                         <!-- แท็ก -->
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1">แท็ก</label>
-                          <TagSelector
+                          <TagDropdown
                             v-model="selectedTags"
-                            :available-tags="availableTags"
-                            :search-keys="['name']"
                             placeholder="เลือกแท็ก..."
                             class="w-full"
                           />
@@ -122,36 +120,18 @@
                         <!-- กลุ่มลูกค้า -->
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มลูกค้า <span class="text-red-500">*</span></label>
-                          <SearchableDropdown
+                          <PatientGroupDropdown
                             v-model="form.patient_group_id"
-                            :options="patientGroups"
-                            :search-keys="['name']"
                             placeholder="เลือกกลุ่มลูกค้า..."
                             class="w-full"
-                          >
-                            <template #display="{ selected }">
-                              <div v-if="selected" class="flex items-center">
-                                <div v-if="selected.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: selected.color }"></div>
-                                <span>{{ selected.name }}</span>
-                              </div>
-                              <span v-else>เลือกกลุ่มลูกค้า...</span>
-                            </template>
-                            <template #option="{ item, selected }">
-                              <div class="flex items-center">
-                                <div v-if="item.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: item.color }"></div>
-                                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ item.name }}</span>
-                              </div>
-                            </template>
-                          </SearchableDropdown>
+                          />
                         </div>
                         
                         <!-- สาขา -->
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1">สาขา <span class="text-red-500">*</span></label>
-                          <SearchableDropdown
+                          <BranchDropdown
                             v-model="form.branchId"
-                            :options="branches"
-                            :search-keys="['name']"
                             placeholder="เลือกสาขา..."
                             class="w-full"
                           />
@@ -912,15 +892,9 @@
 
                       <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทสิทธิ์การรักษา *</label>
-                        <SearchableDropdown
+                        <InsuranceTypeDropdown
                           v-model="form.insurance_type_id"
-                          :options="insuranceTypes"
                           placeholder="เลือกประเภทสิทธิ์การรักษา..."
-                          search-placeholder="ค้นหาประเภทสิทธิ์การรักษา..."
-                          display-key="name"
-                          value-key="id"
-                          :search-keys="['name', 'code']"
-                          @search="handleInsuranceTypeSearch"
                         />
                       </div>
 
@@ -1161,18 +1135,24 @@
       </div>
     </HeadlessDialog>
   </TransitionRoot>
+
+  <!-- Confirm Close Popover -->
+  <ConfirmClosePopover
+    v-if="showConfirmClose"
+    @confirm="confirmClose"
+    @cancel="cancelClose"
+  />
 </template>
 
 <script>
 import { Dialog as HeadlessDialog, DialogPanel, TransitionRoot, TransitionChild } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { ChevronDown, Check, Plus } from 'lucide-vue-next'
-import patientGroupService from '@/services/patient-group.js'
-import insuranceTypeService from '@/services/insurance-type.js'
-import tagService from '@/services/tag.js'
-import { branchService } from '@/services/branch.js'
-import SearchableDropdown from '@/components/SearchableDropdown.vue'
-import TagSelector from '@/components/TagSelector.vue'
+import TagDropdown from '@/components/dropdown/TagDropdown.vue'
+import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
+import PatientGroupDropdown from '@/components/dropdown/PatientGroupDropdown.vue'
+import InsuranceTypeDropdown from '@/components/dropdown/InsuranceTypeDropdown.vue'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -1182,7 +1162,9 @@ export default {
     HeadlessDialog, DialogPanel, TransitionRoot, TransitionChild,
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
     ChevronDown, Check, Plus,
-    SearchableDropdown, TagSelector, VueDatePicker
+    TagDropdown, VueDatePicker,
+    BranchDropdown, PatientGroupDropdown, InsuranceTypeDropdown,
+    ConfirmClosePopover
   },
   props: {
     modelValue: {
@@ -1264,11 +1246,9 @@ export default {
         tagIds: []
       },
       selectedTags: [],
-      availableTags: [],
-      patientGroups: [],
-      insuranceTypes: [],
-      branches: [],
       showPrefixDropdown: false,
+      showConfirmClose: false,
+      originalForm: null,
       showGenderDropdown: false,
       showNationalityDropdown: false,
       showReligionDropdown: false,
@@ -1335,29 +1315,25 @@ export default {
   computed: {
     isEdit() {
       return !!this.initialData
+    },
+    isFormDirty() {
+      if (!this.originalForm) return false
+      
+      // ตรวจสอบการเปลี่ยนแปลงของฟอร์มหลัก
+      const formChanged = JSON.stringify(this.form) !== JSON.stringify(this.originalForm)
+      
+      // ตรวจสอบการเปลี่ยนแปลงของ selectedTags
+      const originalTags = this.initialData?.patientTags ? this.initialData.patientTags.map(pt => pt.tag.id) : []
+      const currentTags = this.selectedTags.map(tag => tag.id)
+      const tagsChanged = JSON.stringify(originalTags.sort()) !== JSON.stringify(currentTags.sort())
+      
+      return formChanged || tagsChanged
     }
   },
   mounted() {
-    this.loadData()
+    // TagDropdown จัดการ API เอง
   },
   methods: {
-    async loadData() {
-      try {
-        const [patientGroupsRes, insuranceTypesRes, tagsRes, branchesRes] = await Promise.all([
-          patientGroupService.getAll({ limit: 1000 }),
-          insuranceTypeService.getAll({ limit: 1000 }),
-          tagService.getAll({ limit: 1000 }),
-          branchService.getAll({ limit: 1000 })
-        ])
-        
-        this.patientGroups = patientGroupsRes.data || []
-        this.insuranceTypes = insuranceTypesRes.data || []
-        this.availableTags = tagsRes.data || []
-        this.branches = branchesRes.data || []
-      } catch (error) {
-        console.error('Error loading data:', error)
-      }
-    },
     isTagSelected(tagId) {
       return this.selectedTags.some(t => t.id === tagId)
     },
@@ -1373,49 +1349,23 @@ export default {
         console.error('Error saving patient:', error)
       }
     },
-    async handlePatientGroupSearch(query) {
-      try {
-        const response = await patientGroupService.getAll({ 
-          search: query, 
-          limit: 1000 
-        })
-        this.patientGroups = response.data || []
-      } catch (error) {
-        console.error('Error searching patient groups:', error)
+    handleClose() {
+      if (this.isFormDirty) {
+        this.showConfirmClose = true
+      } else {
+        this.closeModal()
       }
     },
-    async handleBranchSearch(query) {
-      try {
-        const response = await branchService.getAll({ 
-          search: query, 
-          limit: 1000 
-        })
-        this.branches = response.data || []
-      } catch (error) {
-        console.error('Error searching branches:', error)
-      }
+    closeModal() {
+      this.$emit('update:modelValue', false)
+      this.showConfirmClose = false
     },
-    async handleInsuranceTypeSearch(query) {
-      try {
-        const response = await insuranceTypeService.getAll({ 
-          search: query, 
-          limit: 1000 
-        })
-        this.insuranceTypes = response.data || []
-      } catch (error) {
-        console.error('Error searching insurance types:', error)
-      }
+    confirmClose() {
+      this.resetForm()
+      this.closeModal()
     },
-    async handleTagSearch(query) {
-      try {
-        const response = await tagService.getAll({ 
-          search: query, 
-          limit: 1000 
-        })
-        this.availableTags = response.data || []
-      } catch (error) {
-        console.error('Error searching tags:', error)
-      }
+    cancelClose() {
+      this.showConfirmClose = false
     },
     selectPrefix(prefix) {
       this.form.prefix = prefix
@@ -1647,6 +1597,7 @@ export default {
       }
       this.selectedTags = []
       this.activeTab = 'personal'
+      this.originalForm = null
     }
   },
   watch: {
@@ -1659,6 +1610,8 @@ export default {
           } else {
             this.resetForm()
           }
+          // บันทึก originalForm เพื่อเปรียบเทียบการเปลี่ยนแปลง
+          this.originalForm = JSON.parse(JSON.stringify(this.form))
         }
       },
       immediate: false

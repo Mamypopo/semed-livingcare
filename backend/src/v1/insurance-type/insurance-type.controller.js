@@ -49,6 +49,37 @@ export const getAllInsuranceTypes = async (req, res) => {
 };
 
 /**
+ * Get all insurance types for dropdown
+ * GET /api/v1/insurance-types/dropdown
+ */
+export const getAllInsuranceTypesForDropdown = async (req, res) => {
+  try {
+    const { search, limit } = req.query;
+    
+    const filters = {
+      ...(search && { search }),
+      ...(limit && { limit: Number(limit) })
+    };
+
+    const insuranceTypes = await insuranceTypeService.getAllInsuranceTypesForDropdown(filters);
+
+    res.status(200).json({
+      success: true,
+      message: 'ดึงข้อมูลประเภทประกันสำเร็จ',
+      data: insuranceTypes
+    });
+
+  } catch (error) {
+    console.error('Get insurance types for dropdown error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลประเภทประกัน'
+    });
+  }
+};
+
+/**
  * Get insurance type by ID
  * GET /api/v1/insurance-types/:id
  */

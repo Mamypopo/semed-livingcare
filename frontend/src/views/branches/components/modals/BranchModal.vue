@@ -75,7 +75,7 @@
 
 <script>
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
-import ConfirmClosePopover from '@/views/branches/components/modals/ConfirmClosePopover.vue'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import Swal from 'sweetalert2'
 import { X } from 'lucide-vue-next'
 

@@ -44,6 +44,16 @@ const patientGroupService = {
   async getStats() {
     const response = await apiClient.get('/patient-groups/stats')
     return response.data
+  },
+
+  // Get all patient groups for dropdown
+  async getAllForDropdown(search = '', limit = 20) {
+    const params = new URLSearchParams()
+    if (search) params.append('search', search)
+    if (limit) params.append('limit', limit)
+    
+    const response = await apiClient.get(`/patient-groups/dropdown?${params.toString()}`)
+    return response.data.data
   }
 }
 

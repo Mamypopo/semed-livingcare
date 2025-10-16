@@ -47,6 +47,37 @@ export const getAllTags = async (req, res) => {
 };
 
 /**
+ * Get all tags for dropdown
+ * GET /api/v1/tags/dropdown
+ */
+export const getAllTagsForDropdown = async (req, res) => {
+  try {
+    const { search, limit } = req.query;
+    
+    const filters = {
+      ...(search && { search }),
+      ...(limit && { limit: Number(limit) })
+    };
+
+    const tags = await tagService.getAllTagsForDropdown(filters);
+
+    res.status(200).json({
+      success: true,
+      message: 'ดึงข้อมูลแท็กสำเร็จ',
+      data: tags
+    });
+
+  } catch (error) {
+    console.error('Get tags for dropdown error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลแท็ก'
+    });
+  }
+};
+
+/**
  * Get tag by ID
  * GET /api/v1/tags/:id
  */

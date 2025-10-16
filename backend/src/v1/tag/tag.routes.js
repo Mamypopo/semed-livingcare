@@ -10,6 +10,9 @@ router.use(authenticateToken);
 // Get all tags
 router.get("/", tagController.getAllTags);
 
+// Get all tags for dropdown
+router.get("/dropdown", tagController.getAllTagsForDropdown);
+
 // Get tag statistics
 router.get("/stats", tagController.getTagStats);
 

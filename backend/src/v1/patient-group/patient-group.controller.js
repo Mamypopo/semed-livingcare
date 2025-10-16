@@ -49,6 +49,37 @@ export const getAllPatientGroups = async (req, res) => {
 };
 
 /**
+ * Get all patient groups for dropdown
+ * GET /api/v1/patient-groups/dropdown
+ */
+export const getAllPatientGroupsForDropdown = async (req, res) => {
+  try {
+    const { search, limit } = req.query;
+    
+    const filters = {
+      ...(search && { search }),
+      ...(limit && { limit: Number(limit) })
+    };
+
+    const patientGroups = await patientGroupService.getAllPatientGroupsForDropdown(filters);
+
+    res.status(200).json({
+      success: true,
+      message: 'ดึงข้อมูลกลุ่มลูกค้าสำเร็จ',
+      data: patientGroups
+    });
+
+  } catch (error) {
+    console.error('Get patient groups for dropdown error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลกลุ่มลูกค้า'
+    });
+  }
+};
+
+/**
  * Get patient group by ID
  * GET /api/v1/patient-groups/:id
  */

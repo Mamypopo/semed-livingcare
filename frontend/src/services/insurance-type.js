@@ -49,5 +49,15 @@ export default {
   async getStats() {
     const response = await apiClient.get('/insurance-types/stats')
     return response.data
+  },
+
+  // Get all insurance types for dropdown
+  async getAllForDropdown(search = '', limit = 20) {
+    const params = new URLSearchParams()
+    if (search) params.append('search', search)
+    if (limit) params.append('limit', limit)
+    
+    const response = await apiClient.get(`/insurance-types/dropdown?${params.toString()}`)
+    return response.data.data
   }
 }

@@ -10,6 +10,9 @@ router.use(authenticateToken);
 // Get all patient groups
 router.get("/", patientGroupController.getAllPatientGroups);
 
+// Get all patient groups for dropdown
+router.get("/dropdown", patientGroupController.getAllPatientGroupsForDropdown);
+
 // Get patient group statistics
 router.get("/stats", patientGroupController.getPatientGroupStats);
 

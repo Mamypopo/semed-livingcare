@@ -10,6 +10,9 @@ router.use(authenticateToken);
 // Get all insurance types
 router.get("/", insuranceTypeController.getAllInsuranceTypes);
 
+// Get all insurance types for dropdown
+router.get("/dropdown", insuranceTypeController.getAllInsuranceTypesForDropdown);
+
 // Get insurance type statistics
 router.get("/stats", insuranceTypeController.getInsuranceTypeStats);
 
