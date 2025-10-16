@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="modelValue" as="template">
-    <DialogModal as="div" class="relative z-50" @close="onClose">
+    <DialogModal as="div" class="relative z-50" @close="requestClose">
       <TransitionChild as="template" enter="ease-out duration-200" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-150" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-black/25" />
       </TransitionChild>
@@ -12,8 +12,9 @@
               <!-- Header -->
               <div class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white">
                 <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold">{{ isEdit ? 'แก้ไขกลุ่มลูกค้า' : 'เพิ่มกลุ่มลูกค้าใหม่' }}</DialogTitle>
-                <button @click="onClose" class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors relative">
+                <button @click="requestClose" class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors relative">
                   <X class="w-5 h-5" />
+                  <ConfirmClosePopover v-if="showConfirmClose" @cancel="showConfirmClose=false" @confirm="forceClose" />
                 </button>
               </div>
 
@@ -114,7 +115,7 @@
               </div>
 
               <div class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl">
-                <button type="button" class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50" @click="onClose">ยกเลิก</button>
+                <button type="button" class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50" @click="requestClose">ยกเลิก</button>
                 <button type="button" class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm" :disabled="loading" @click="onSubmit">
                   {{ loading ? 'กำลังบันทึก...' : (isEdit ? 'บันทึกการแก้ไข' : 'บันทึก') }}
                 </button>
@@ -131,6 +132,7 @@
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { X, ChevronDown, CheckIcon } from 'lucide-vue-next'
 import ColorPicker from '@/components/ColorPicker.vue'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 
 export default {
   name: 'PatientGroupModal',
@@ -147,7 +149,8 @@ export default {
     X,
     ChevronDown,
     CheckIcon,
-    ColorPicker
+    ColorPicker,
+    ConfirmClosePopover
   },
   props: {
     modelValue: { type: Boolean, required: true },
@@ -167,6 +170,8 @@ export default {
         isActive: true
       },
       errors: {},
+      originalSnapshot: null,
+      showConfirmClose: false,
       discountTypeOptions: [
         { label: 'ไม่ระบุ', value: '' },
         { label: 'เปอร์เซ็นต์ (%)', value: 'percent' },
@@ -194,6 +199,8 @@ export default {
         } else {
           this.resetForm()
         }
+        this.errors = {}
+        this.originalSnapshot = JSON.stringify(this.form)
       }
     }
   },
@@ -220,6 +227,7 @@ export default {
           isActive: true 
         }
       }
+      this.originalSnapshot = JSON.stringify(this.form)
     },
 
     async onSubmit() {
@@ -259,8 +267,22 @@ export default {
 
     onClose() {
       if (!this.loading) {
+        const isDirty = JSON.stringify(this.form) !== this.originalSnapshot
+        if (isDirty) {
+          this.showConfirmClose = true
+          return
+        }
+        this.resetForm()
         this.$emit('update:modelValue', false)
       }
+    },
+    requestClose() {
+      this.onClose()
+    },
+    forceClose() {
+      this.resetForm()
+      this.showConfirmClose = false
+      this.$emit('update:modelValue', false)
     },
 
     getDiscountTypeLabel(value) {

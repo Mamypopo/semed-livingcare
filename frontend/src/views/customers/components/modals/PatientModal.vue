@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="modelValue">
-    <HeadlessDialog as="div" class="relative z-50" @close="handleClose">
+    <HeadlessDialog as="div" class="relative z-50" @close="requestClose">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -47,7 +47,7 @@
                   </button>
                   <button
                     type="button"
-                    @click="handleClose"
+                    @click="requestClose"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     ยกเลิก
@@ -1139,8 +1139,8 @@
   <!-- Confirm Close Popover -->
   <ConfirmClosePopover
     v-if="showConfirmClose"
-    @confirm="confirmClose"
-    @cancel="cancelClose"
+    @confirm="forceClose"
+    @cancel="showConfirmClose=false"
   />
 </template>
 
@@ -1248,7 +1248,7 @@ export default {
       selectedTags: [],
       showPrefixDropdown: false,
       showConfirmClose: false,
-      originalForm: null,
+      originalSnapshot: null,
       showGenderDropdown: false,
       showNationalityDropdown: false,
       showReligionDropdown: false,
@@ -1316,19 +1316,6 @@ export default {
     isEdit() {
       return !!this.initialData
     },
-    isFormDirty() {
-      if (!this.originalForm) return false
-      
-      // ตรวจสอบการเปลี่ยนแปลงของฟอร์มหลัก
-      const formChanged = JSON.stringify(this.form) !== JSON.stringify(this.originalForm)
-      
-      // ตรวจสอบการเปลี่ยนแปลงของ selectedTags
-      const originalTags = this.initialData?.patientTags ? this.initialData.patientTags.map(pt => pt.tag.id) : []
-      const currentTags = this.selectedTags.map(tag => tag.id)
-      const tagsChanged = JSON.stringify(originalTags.sort()) !== JSON.stringify(currentTags.sort())
-      
-      return formChanged || tagsChanged
-    }
   },
   mounted() {
     // TagDropdown จัดการ API เอง
@@ -1349,23 +1336,22 @@ export default {
         console.error('Error saving patient:', error)
       }
     },
-    handleClose() {
-      if (this.isFormDirty) {
+    onClose() {
+      const isDirty = JSON.stringify(this.form) !== this.originalSnapshot
+      if (isDirty) {
         this.showConfirmClose = true
-      } else {
-        this.closeModal()
+        return
       }
-    },
-    closeModal() {
-      this.$emit('update:modelValue', false)
-      this.showConfirmClose = false
-    },
-    confirmClose() {
       this.resetForm()
-      this.closeModal()
+      this.$emit('update:modelValue', false)
     },
-    cancelClose() {
+    requestClose() {
+      this.onClose()
+    },
+    forceClose() {
+      this.resetForm()
       this.showConfirmClose = false
+      this.$emit('update:modelValue', false)
     },
     selectPrefix(prefix) {
       this.form.prefix = prefix
@@ -1597,7 +1583,7 @@ export default {
       }
       this.selectedTags = []
       this.activeTab = 'personal'
-      this.originalForm = null
+      this.originalSnapshot = JSON.stringify(this.form)
     }
   },
   watch: {
@@ -1610,8 +1596,8 @@ export default {
           } else {
             this.resetForm()
           }
-          // บันทึก originalForm เพื่อเปรียบเทียบการเปลี่ยนแปลง
-          this.originalForm = JSON.parse(JSON.stringify(this.form))
+          // บันทึก originalSnapshot เพื่อเปรียบเทียบการเปลี่ยนแปลง
+          this.originalSnapshot = JSON.stringify(this.form)
         }
       },
       immediate: false
