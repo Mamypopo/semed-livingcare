@@ -59,7 +59,10 @@
               @click="toggleSubmenu(index)"
               :class="[
                 'group flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200',
-                'text-slate-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:text-slate-800 hover:shadow-sm',
+                // Highlight main menu when any submenu is active
+                isAnySubmenuActive(index)
+                  ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 shadow-sm'
+                  : 'text-slate-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:text-slate-800 hover:shadow-sm',
                 // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
                 'md:justify-center lg:justify-start',
                 isCollapsed ? 'md:justify-center lg:justify-center' : 'md:justify-start lg:justify-start'
@@ -155,7 +158,7 @@
 import { Heart, X, Building2, Building, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users,Settings } from 'lucide-vue-next'
 
 export default {
-  name: 'Sidebar',
+  name: 'AppSidebar',
   components: {
     Heart, X, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Building2, Building,Settings
   },
@@ -225,6 +228,14 @@ export default {
       if (idx !== -1) {
         this.openSubmenu = idx
       }
+    },
+    isAnySubmenuActive(index) {
+      // ตรวจสอบว่าเมนูหลักนี้มี submenu ที่ active อยู่หรือไม่
+      const item = this.navigation[index]
+      if (!item.submenu) return false
+      
+      const currentPath = this.$route.path
+      return item.submenu.some(sub => sub.href === currentPath)
     }
   }
   ,

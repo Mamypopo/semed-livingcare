@@ -26,7 +26,7 @@
               @click="toggleSidebar"
               class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
             >
-              <Menu class="w-5 h-5" />
+              <MenuIcon class="w-5 h-5" />
             </button>
 
             <!-- Page Title -->
@@ -35,7 +35,61 @@
             </div>
 
             <!-- Right side items -->
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4">
+              <!-- Global Search -->
+              <div class="relative hidden sm:block">
+                <div class="relative">
+                  <input
+                    ref="searchInput"
+                    v-model="searchQuery"
+                    @keydown="handleSearchKeydown"
+                    @focus="showSearchResults = true"
+                    @blur="hideSearchResults"
+                    type="text"
+                    placeholder="ค้นหา... (Ctrl+K)"
+                    class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 focus:outline-none hover:border-emerald-300"
+                  />
+                  <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
+                
+                <!-- Search Results Dropdown -->
+                <div
+                  v-if="showSearchResults && (searchQuery || searchResults.length > 0)"
+                  class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
+                >
+                  <div v-if="searchResults.length === 0 && searchQuery" class="p-4 text-center text-gray-500">
+                    ไม่พบผลลัพธ์
+                  </div>
+                  <div v-else>
+                    <div v-for="(result, index) in searchResults" :key="index">
+                      <button
+                        @click="selectSearchResult(result)"
+                        :class="[
+                          'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors',
+                          selectedSearchIndex === index ? 'bg-emerald-50' : ''
+                        ]"
+                      >
+                        <div class="flex items-center space-x-3">
+                          <component :is="result.icon" class="w-4 h-4 text-gray-500" />
+                          <div>
+                            <div class="font-medium text-gray-900">{{ result.title }}</div>
+                            <div class="text-sm text-gray-500">{{ result.description }}</div>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Search Button for Mobile -->
+              <button
+                @click="toggleMobileSearch"
+                class="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                v-tooltip="'ค้นหา'"
+              >
+                <SearchIcon class="w-5 h-5" />
+              </button>
 
               <!-- User Menu (Headless UI) -->
               <HMenu as="div" class="relative inline-block text-left" v-slot="{ open }">
@@ -105,6 +159,66 @@
       @click="toggleSidebar"
       class="fixed inset-0 z-40 bg-black bg-opacity-25 md:hidden"
     ></div>
+
+    <!-- Mobile Search Modal -->
+    <div
+      v-if="mobileSearchOpen"
+      class="fixed inset-0 z-50 bg-black bg-opacity-25 sm:hidden"
+      @click="closeMobileSearch"
+    >
+      <div class="flex items-start justify-center pt-16 px-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md" @click.stop>
+          <div class="p-4">
+            <div class="flex items-center space-x-3 mb-4">
+              <SearchIcon class="w-5 h-5 text-gray-400" />
+              <input
+                ref="mobileSearchInput"
+                v-model="searchQuery"
+                @keydown="handleSearchKeydown"
+                @focus="showSearchResults = true"
+                @blur="hideSearchResults"
+                type="text"
+                placeholder="ค้นหา... (Ctrl+K)"
+                class="flex-1 text-sm border-0 focus:ring-0 focus:outline-none"
+                autofocus
+              />
+              <button
+                @click="closeMobileSearch"
+                class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              >
+                <X class="w-5 h-5" />
+              </button>
+            </div>
+            
+            <!-- Search Results -->
+            <div v-if="showSearchResults && (searchQuery || searchResults.length > 0)" class="max-h-80 overflow-y-auto">
+              <div v-if="searchResults.length === 0 && searchQuery" class="p-4 text-center text-gray-500">
+                ไม่พบผลลัพธ์
+              </div>
+              <div v-else>
+                <div v-for="(result, index) in searchResults" :key="index">
+                  <button
+                    @click="selectSearchResult(result)"
+                    :class="[
+                      'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors',
+                      selectedSearchIndex === index ? 'bg-emerald-50' : ''
+                    ]"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <component :is="result.icon" class="w-4 h-4 text-gray-500" />
+                      <div>
+                        <div class="font-medium text-gray-900">{{ result.title }}</div>
+                        <div class="text-sm text-gray-500">{{ result.description }}</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -114,7 +228,7 @@ import { useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import Swal from 'sweetalert2'
 import { 
-  Menu, ChevronDown, User, Settings, LogOut, Building2
+  Menu as MenuIcon, ChevronDown, User, Settings, LogOut, Building2, Search as SearchIcon, Home, Users, Building, Tag, Shield, Plus, X
 } from 'lucide-vue-next'
 import { Menu as HMenu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
@@ -122,7 +236,7 @@ export default {
   name: 'MainLayout',
   components: {
     Sidebar,
-    Menu, ChevronDown, User, Settings, LogOut, Building2,
+    MenuIcon, ChevronDown, User, Settings, LogOut, Building2, SearchIcon, Home, Users, Building, Tag, Shield, Plus, X,
     HMenu, MenuButton, MenuItems, MenuItem
   },
   setup() {
@@ -135,7 +249,21 @@ export default {
           sidebarOpen: false,
           sidebarCollapsed: false, // สำหรับย่อขยาย sidebar บนเดสก์ท็อป
           showSidebar: false, // ซ่อน sidebar จนกว่าจะเลือกสาขา
-          userMenuOpen: false
+          userMenuOpen: false,
+          // Search
+          searchQuery: '',
+          showSearchResults: false,
+          selectedSearchIndex: -1,
+          mobileSearchOpen: false,
+          searchData: [
+            // Navigation
+            { type: 'page', title: 'ภาพรวม', description: 'หน้าหลักของระบบ', path: '/main/overview', icon: 'Home' },
+            { type: 'page', title: 'รายชื่อสาขา', description: 'จัดการข้อมูลสาขา', path: '/main/branches', icon: 'Building' },
+            { type: 'page', title: 'กลุ่มลูกค้า', description: 'จัดการกลุ่มลูกค้า', path: '/main/customers/patient-groups', icon: 'Users' },
+            { type: 'page', title: 'แท็ก', description: 'จัดการแท็กลูกค้า', path: '/main/customers/tags', icon: 'Tag' },
+            { type: 'page', title: 'ประเภทประกัน', description: 'จัดการประเภทประกัน', path: '/main/customers/insurance-types', icon: 'Shield' },
+            { type: 'page', title: 'ผู้ใช้งาน', description: 'จัดการผู้ใช้งานระบบ', path: '/main/users', icon: 'Users' },
+          ]
         }
       },
   computed: {
@@ -146,6 +274,15 @@ export default {
           const metaTitle = this.$route.meta && this.$route.meta.title
           const routeName = this.$route.name
           return metaTitle || routeName || 'SEMed Livingcare'
+        },
+        searchResults() {
+          if (!this.searchQuery.trim()) return []
+          
+          const query = this.searchQuery.toLowerCase()
+          return this.searchData.filter(item => 
+            item.title.toLowerCase().includes(query) || 
+            item.description.toLowerCase().includes(query)
+          )
         }
   },
   methods: {
@@ -210,7 +347,56 @@ export default {
           else {
             this.sidebarCollapsed = false
           }
-        }
+        },
+        // Search Methods
+        handleSearchKeydown(event) {
+          if (event.key === 'Escape') {
+            this.hideSearchResults()
+            this.$refs.searchInput.blur()
+          } else if (event.key === 'ArrowDown') {
+            event.preventDefault()
+            this.selectedSearchIndex = Math.min(this.selectedSearchIndex + 1, this.searchResults.length - 1)
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault()
+            this.selectedSearchIndex = Math.max(this.selectedSearchIndex - 1, -1)
+          } else if (event.key === 'Enter') {
+            event.preventDefault()
+            if (this.selectedSearchIndex >= 0 && this.searchResults[this.selectedSearchIndex]) {
+              this.selectSearchResult(this.searchResults[this.selectedSearchIndex])
+            }
+          }
+        },
+        hideSearchResults() {
+          // ใช้ setTimeout เพื่อให้ click event ทำงานก่อน
+          setTimeout(() => {
+            this.showSearchResults = false
+            this.selectedSearchIndex = -1
+          }, 150)
+        },
+        selectSearchResult(result) {
+          this.closeMobileSearch()
+          
+          if (result.type === 'page') {
+            this.router.push(result.path)
+          }
+        },
+        toggleMobileSearch() {
+          this.mobileSearchOpen = !this.mobileSearchOpen
+          if (this.mobileSearchOpen) {
+            this.$nextTick(() => {
+              this.$refs.mobileSearchInput?.focus()
+            })
+          } else {
+            this.closeMobileSearch()
+          }
+        },
+        closeMobileSearch() {
+          this.mobileSearchOpen = false
+          // ล้างค่าค้นหาเมื่อปิด modal
+          this.searchQuery = ''
+          this.showSearchResults = false
+          this.selectedSearchIndex = -1
+        },
   },
   mounted() {
     // ตรวจสอบว่ามีสาขาที่เลือกแล้วหรือไม่
@@ -228,11 +414,21 @@ export default {
       }
     }
     window.addEventListener('click', this._onClickOutside)
+    
+    // Keyboard shortcut for search (Ctrl+K or Cmd+K)
+    this._onKeydown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        this.$refs.searchInput.focus()
+      }
+    }
+    window.addEventListener('keydown', this._onKeydown)
   },
   beforeUnmount() {
     // ลบ event listener เมื่อ component ถูกทำลาย
     window.removeEventListener('resize', this.checkScreenSize)
     window.removeEventListener('click', this._onClickOutside)
+    window.removeEventListener('keydown', this._onKeydown)
   },
       watch: {
         // ดูการเปลี่ยนแปลงของสาขาที่เลือก
