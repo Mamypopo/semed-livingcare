@@ -24,7 +24,7 @@
             leave-from="opacity-100 translate-y-0 sm:scale-100"
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl">
+            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl w-[80vw] h-[80vh] min-h-[600px] flex flex-col z-50">
               <!-- Header -->
               <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">
@@ -75,7 +75,7 @@
               </div>
 
               <!-- Form Content -->
-              <form id="patient-form" @submit.prevent="handleSubmit" class="px-6 py-6">
+              <form id="patient-form" @submit.prevent="handleSubmit" class="px-6 py-6 flex-1 overflow-y-auto">
                 <!-- Personal Information Tab -->
                 <div v-if="activeTab === 'personal'" class="space-y-6">
                   <div class="grid grid-cols-12 gap-6">
@@ -101,8 +101,59 @@
                             v-model="form.hn"
                             type="text"
                             readonly
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed focus:outline-none"
                             placeholder="ระบบจะสร้างให้อัตโนมัติ"
+                          />
+                        </div>
+                        
+                           
+                        <!-- แท็ก -->
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">แท็ก</label>
+                          <TagSelector
+                            v-model="selectedTags"
+                            :available-tags="availableTags"
+                            :search-keys="['name']"
+                            placeholder="เลือกแท็ก..."
+                            class="w-full"
+                          />
+                        </div>
+                        
+                        <!-- กลุ่มลูกค้า -->
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มลูกค้า <span class="text-red-500">*</span></label>
+                          <SearchableDropdown
+                            v-model="form.patient_group_id"
+                            :options="patientGroups"
+                            :search-keys="['name']"
+                            placeholder="เลือกกลุ่มลูกค้า..."
+                            class="w-full"
+                          >
+                            <template #display="{ selected }">
+                              <div v-if="selected" class="flex items-center">
+                                <div v-if="selected.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: selected.color }"></div>
+                                <span>{{ selected.name }}</span>
+                              </div>
+                              <span v-else>เลือกกลุ่มลูกค้า...</span>
+                            </template>
+                            <template #option="{ item, selected }">
+                              <div class="flex items-center">
+                                <div v-if="item.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: item.color }"></div>
+                                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ item.name }}</span>
+                              </div>
+                            </template>
+                          </SearchableDropdown>
+                        </div>
+                        
+                        <!-- สาขา -->
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">สาขา <span class="text-red-500">*</span></label>
+                          <SearchableDropdown
+                            v-model="form.branchId"
+                            :options="branches"
+                            :search-keys="['name']"
+                            placeholder="เลือกสาขา..."
+                            class="w-full"
                           />
                         </div>
                         
@@ -135,8 +186,10 @@
                           <input
                             v-model="form.points"
                             type="number"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="0"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"                            placeholder="0"
                           />
                         </div>
                         
@@ -146,10 +199,12 @@
                             v-model="form.balance"
                             type="number"
                             step="0.01"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            readonly
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed focus:outline-none"
                             placeholder="0.00"
                           />
                         </div>
+                     
                      
                       </div>
                     </div>
@@ -159,215 +214,375 @@
                       <div class="space-y-4">
                         <!-- Row 1: 4 columns -->
                         <div class="grid grid-cols-4 gap-4">
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า *</label>
-                            <Listbox v-model="form.prefix">
+                            <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า <span class="text-red-500">*</span></label>
                               <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.prefix || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
+                                <input
+                                  v-model="form.prefix"
+                                  type="text"
+                                  required
+                                  :class="[
+                                    'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                    form.prefix && form.prefix !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                  ]"
+                                  placeholder="ระบุคำนำหน้า"
+                                  @focus="showPrefixDropdown = true"
+                                  @blur="hidePrefixDropdown"
+                                  @input="handlePrefixInput"
+                                />
+                                <button
+                                  v-if="form.prefix && form.prefix !== ''"
+                                  type="button"
+                                  @click="clearPrefix"
+                                  class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                                >
+                                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                  </svg>
+                                </button>
+                                <button
+                                  type="button"
+                                  @click="showPrefixDropdown = !showPrefixDropdown"
+                                  class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                                >
+                                  <ChevronDown class="h-5 w-5" />
+                                </button>
+                                
+                                <!-- Dropdown Options -->
+                                <div
+                                  v-if="showPrefixDropdown"
+                                  class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                                >
+                                  <div
                                     v-for="prefix in prefixOptions"
                                     :key="prefix"
-                                    :value="prefix"
-                                    v-slot="{ active, selected }"
+                                    @click="selectPrefix(prefix)"
+                                    class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
                                   >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ prefix }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                                    <span class="block truncate">{{ prefix }}</span>
+                                  </div>
+                                </div>
                               </div>
-                            </Listbox>
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">เพศ *</label>
-                            <Listbox v-model="form.gender">
+                            </div>
+                            <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-1">เพศ <span class="text-red-500">*</span></label>
                               <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.gender || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
+                                <input
+                                  v-model="form.gender"
+                                  type="text"
+                                  required
+                                  :class="[
+                                    'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                    form.gender && form.gender !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                  ]"
+                                  placeholder="ระบุเพศ"
+                                  @focus="showGenderDropdown = true"
+                                  @blur="hideGenderDropdown"
+                                  @input="handleGenderInput"
+                                />
+                                <button
+                                  v-if="form.gender && form.gender !== ''"
+                                  type="button"
+                                  @click="clearGender"
+                                  class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                                >
+                                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                  </svg>
+                                </button>
+                                <button
+                                  type="button"
+                                  @click="showGenderDropdown = !showGenderDropdown"
+                                  class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                                >
+                                  <ChevronDown class="h-5 w-5" />
+                                </button>
+                                
+                                <!-- Dropdown Options -->
+                                <div
+                                  v-if="showGenderDropdown"
+                                  class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                                >
+                                  <div
                                     v-for="gender in genderOptions"
                                     :key="gender"
-                                    :value="gender"
-                                    v-slot="{ active, selected }"
+                                    @click="selectGender(gender)"
+                                    class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
                                   >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ gender }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                                    <span class="block truncate">{{ gender }}</span>
+                                  </div>
+                                </div>
                               </div>
-                            </Listbox>
+                            </div>
+                          <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">สัญชาติ <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                              <input
+                                v-model="form.nationality"
+                                type="text"
+                                required
+                                :class="[
+                                  'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.nationality && form.nationality !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                ]"
+                                placeholder="ระบุสัญชาติ"
+                                @focus="showNationalityDropdown = true"
+                                @blur="hideNationalityDropdown"
+                                @input="handleNationalityInput"
+                              />
+                              <button
+                                v-if="form.nationality && form.nationality !== ''"
+                                type="button"
+                                @click="clearNationality"
+                                class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                @click="showNationalityDropdown = !showNationalityDropdown"
+                                class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <ChevronDown class="h-5 w-5" />
+                              </button>
+                              
+                              <!-- Dropdown Options -->
+                              <div
+                                v-if="showNationalityDropdown"
+                                class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                              >
+                                <div
+                                  v-for="nationality in nationalityOptions"
+                                  :key="nationality"
+                                  @click="selectNationality(nationality)"
+                                  class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                                >
+                                  <span class="block truncate">{{ nationality }}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">สัญชาติ *</label>
-                            <Listbox v-model="form.nationality">
-                              <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.nationality || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
-                                    v-for="nationality in nationalityOptions"
-                                    :key="nationality"
-                                    :value="nationality"
-                                    v-slot="{ active, selected }"
-                                  >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ nationality }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ศาสนา <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                              <input
+                                v-model="form.religion"
+                                type="text"
+                                required
+                                :class="[
+                                  'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.religion && form.religion !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                ]"
+                                placeholder="ระบุศาสนา"
+                                @focus="showReligionDropdown = true"
+                                @blur="hideReligionDropdown"
+                                @input="handleReligionInput"
+                              />
+                              <button
+                                v-if="form.religion && form.religion !== ''"
+                                type="button"
+                                @click="clearReligion"
+                                class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                @click="showReligionDropdown = !showReligionDropdown"
+                                class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <ChevronDown class="h-5 w-5" />
+                              </button>
+                              
+                              <!-- Dropdown Options -->
+                              <div
+                                v-if="showReligionDropdown"
+                                class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                              >
+                                <div
+                                  v-for="religion in religionOptions"
+                                  :key="religion"
+                                  @click="selectReligion(religion)"
+                                  class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                                >
+                                  <span class="block truncate">{{ religion }}</span>
+                                </div>
                               </div>
-                            </Listbox>
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ศาสนา *</label>
-                            <Listbox v-model="form.religion">
-                              <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.religion || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
-                                    v-for="religion in religionOptions"
-                                    :key="religion"
-                                    :value="religion"
-                                    v-slot="{ active, selected }"
-                                  >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ religion }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
-                              </div>
-                            </Listbox>
+                            </div>
                           </div>
                         </div>
 
                         <!-- Row 2: 4 columns -->
                         <div class="grid grid-cols-4 gap-4">
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ระดับการศึกษา *</label>
-                            <Listbox v-model="form.education_level">
-                              <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.education_level || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
-                                    v-for="level in educationLevelOptions"
-                                    :key="level"
-                                    :value="level"
-                                    v-slot="{ active, selected }"
-                                  >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ level }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ระดับการศึกษา <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                              <input
+                                v-model="form.education_level"
+                                type="text"
+                                required
+                                :class="[
+                                  'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.education_level && form.education_level !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                ]"
+                                placeholder="ระบุระดับการศึกษา"
+                                @focus="showEducationLevelDropdown = true"
+                                @blur="hideEducationLevelDropdown"
+                                @input="handleEducationLevelInput"
+                              />
+                              <button
+                                v-if="form.education_level && form.education_level !== ''"
+                                type="button"
+                                @click="clearEducationLevel"
+                                class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                @click="showEducationLevelDropdown = !showEducationLevelDropdown"
+                                class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <ChevronDown class="h-5 w-5" />
+                              </button>
+                              
+                              <!-- Dropdown Options -->
+                              <div
+                                v-if="showEducationLevelDropdown"
+                                class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                              >
+                                <div
+                                  v-for="level in educationLevelOptions"
+                                  :key="level"
+                                  @click="selectEducationLevel(level)"
+                                  class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                                >
+                                  <span class="block truncate">{{ level }}</span>
+                                </div>
                               </div>
-                            </Listbox>
+                            </div>
                           </div>
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">สถานะภาพสมรส *</label>
-                            <Listbox v-model="form.marital_status">
-                              <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.marital_status || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
-                                    v-for="status in maritalStatusOptions"
-                                    :key="status"
-                                    :value="status"
-                                    v-slot="{ active, selected }"
-                                  >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ status }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">สถานะภาพสมรส <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                              <input
+                                v-model="form.marital_status"
+                                type="text"
+                                required
+                                :class="[
+                                  'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.marital_status && form.marital_status !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                ]"
+                                placeholder="ระบุสถานะภาพสมรส"
+                                @focus="showMaritalStatusDropdown = true"
+                                @blur="hideMaritalStatusDropdown"
+                                @input="handleMaritalStatusInput"
+                              />
+                              <button
+                                v-if="form.marital_status && form.marital_status !== ''"
+                                type="button"
+                                @click="clearMaritalStatus"
+                                class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                @click="showMaritalStatusDropdown = !showMaritalStatusDropdown"
+                                class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <ChevronDown class="h-5 w-5" />
+                              </button>
+                              
+                              <!-- Dropdown Options -->
+                              <div
+                                v-if="showMaritalStatusDropdown"
+                                class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                              >
+                                <div
+                                  v-for="status in maritalStatusOptions"
+                                  :key="status"
+                                  @click="selectMaritalStatus(status)"
+                                  class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                                >
+                                  <span class="block truncate">{{ status }}</span>
+                                </div>
                               </div>
-                            </Listbox>
+                            </div>
                           </div>
                           <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">กรุ๊บเลือด *</label>
-                            <Listbox v-model="form.blood_group">
-                              <div class="relative">
-                                <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                  <span class="block truncate">{{ form.blood_group || 'ไม่ระบุ' }}</span>
-                                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
-                                  </span>
-                                </ListboxButton>
-                                <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  <ListboxOption
-                                    v-for="group in bloodGroupOptions"
-                                    :key="group"
-                                    :value="group"
-                                    v-slot="{ active, selected }"
-                                  >
-                                    <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
-                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ group }}</span>
-                                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600">
-                                        <Check class="h-5 w-5" />
-                                      </span>
-                                    </li>
-                                  </ListboxOption>
-                                </ListboxOptions>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">กรุ๊บเลือด <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                              <input
+                                v-model="form.blood_group"
+                                type="text"
+                                required
+                                :class="[
+                                  'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.blood_group && form.blood_group !== '' ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-700 placeholder-gray-400'
+                                ]"
+                                placeholder="ระบุกรุ๊บเลือด"
+                                @focus="showBloodGroupDropdown = true"
+                                @blur="hideBloodGroupDropdown"
+                                @input="handleBloodGroupInput"
+                              />
+                              <button
+                                v-if="form.blood_group && form.blood_group !== ''"
+                                type="button"
+                                @click="clearBloodGroup"
+                                class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                @click="showBloodGroupDropdown = !showBloodGroupDropdown"
+                                class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                              >
+                                <ChevronDown class="h-5 w-5" />
+                              </button>
+                              
+                              <!-- Dropdown Options -->
+                              <div
+                                v-if="showBloodGroupDropdown"
+                                class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                              >
+                                <div
+                                  v-for="group in bloodGroupOptions"
+                                  :key="group"
+                                  @click="selectBloodGroup(group)"
+                                  class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                                >
+                                  <span class="block truncate">{{ group }}</span>
+                                </div>
                               </div>
-                            </Listbox>
+                            </div>
                           </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">วันเกิด *</label>
-                            <input
-                              v-model="form.birth_date"
-                              type="date"
-                              required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            />
-                          </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">วันเกิด <span class="text-red-500">*</span></label>
+                          <VueDatePicker
+                            v-model="form.birth_date"
+                            :enable-time-picker="false"
+                            :format="'dd/MM/yyyy'"
+                            :placeholder="'เลือกวันเกิด'"
+                            :max-date="new Date()"
+                            :clearable="false"
+                            :auto-apply="true"
+                            :teleport="true"
+                            :teleport-target="'body'"
+                            input-class-name="dp-custom-input"
+                          />
+                        </div>
                         </div>
 
                         <!-- Row 3: 2 columns -->
@@ -375,19 +590,26 @@
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">เลขบัตรประชาชน</label>
                             <input
-                              v-model="form.national_id"
-                              type="text"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                              placeholder="ระบุเลขบัตรประชาชน"
-                            />
+  v-model="form.national_id"
+  type="text"
+  placeholder="ระบุเลขบัตรประชาชน"
+  class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+         bg-white text-gray-700 placeholder-gray-400 
+         focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+         focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+/>
                           </div>
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">หนังสือเดินทาง</label>
                             <input
                               v-model="form.passport_no"
                               type="text"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                              placeholder="ระบุหนังสือเดินทาง"
+                                                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                      
+           placeholder="ระบุหนังสือเดินทาง"
                             />
                           </div>
                         </div>
@@ -400,7 +622,10 @@
                               v-model="form.first_name"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุชื่อ"
                             />
                           </div>
@@ -410,7 +635,10 @@
                               v-model="form.last_name"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุนามสกุล"
                             />
                           </div>
@@ -419,7 +647,10 @@
                             <input
                               v-model="form.nickname"
                               type="text"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุชื่อเล่น"
                             />
                           </div>
@@ -432,7 +663,10 @@
                             <input
                               v-model="form.first_name_en"
                               type="text"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุชื่อภาษาอังกฤษ"
                             />
                           </div>
@@ -441,29 +675,27 @@
                             <input
                               v-model="form.last_name_en"
                               type="text"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุนามสกุลภาษาอังกฤษ"
                             />
                           </div>
                         </div>
 
-                        <!-- Row 6: 2 columns (อีเมล, แท็ก) -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <!-- Row 6: 1 column (อีเมล) -->
+                        <div class="grid grid-cols-1 gap-4">
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
                             <input
                               v-model="form.email"
                               type="email"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุอีเมล"
-                            />
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">แท็ก</label>
-                            <TagSelector
-                              v-model="selectedTags"
-                              :available-tags="availableTags"
-                              @search="handleTagSearch"
                             />
                           </div>
                         </div>
@@ -475,7 +707,10 @@
                             <input
                               v-model="form.phone_1"
                               type="tel"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุเบอร์โทรศัพท์"
                             />
                           </div>
@@ -484,57 +719,16 @@
                             <input
                               v-model="form.phone_2"
                               type="tel"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุเบอร์โทรศัพท์"
                             />
                           </div>
                         </div>
 
-                        <!-- Row 8: 2 columns (กลุ่มลูกค้า, สาขา) -->
-                        <div class="grid grid-cols-2 gap-4">
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มลูกค้า *</label>
-                            <SearchableDropdown
-                              v-model="form.patient_group_id"
-                              :options="patientGroups"
-                              placeholder="เลือกกลุ่มลูกค้า..."
-                              search-placeholder="ค้นหากลุ่มลูกค้า..."
-                              display-key="name"
-                              value-key="id"
-                              :search-keys="['name']"
-                              @search="handlePatientGroupSearch"
-                            >
-                              <template #display="{ selected }">
-                                <div v-if="selected" class="flex items-center">
-                                  <div v-if="selected.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: selected.color }"></div>
-                                  <span>{{ selected.name }}</span>
-                                </div>
-                                <span v-else>เลือกกลุ่มลูกค้า...</span>
-                              </template>
-                              <template #option="{ item, selected }">
-                                <div class="flex items-center">
-                                  <div v-if="item.color" class="w-4 h-4 rounded-full mr-3" :style="{ backgroundColor: item.color }"></div>
-                                  <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ item.name }}</span>
-                                </div>
-                              </template>
-                            </SearchableDropdown>
-                          </div>
-                          <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">สาขา</label>
-                            <SearchableDropdown
-                              v-model="form.branchId"
-                              :options="branches"
-                              placeholder="เลือกสาขา..."
-                              search-placeholder="ค้นหาสาขา..."
-                              display-key="name"
-                              value-key="id"
-                              :search-keys="['name', 'code']"
-                              @search="handleBranchSearch"
-                            />
-                          </div>
-                        </div>
-
-                        <!-- Row 9: 2 columns (ที่อยู่, จังหวัด) -->
+                        <!-- Row 8: 2 columns (ที่อยู่, จังหวัด) -->
                         <div class="grid grid-cols-2 gap-4">
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">ที่อยู่ *</label>
@@ -542,7 +736,10 @@
                               v-model="form.address"
                               required
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุที่อยู่"
                             />
                           </div>
@@ -552,13 +749,16 @@
                               v-model="form.province"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุจังหวัด"
                             />
                           </div>
                         </div>
 
-                        <!-- Row 10: 3 columns (ตำบล/แขวง, อำเภอ/เขต, รหัสไปรษณีย์) -->
+                        <!-- Row 9: 3 columns (ตำบล/แขวง, อำเภอ/เขต, รหัสไปรษณีย์) -->
                         <div class="grid grid-cols-3 gap-4">
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">ตำบล/แขวง *</label>
@@ -566,7 +766,10 @@
                               v-model="form.sub_district"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุตำบล/แขวง"
                             />
                           </div>
@@ -576,7 +779,10 @@
                               v-model="form.district"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุอำเภอ/เขต"
                             />
                           </div>
@@ -586,20 +792,26 @@
                               v-model="form.postal_code"
                               type="text"
                               required
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุรหัสไปรษณีย์"
                             />
                           </div>
                         </div>
 
-                        <!-- Row 12: 1 column (หมายเหตุ) -->
+                        <!-- Row 10: 1 column (หมายเหตุ) -->
                         <div class="grid grid-cols-1 gap-4">
                           <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">หมายเหตุ</label>
                             <textarea
                               v-model="form.note"
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุหมายเหตุ"
                             />
                           </div>
@@ -621,7 +833,10 @@
                             v-model="form.weight"
                             type="number"
                             step="0.1"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
                         </div>
@@ -631,7 +846,10 @@
                             v-model="form.height"
                             type="number"
                             step="0.1"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
                         </div>
@@ -641,7 +859,10 @@
                             v-model="form.waist"
                             type="number"
                             step="0.1"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
                         </div>
@@ -651,7 +872,10 @@
                             v-model="form.chest"
                             type="number"
                             step="0.1"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
                         </div>
@@ -661,7 +885,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการรักษา *</label>
                         <Listbox v-model="form.treatment_type">
                           <div class="relative">
-                            <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400">
                               <span class="block truncate">{{ form.treatment_type || 'OPD ผู้ป่วยนอก' }}</span>
                               <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                 <ChevronDown class="h-5 w-5 text-gray-400" />
@@ -700,41 +924,20 @@
                         />
                       </div>
 
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ความสัมพันธ์ทางครอบครัว</label>
-                        <div class="text-red-500 text-sm mb-2">ต้องมีรายชื่อในระบบเท่านั้น</div>
-                        <div class="grid grid-cols-3 gap-2">
-                          <input
-                            v-model="familyMember.name"
-                            type="text"
-                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="ค้นหาอย่างน้อย 3 ตัวอักษร"
-                          />
-                          <input
-                            v-model="familyMember.relationship"
-                            type="text"
-                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            placeholder="ความสัมพันธ์"
-                          />
-                          <button
-                            type="button"
-                            class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <Plus class="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
                     </div>
 
                     <!-- Right Column -->
                     <div class="space-y-4">
                       <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">ประวัติการแพ้ยา</label>
-                        <input
+                        <textarea
                           v-model="form.allergy_history"
-                          type="text"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          placeholder="HN68001XXXX"
+                          rows="3"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                          placeholder="ระบุประวัติการแพ้ยา"
                         />
                       </div>
 
@@ -742,8 +945,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">ประวัติสุขภาพจิต</label>
                         <textarea
                           v-model="form.mental_health"
-                          rows="4"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="3"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุประวัติสุขภาพจิต"
                         />
                       </div>
@@ -752,8 +958,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">โรคประจำตัว</label>
                         <textarea
                           v-model="form.underlying_disease"
-                          rows="4"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="3"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุโรคประจำตัว"
                         />
                       </div>
@@ -762,35 +971,21 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">หมายเหตุ</label>
                         <textarea
                           v-model="form.note"
-                          rows="4"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="3"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุหมายเหตุ"
                         />
                       </div>
-
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">รับแจ้งเตือนเอกสารต่างๆ ทาง Email</label>
-                        <div class="space-y-2">
-                          <label class="flex items-center">
-                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                            <span class="ml-2 text-sm text-gray-700">แฟ้มโปรไฟล์ OPD</span>
-                          </label>
-                          <label class="flex items-center">
-                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                            <span class="ml-2 text-sm text-gray-700">ผลแล็บ</span>
-                          </label>
-                          <label class="flex items-center">
-                            <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                            <span class="ml-2 text-sm text-gray-700">ใบรับรองแพทย์</span>
-                          </label>
-                        </div>
-                      </div>
+   
                     </div>
                   </div>
                 </div>
 
                 <!-- Contact Information Tab -->
-                <div v-if="activeTab === 'contact'" class="space-y-6">
+                <div v-if="activeTab === 'contact'" class="space-y-6 py-8">
                   <div class="space-y-4">
                     <div class="grid grid-cols-3 gap-4">
                       <div>
@@ -798,7 +993,10 @@
                         <input
                           v-model="contactPerson.name"
                           type="text"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ชื่อ-นามสกุล"
                         />
                       </div>
@@ -807,7 +1005,10 @@
                         <input
                           v-model="contactPerson.phone"
                           type="tel"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="เบอร์โทร"
                         />
                       </div>
@@ -816,7 +1017,10 @@
                         <input
                           v-model="contactPerson.relationship"
                           type="text"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ความสัมพันธ์"
                         />
                       </div>
@@ -832,7 +1036,7 @@
                 </div>
 
                 <!-- Company Information Tab -->
-                <div v-if="activeTab === 'company'" class="space-y-6">
+                <div v-if="activeTab === 'company'" class="space-y-6 py-8">
                   <div class="grid grid-cols-2 gap-6">
                     <div class="space-y-4">
                       <div>
@@ -840,7 +1044,10 @@
                         <input
                           v-model="form.company_name"
                           type="text"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุชื่อบริษัท"
                         />
                       </div>
@@ -849,7 +1056,10 @@
                         <input
                           v-model="form.company_tax_id"
                           type="text"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุเลขประจำตัวผู้เสียภาษี"
                         />
                       </div>
@@ -858,7 +1068,10 @@
                         <input
                           v-model="form.company_phone"
                           type="tel"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุเบอร์โทรบริษัท"
                         />
                       </div>
@@ -867,7 +1080,10 @@
                         <input
                           v-model="form.company_email"
                           type="email"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุอีเมลบริษัท"
                         />
                       </div>
@@ -878,7 +1094,10 @@
                         <textarea
                           v-model="form.company_address"
                           rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุที่อยู่บริษัท"
                         />
                       </div>
@@ -888,7 +1107,10 @@
                           <input
                             v-model="form.company_subdistrict"
                             type="text"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="ระบุตำบล/แขวง"
                           />
                         </div>
@@ -897,7 +1119,10 @@
                           <input
                             v-model="form.company_district"
                             type="text"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="ระบุอำเภอ/เขต"
                           />
                         </div>
@@ -906,7 +1131,10 @@
                           <input
                             v-model="form.company_province"
                             type="text"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="ระบุจังหวัด"
                           />
                         </div>
@@ -915,7 +1143,10 @@
                           <input
                             v-model="form.company_postal_code"
                             type="text"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="ระบุรหัสไปรษณีย์"
                           />
                         </div>
@@ -942,6 +1173,8 @@ import tagService from '@/services/tag.js'
 import { branchService } from '@/services/branch.js'
 import SearchableDropdown from '@/components/SearchableDropdown.vue'
 import TagSelector from '@/components/TagSelector.vue'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
   name: 'PatientModal',
@@ -949,7 +1182,7 @@ export default {
     HeadlessDialog, DialogPanel, TransitionRoot, TransitionChild,
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
     ChevronDown, Check, Plus,
-    SearchableDropdown, TagSelector
+    SearchableDropdown, TagSelector, VueDatePicker
   },
   props: {
     modelValue: {
@@ -1035,6 +1268,13 @@ export default {
       patientGroups: [],
       insuranceTypes: [],
       branches: [],
+      showPrefixDropdown: false,
+      showGenderDropdown: false,
+      showNationalityDropdown: false,
+      showReligionDropdown: false,
+      showEducationLevelDropdown: false,
+      showMaritalStatusDropdown: false,
+      showBloodGroupDropdown: false,
       tabs: [
         { id: 'personal', name: 'ข้อมูลส่วนตัว' },
         { id: 'health', name: 'ข้อมูลสุขภาพ' },
@@ -1045,14 +1285,51 @@ export default {
         { label: 'ปกติ', value: true },
         { label: 'ปิดใช้งาน', value: false }
       ],
-      prefixOptions: ['นาย', 'นาง', 'นางสาว', 'เด็กชาย', 'เด็กหญิง'],
-      genderOptions: ['ชาย', 'หญิง'],
-      nationalityOptions: ['ไทย', 'ต่างชาติ'],
-      religionOptions: ['พุทธ', 'คริสต์', 'อิสลาม', 'ฮินดู', 'ซิกข์', 'อื่นๆ'],
-      educationLevelOptions: ['ประถมศึกษา', 'มัธยมศึกษาตอนต้น', 'มัธยมศึกษาตอนปลาย', 'ประกาศนียบัตรวิชาชีพ', 'ประกาศนียบัตรวิชาชีพชั้นสูง', 'ปริญญาตรี', 'ปริญญาโท', 'ปริญญาเอก', 'อื่นๆ'],
-      maritalStatusOptions: ['โสด', 'สมรส', 'หย่า', 'หม้าย'],
-      bloodGroupOptions: ['A', 'B', 'AB', 'O'],
-      treatmentTypeOptions: ['OPD ผู้ป่วยนอก', 'IPD ผู้ป่วยใน', 'ผู้ป่วยฉุกเฉิน']
+      prefixOptions: [
+        'ไม่ระบุ',
+        // บุคคลทั่วไป
+        'นาย', 'นาง', 'นางสาว', 'เด็กชาย', 'เด็กหญิง',
+        // ศาสนา
+        'พระ', 'พระครู', 'พระมหา', 'พระอาจารย์', 'พระสมุห์', 'พระปลัด', 'แม่ชี',
+        'บาทหลวง', 'ซิสเตอร์', 'อิหม่าม', 'ซัยยิด',
+        // ราชวงศ์ / ชนชั้นสูง
+        'หม่อมเจ้า', 'หม่อมราชวงศ์', 'หม่อมหลวง', 'หม่อม', 'คุณชาย', 'คุณหญิง',
+        'ศาสตราจารย์', 'รศ.ดร.', 'ผศ.ดร.', 'ดร.',
+        'พลเอก', 'พลตำรวจเอก',
+        ],
+        genderOptions: ['ไม่ระบุ','ชาย','หญิง',],
+            nationalityOptions: [
+    'ไม่ระบุ',
+    'ไทย',
+    'ต่างชาติ',
+    'ลาว',
+    'กัมพูชา',
+    'เมียนมา',
+    'เวียดนาม',
+    'จีน',
+    'ญี่ปุ่น',
+    'เกาหลี',
+    'ฟิลิปปินส์',
+    'อินโดนีเซีย',
+    'มาเลเซีย',
+    'สิงคโปร์',
+    'อินเดีย',
+    'ปากีสถาน',
+    'บังกลาเทศ',
+    'ศรีลังกา',
+    'อังกฤษ',
+    'ฝรั่งเศส',
+    'เยอรมัน',
+    'สหรัฐอเมริกา',
+    'แคนาดา',
+    'ออสเตรเลีย',
+    'รัสเซีย',
+    ],
+      religionOptions: ['ไม่ระบุ', 'พุทธ', 'คริสต์', 'อิสลาม', 'ฮินดู', 'ซิกข์'],
+      educationLevelOptions: ['ไม่ระบุ', 'ประถมศึกษา', 'มัธยมศึกษาตอนต้น', 'มัธยมศึกษาตอนปลาย', 'ประกาศนียบัตรวิชาชีพ', 'ประกาศนียบัตรวิชาชีพชั้นสูง', 'ปริญญาตรี', 'ปริญญาโท', 'ปริญญาเอก'],
+      maritalStatusOptions: ['ไม่ระบุ', 'โสด', 'สมรส', 'หย่า', 'หม้าย'],
+      bloodGroupOptions: ['ไม่ระบุ', 'A', 'B', 'AB', 'O'],
+      treatmentTypeOptions: ['OPD ผู้ป่วยนอก', 'IPD ผู้ป่วยใน']
     }
   },
   computed: {
@@ -1140,24 +1417,199 @@ export default {
         console.error('Error searching tags:', error)
       }
     },
+    selectPrefix(prefix) {
+      this.form.prefix = prefix
+      this.showPrefixDropdown = false
+    },
+    hidePrefixDropdown() {
+      setTimeout(() => {
+        this.showPrefixDropdown = false
+      }, 200)
+    },
+    handlePrefixInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.prefixOptions.some(option => 
+        option.toLowerCase() === this.form.prefix.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.prefix.length > 0) {
+        this.showPrefixDropdown = false
+      } else if (this.form.prefix.length === 0) {
+        this.showPrefixDropdown = true
+      }
+    },
+    clearPrefix() {
+      this.form.prefix = ''
+      this.showPrefixDropdown = true
+    },
+    selectGender(gender) {
+      this.form.gender = gender
+      this.showGenderDropdown = false
+    },
+    hideGenderDropdown() {
+      setTimeout(() => {
+        this.showGenderDropdown = false
+      }, 200)
+    },
+    handleGenderInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.genderOptions.some(option => 
+        option.toLowerCase() === this.form.gender.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.gender.length > 0) {
+        this.showGenderDropdown = false
+      } else if (this.form.gender.length === 0) {
+        this.showGenderDropdown = true
+      }
+    },
+    clearGender() {
+      this.form.gender = ''
+      this.showGenderDropdown = true
+    },
+    selectNationality(nationality) {
+      this.form.nationality = nationality
+      this.showNationalityDropdown = false
+    },
+    hideNationalityDropdown() {
+      setTimeout(() => {
+        this.showNationalityDropdown = false
+      }, 200)
+    },
+    handleNationalityInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.nationalityOptions.some(option => 
+        option.toLowerCase() === this.form.nationality.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.nationality.length > 0) {
+        this.showNationalityDropdown = false
+      } else if (this.form.nationality.length === 0) {
+        this.showNationalityDropdown = true
+      }
+    },
+    clearNationality() {
+      this.form.nationality = ''
+      this.showNationalityDropdown = true
+    },
+    selectReligion(religion) {
+      this.form.religion = religion
+      this.showReligionDropdown = false
+    },
+    hideReligionDropdown() {
+      setTimeout(() => {
+        this.showReligionDropdown = false
+      }, 200)
+    },
+    handleReligionInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.religionOptions.some(option => 
+        option.toLowerCase() === this.form.religion.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.religion.length > 0) {
+        this.showReligionDropdown = false
+      } else if (this.form.religion.length === 0) {
+        this.showReligionDropdown = true
+      }
+    },
+    clearReligion() {
+      this.form.religion = ''
+      this.showReligionDropdown = true
+    },
+    selectEducationLevel(level) {
+      this.form.education_level = level
+      this.showEducationLevelDropdown = false
+    },
+    hideEducationLevelDropdown() {
+      setTimeout(() => {
+        this.showEducationLevelDropdown = false
+      }, 200)
+    },
+    handleEducationLevelInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.educationLevelOptions.some(option => 
+        option.toLowerCase() === this.form.education_level.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.education_level.length > 0) {
+        this.showEducationLevelDropdown = false
+      } else if (this.form.education_level.length === 0) {
+        this.showEducationLevelDropdown = true
+      }
+    },
+    clearEducationLevel() {
+      this.form.education_level = ''
+      this.showEducationLevelDropdown = true
+    },
+    selectMaritalStatus(status) {
+      this.form.marital_status = status
+      this.showMaritalStatusDropdown = false
+    },
+    hideMaritalStatusDropdown() {
+      setTimeout(() => {
+        this.showMaritalStatusDropdown = false
+      }, 200)
+    },
+    handleMaritalStatusInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.maritalStatusOptions.some(option => 
+        option.toLowerCase() === this.form.marital_status.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.marital_status.length > 0) {
+        this.showMaritalStatusDropdown = false
+      } else if (this.form.marital_status.length === 0) {
+        this.showMaritalStatusDropdown = true
+      }
+    },
+    clearMaritalStatus() {
+      this.form.marital_status = ''
+      this.showMaritalStatusDropdown = true
+    },
+    selectBloodGroup(group) {
+      this.form.blood_group = group
+      this.showBloodGroupDropdown = false
+    },
+    hideBloodGroupDropdown() {
+      setTimeout(() => {
+        this.showBloodGroupDropdown = false
+      }, 200)
+    },
+    handleBloodGroupInput() {
+      // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
+      const isMatching = this.bloodGroupOptions.some(option => 
+        option.toLowerCase() === this.form.blood_group.toLowerCase()
+      )
+      
+      if (!isMatching && this.form.blood_group.length > 0) {
+        this.showBloodGroupDropdown = false
+      } else if (this.form.blood_group.length === 0) {
+        this.showBloodGroupDropdown = true
+      }
+    },
+    clearBloodGroup() {
+      this.form.blood_group = ''
+      this.showBloodGroupDropdown = true
+    },
     resetForm() {
       this.form = {
         hn: '',
-        prefix: '',
+        prefix: 'ไม่ระบุ',
         first_name: '',
         last_name: '',
         nickname: '',
         first_name_en: '',
         last_name_en: '',
-        gender: '',
+        gender: 'ไม่ระบุ',
         birth_date: '',
         national_id: '',
         passport_no: '',
-        nationality: '',
-        religion: '',
-        marital_status: '',
-        education_level: '',
-        blood_group: '',
+        nationality: 'ไม่ระบุ',
+        religion: 'ไม่ระบุ',
+        marital_status: 'ไม่ระบุ',
+        education_level: 'ไม่ระบุ',
+        blood_group: 'ไม่ระบุ',
         phone_1: '',
         phone_2: '',
         email: '',
@@ -1214,3 +1666,42 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+:deep(.dp-custom-input) {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  height: 42px;
+}
+
+:deep(.dp-custom-input:hover) {
+  border-color: #10b981;
+}
+
+:deep(.dp-custom-input:focus) {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+:deep(.dp__input_wrap) {
+  height: 42px;
+}
+
+:deep(.dp__input) {
+  height: 42px;
+  padding: 0.5rem 0.75rem;
+  padding-left: 2.5rem;
+}
+
+:deep(.dp__input_icon) {
+  left: 0.50rem;
+  right: auto;
+}
+
+:deep(.dp__input_icon_pad) {
+  padding-left: 2.5rem;
+}
+</style>

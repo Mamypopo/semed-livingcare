@@ -2,7 +2,7 @@
   <div class="relative">
     <Listbox v-model="selectedValue" @update:modelValue="handleSelection">
       <div class="relative">
-        <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        <ListboxButton class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400">
           <span class="block truncate">
             <slot name="display" :selected="selectedItem">
               {{ selectedItem ? getDisplayText(selectedItem) : placeholder }}
@@ -19,7 +19,10 @@
             <input
               v-model="searchQuery"
               type="text"
-              class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="w-full px-2 py-1 text-sm  border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               :placeholder="searchPlaceholder"
               @click.stop
             />
@@ -32,7 +35,7 @@
             :value="getItemValue(item)"
             v-slot="{ active, selected }"
           >
-            <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+            <li :class="[active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900', 'relative cursor-default select-none py-2 pr-4', selected ? 'pl-10' : 'pl-3']">
               <slot name="option" :item="item" :active="active" :selected="selected">
                 <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
                   {{ getDisplayText(item) }}
