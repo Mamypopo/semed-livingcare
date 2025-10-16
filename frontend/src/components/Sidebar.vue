@@ -10,12 +10,19 @@
         ]"
   >
     <!-- Sidebar Header -->
-    <div class="flex items-center justify-between h-16 px-4 border-b border-slate-200/60 bg-white/50 backdrop-blur-sm">
+    <div class="flex items-center justify-between h-16 px-4 border-b border-slate-200/60  backdrop-blur-sm">
       <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-md">
-          <Heart class="w-5 h-5 text-white" />
+        <div class="w-10 h-10 overflow-hidden object-contain drop-shadow-lg">
+          <img 
+            src="/src/assets/image/Logosemed.png" 
+            alt="SEMed Logo" 
+            class="w-full h-full object-cover mix-blend-multiply"
+          />
         </div>
-        <span v-if="!isCollapsed" class="text-lg font-semibold text-slate-800 transition-opacity duration-300">SEMed</span>
+        <div v-if="!isCollapsed" class="flex flex-col transition-opacity duration-300">
+          <span class="text-lg font-bold bg-gray-700 bg-clip-text text-transparent">SEMed</span>
+          <span class="text-xs text-slate-500 font-medium">v0.0.1</span>
+        </div>
       </div>
       
       <!-- Collapse Button (Tablet and Desktop - when expanded) -->
@@ -25,7 +32,7 @@
         class="hidden md:block p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100/80 transition-all duration-200"
         v-tooltip.right="'ย่อเมนู'"
       >
-        <ChevronLeft class="w-4 h-4" />
+        <ChevronLeft class="w-5 h-5" />
       </button>
       
       <!-- Close Button (Mobile only) -->
@@ -155,12 +162,12 @@
 </template>
 
 <script>
-import { Heart, X, Building2, Building, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users,Settings } from 'lucide-vue-next'
+import { X, Building2, Building, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Settings } from 'lucide-vue-next'
 
 export default {
   name: 'AppSidebar',
   components: {
-    Heart, X, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Building2, Building,Settings
+    X, ChevronLeft, ChevronRight, ChevronDown, Home, BarChart3, Users, Building2, Building, Settings
   },
   props: {
     sidebarOpen: {
@@ -186,7 +193,7 @@ export default {
           name: 'ลูกค้า', 
           icon: 'Users',
           submenu: [
-            { name: 'ลูกค้า', href: '/main/customers' },
+            { name: 'ลูกค้า', href: '/main/customers/patients' },
             { name: 'กลุ่มลูกค้า', href: '/main/customers/patient-groups' },
             { name: 'แท็ก', href: '/main/customers/tags' },
             { name: 'ประเภทประกัน', href: '/main/customers/insurance-types' },

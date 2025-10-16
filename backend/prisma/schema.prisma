@@ -71,6 +71,8 @@ model User {
   tagsUpdated Tag[] @relation("TagUpdatedBy")
   usersCreated User[] @relation("UserCreatedBy")
   usersUpdated User[] @relation("UserUpdatedBy")
+  patientsCreated Patient[] @relation("PatientCreatedBy")
+  patientsUpdated Patient[] @relation("PatientUpdatedBy")
 }
 
 model Patient {
@@ -141,15 +143,33 @@ model Patient {
   points             Int       @default(0)
   balance            Float     @default(0.0)
 
+  //  สถานะการใช้งาน
+  isActive           Boolean   @default(true)
+
   //  ผู้ติดต่อและไฟล์แนบ
   contactPersons     ContactPerson[]
   files              File[]
   patientTags        PatientTag[]
 
+  // Audit fields
+  createdBy          Int?
+  updatedBy          Int?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  // Relations
+  createdByUser      User? @relation("PatientCreatedBy", fields: [createdBy], references: [id])
+  updatedByUser      User? @relation("PatientUpdatedBy", fields: [updatedBy], references: [id])
+
   @@index([branchId])
+  @@index([createdBy])
+  @@index([updatedBy])
+  @@index([hn])
+  @@index([first_name, last_name])
+  @@index([phone_1])
+  @@index([national_id])
+  @@index([isActive])
+  @@index([createdAt])
 }
 
 model ContactPerson {

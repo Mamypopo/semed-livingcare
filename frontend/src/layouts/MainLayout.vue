@@ -46,7 +46,7 @@
                     @focus="showSearchResults = true"
                     @blur="hideSearchResults"
                     type="text"
-                    placeholder="ค้นหา... (Ctrl+K)"
+                    placeholder="ค้นหา..."
                     class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 focus:outline-none hover:border-emerald-300"
                   />
                   <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />

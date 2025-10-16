@@ -60,6 +60,12 @@ const router = createRouter({
             },
             // Customer Management
             {
+              path: 'customers/patients',
+              name: 'Patients',
+              component: () => import('@/views/customers/Patients.vue'),
+              meta: { requiresBranch: true, title: 'ลูกค้า' }
+            },
+            {
               path: 'customers/patient-groups',
               name: 'PatientGroups',
               component: () => import('@/views/customers/PatientGroups.vue'),
@@ -77,36 +83,7 @@ const router = createRouter({
               component: () => import('@/views/customers/InsuranceTypes.vue'),
               meta: { requiresBranch: true, title: 'ประเภทประกัน' }
             },
-            // {
-            //   path: 'packages',
-            //   name: 'Packages',
-            //   component: () => import('@/views/main/Packages.vue')
-            // },
-            // {
-            //   path: 'notifications',
-            //   name: 'Notifications',
-            //   component: () => import('@/views/main/Notifications.vue')
-            // },
-            // {
-            //   path: 'orders',
-            //   name: 'Orders',
-            //   component: () => import('@/views/main/Orders.vue')
-            // },
-            // {
-            //   path: 'users',
-            //   name: 'Users',
-            //   component: () => import('@/views/main/Users.vue')
-            // },
-            // {
-            //   path: 'appointments',
-            //   name: 'Appointments',
-            //   component: () => import('@/views/main/Appointments.vue')
-            // },
-            // {
-            //   path: 'security',
-            //   name: 'Security',
-            //   component: () => import('@/views/main/Security.vue')
-            // }
+      
           ]
         },
         {
