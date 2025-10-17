@@ -1873,6 +1873,153 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Documents Tab -->
+                <div v-if="activeTab === 'documents'" class="space-y-6">
+                  <!-- Upload Section -->
+                  <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                      <h3 class="text-sm font-medium text-gray-900">อัปโหลดเอกสาร</h3>
+                      <button
+                        v-if="selectedFiles.length > 0"
+                        type="button"
+                        @click="clearSelectedFiles"
+                        class="text-xs text-gray-500 hover:text-gray-700 underline"
+                      >
+                        ล้างค่า
+                      </button>
+                    </div>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-teal-400 transition-colors duration-200">
+                      <input
+                        ref="fileInput"
+                        type="file"
+                        multiple
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        @change="handleFileUpload"
+                        class="hidden"
+                      />
+                      <div @click="$refs.fileInput.click()" class="cursor-pointer">
+                        <Upload class="mx-auto h-8 w-8 text-gray-400" />
+                        <p v-if="selectedFiles.length === 0" class="mt-1 text-xs text-gray-600">
+                          <span class="font-medium text-teal-600">คลิกเพื่อเลือกไฟล์</span> หรือลากมาวาง
+                        </p>
+                        <div v-else class="mt-1">
+                          <p class="text-xs text-teal-600 font-medium">เลือกไฟล์แล้ว {{ selectedFiles.length }} ไฟล์</p>
+                          <div class="mt-2 space-y-1">
+                            <p v-for="file in selectedFiles" :key="file.name" class="text-xs text-gray-600 truncate">
+                              {{ file.name }}
+                            </p>
+                          </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">PDF, JPG, PNG, DOC, DOCX (สูงสุด 10MB)</p>
+                      </div>
+                    </div>
+
+                    <!-- Selected Files Info -->
+                    <div v-if="selectedFiles.length > 0" class="mt-3 p-3 bg-teal-50 rounded-lg border border-teal-200">
+                      <p class="text-xs text-teal-800 mb-2">ไฟล์ที่เลือก: {{ selectedFiles.length }} ไฟล์</p>
+                      <div class="space-y-2">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">
+                            คำอธิบาย <span class="text-xs text-gray-500">(ไม่บังคับ)</span> 
+                          </label>
+                          <input
+                            v-model="fileDescription"
+                            type="text"
+                            placeholder="เช่น บัตรประชาชน, เอกสารทางการแพทย์"
+                            class="w-full px-3 py-2 text-xs border border-gray-200 rounded shadow-sm bg-white text-gray-700 hover:border-teal-400 placeholder-gray-400 focus:border-teal-400 focus:ring-1 focus:ring-teal-300/80 focus:outline-none transition-colors duration-200"
+                          />
+                        </div>
+                        
+
+                        <div class="flex justify-end space-x-2 pt-2">
+                          <button
+                            type="button"
+                            @click="cancelFileUpload"
+                            class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-500 transition-colors duration-200"
+                          >
+                            ยกเลิก
+                          </button>
+                          <button
+                            type="button"
+                            @click="confirmFileUpload"
+                            class="px-3 py-1 text-xs font-medium text-white bg-teal-600 border border-transparent rounded hover:bg-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-500 transition-colors duration-200"
+                          >
+                            อัปโหลด
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Files List -->
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-lg font-semibold text-gray-900">ไฟล์แนบ</h3>
+                      <span class="text-sm text-gray-500">{{ patientFiles.length }} ไฟล์</span>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div v-if="uploadingFiles" class="text-center py-8">
+                      <div class="inline-flex items-center space-x-2">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        <span class="text-gray-600">กำลังอัปโหลด...</span>
+                      </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-else-if="patientFiles.length === 0" class="text-center py-12">
+                      <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <FileText class="h-12 w-12 text-gray-400" />
+                      </div>
+                      <h3 class="text-lg font-medium text-gray-900 mb-2">ยังไม่มีเอกสารแนบ</h3>
+                      <p class="text-gray-500">อัปโหลดเอกสารเพื่อเก็บไว้ในระบบ</p>
+                    </div>
+
+                    <!-- Files Grid -->
+                    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div v-for="file in patientFiles" :key="file.id" class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex items-start space-x-3">
+                          <!-- File Icon -->
+                          <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <component 
+                                :is="getFileIcon(file)" 
+                                :class="['h-6 w-6', getFileIconColor(file)]" 
+                              />
+                            </div>
+                          </div>
+
+                          <!-- File Info -->
+                          <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ file.description || 'เอกสาร' }}</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ formatFileSize(file.size) }} • {{ formatDate(file.createdAt) }}</p>
+                          </div>
+
+                          <!-- Actions -->
+                          <div class="flex items-center space-x-1">
+                            <button
+                              type="button"
+                              @click="downloadFile(file)"
+                              class="p-1 text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                              v-tooltip.bottom="'ดาวน์โหลด'"
+                            >
+                              <Download class="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              @click="deleteFile(file)"
+                              class="p-1 text-gray-400 hover:text-red-600 transition-colors duration-200"
+                              v-tooltip.bottom="'ลบ'"                            >
+                              <X class="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </form>
             </DialogPanel>
           </TransitionChild>
@@ -1897,7 +2044,8 @@ import {
   TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, Check, Plus, Trash2 } from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, Trash2, Upload, FileText, Download, X, Image as ImageIcon, File } from 'lucide-vue-next'
+import Swal from 'sweetalert2'
 import TagDropdown from '@/components/dropdown/TagDropdown.vue'
 import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
 import PatientGroupDropdown from '@/components/dropdown/PatientGroupDropdown.vue'
@@ -1922,6 +2070,12 @@ export default {
     Check,
     Plus,
     Trash2,
+    Upload,
+    FileText,
+    ImageIcon,
+    File,
+    Download,
+    X,
     TagDropdown,
     VueDatePicker,
     BranchDropdown,
@@ -2027,7 +2181,8 @@ export default {
         { id: 'personal', name: 'ข้อมูลส่วนตัว' },
         { id: 'health', name: 'ข้อมูลสุขภาพ' },
         { id: 'contact', name: 'ข้อมูลติดต่อ' },
-        { id: 'company', name: 'ข้อมูลบริษัท' }
+        { id: 'company', name: 'ข้อมูลบริษัท' },
+        { id: 'documents', name: 'ไฟล์' }
       ],
       statusOptions: [
         { label: 'ปกติ', value: true },
@@ -2183,7 +2338,13 @@ export default {
       companyPostalCodeSearchQuery: '',
 
       // Dropdown states for animation
-      showTreatmentTypeDropdown: false
+      showTreatmentTypeDropdown: false,
+
+      // File management
+      patientFiles: [],
+      uploadingFiles: false,
+      selectedFiles: [],
+      fileDescription: ''
     }
   },
   computed: {
@@ -2929,6 +3090,297 @@ export default {
         contact.relationship = ''
       }
       this.showRelationshipDropdowns[contactId] = true
+    },
+
+    // File management methods
+    handleFileUpload(event) {
+      const files = Array.from(event.target.files)
+      this.selectedFiles = files
+      // TODO: Implement file upload logic
+    },
+
+
+    cancelFileUpload() {
+      this.selectedFiles = []
+      this.fileDescription = ''
+      this.$refs.fileInput.value = ''
+    },
+
+    clearSelectedFiles() {
+      if (this.selectedFiles.length === 0) return
+      
+      this.selectedFiles = []
+      this.fileDescription = ''
+      this.$refs.fileInput.value = ''
+      
+      // แสดง Swal toast
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'success',
+        title: 'ล้างค่าไฟล์เรียบร้อยแล้ว'
+      })
+    },
+
+    async confirmFileUpload() {
+      if (this.selectedFiles.length === 0) return
+      
+      // แสดง SweetAlert ยืนยันการอัปโหลด
+      const result = await Swal.fire({
+        title: 'ยืนยันการอัปโหลดไฟล์',
+        text: `ต้องการอัปโหลด ${this.selectedFiles.length} ไฟล์${this.fileDescription ? ` (${this.fileDescription})` : ''} หรือไม่?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#14b8a6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'อัปโหลด',
+        cancelButtonText: 'ยกเลิก',
+        reverseButtons: true
+      })
+      
+      if (!result.isConfirmed) return
+      
+      this.uploadingFiles = true
+      
+      // แสดง loading
+      Swal.fire({
+        title: 'กำลังอัปโหลด...',
+        text: 'กรุณารอสักครู่',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading()
+        }
+      })
+      
+      try {
+      
+        // Simulate upload delay
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
+        // Add mock files for demonstration
+        const mockFiles = this.selectedFiles.map((file, index) => ({
+          id: Date.now() + index,
+          url: URL.createObjectURL(file),
+          name: file.name, // เพิ่ม name field
+          description: this.fileDescription || file.name,
+          size: file.size,
+          createdAt: new Date().toISOString()
+        }))
+        
+        this.patientFiles.push(...mockFiles)
+        
+        // เก็บจำนวนไฟล์ก่อนล้างค่า
+        const fileCount = this.selectedFiles.length
+        this.cancelFileUpload()
+        
+        // แสดง Swal toast
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+        
+        Toast.fire({
+          icon: 'success',
+          title: `อัปโหลด ${fileCount} ไฟล์เรียบร้อยแล้ว`
+        })
+      } catch (error) {
+        console.error('Error uploading files:', error)
+        
+        // แสดง error message
+        Swal.fire({
+          title: 'เกิดข้อผิดพลาด!',
+          text: 'ไม่สามารถอัปโหลดไฟล์ได้ กรุณาลองใหม่อีกครั้ง',
+          icon: 'error',
+          confirmButtonColor: '#ef4444'
+        })
+      } finally {
+        this.uploadingFiles = false
+      }
+    },
+
+    getFileTypeFromExtension(filename) {
+      const extension = filename.split('.').pop().toLowerCase()
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) return 'image'
+      if (extension === 'pdf') return 'pdf'
+      if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) return 'document'
+      return 'other'
+    },
+
+    getFileIcon(file) {
+      const extension = file.name ? file.name.split('.').pop().toLowerCase() : ''
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+        return 'ImageIcon'
+      }
+      if (extension === 'pdf') {
+        return 'FileText' // ใช้ FileText สำหรับ PDF
+      }
+      if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
+        return 'FileText'
+      }
+      return 'File'
+    },
+
+    getFileIconColor(file) {
+      const extension = file.name ? file.name.split('.').pop().toLowerCase() : ''
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+        return 'text-green-400'
+      }
+      if (extension === 'pdf') {
+        return 'text-rose-400'
+      }
+      if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
+        return 'text-sky-400'
+      }
+      return 'text-teal-400'
+    },
+    
+    formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes'
+      const k = 1024
+      const sizes = ['Bytes', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+
+    formatDate(dateString) {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('th-TH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    },
+
+    downloadFile(file) {
+      console.log('Download file:', file)
+      // TODO: Implement file download logic
+      
+      // แสดง SweetAlert สำหรับการดาวน์โหลด
+      Swal.fire({
+        title: 'กำลังดาวน์โหลด...',
+        text: `กำลังดาวน์โหลดไฟล์ ${file.description || 'เอกสาร'}`,
+        icon: 'info',
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false
+      })
+      
+      // For now, open in new tab
+      setTimeout(() => {
+        window.open(file.url, '_blank')
+      }, 500)
+    },
+
+    async deleteFile(file) {
+      // แสดง SweetAlert ยืนยันการลบ
+      const result = await Swal.fire({
+        title: 'ยืนยันการลบไฟล์',
+        text: `ต้องการลบไฟล์ "${file.description || 'เอกสาร'}" หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ลบไฟล์',
+        cancelButtonText: 'ยกเลิก',
+        reverseButtons: true
+      })
+      
+      if (!result.isConfirmed) return
+      
+      try {
+        // TODO: Implement file delete API
+        
+        // ลบไฟล์จากรายการ
+        const index = this.patientFiles.findIndex(f => f.id === file.id)
+        if (index > -1) {
+          this.patientFiles.splice(index, 1)
+        }
+        
+        // แสดง Swal toast
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'ลบไฟล์เรียบร้อยแล้ว'
+        })
+      } catch (error) {
+        console.error('Error deleting file:', error)
+        
+        // แสดง error message
+        Swal.fire({
+          title: 'เกิดข้อผิดพลาด!',
+          text: 'ไม่สามารถลบไฟล์ได้ กรุณาลองใหม่อีกครั้ง',
+          icon: 'error',
+          confirmButtonColor: '#ef4444'
+        })
+      }
+    },
+
+    async loadPatientFiles() {
+      if (this.activeTab === 'documents' && this.initialData?.id) {
+        try {
+          // TODO: Implement API call to load patient files
+          
+          // Mock data for demonstration
+          this.patientFiles = [
+            {
+              id: 1,
+              url: '#',
+              name: 'id_card.jpg',
+              description: 'บัตรประชาชน',
+              size: 1024000,
+              createdAt: '2024-01-15T10:30:00Z'
+            },
+            {
+              id: 2,
+              url: '#',
+              name: 'lab_result.pdf',
+              description: 'ผลแล็บเลือด',
+              size: 2048000,
+              createdAt: '2024-01-14T14:20:00Z'
+            },
+            {
+              id: 3,
+              url: '#',
+              name: 'medical_cert.docx',
+              description: 'ใบรับรองแพทย์',
+              size: 512000,
+              createdAt: '2024-01-13T09:15:00Z'
+            }
+          ]
+        } catch (error) {
+          console.error('Error loading patient files:', error)
+        }
+      }
     }
   },
   watch: {
@@ -2954,6 +3406,14 @@ export default {
         }
       },
       immediate: false
+    },
+
+    activeTab: {
+      handler(newTab) {
+        if (newTab === 'documents') {
+          this.loadPatientFiles()
+        }
+      }
     }
   }
 }

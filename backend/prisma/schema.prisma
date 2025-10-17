@@ -255,7 +255,6 @@ model PatientTag {
 model File {
   id          Int      @id @default(autoincrement())
   url         String
-  type        String?   // เช่น profile, id_card, lab_result
   description String?
   uploadedBy  String?
   patient_id  Int
