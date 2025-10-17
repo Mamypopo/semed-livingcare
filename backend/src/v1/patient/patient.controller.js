@@ -1,4 +1,5 @@
 import * as patientService from './patient.service.js'
+import { createSystemLog } from '../utils/logger.js'
 // ดึงข้อมูลผู้ป่วยทั้งหมด
 export const getAllPatientsController = async (req, res) => {
     try {
@@ -49,14 +50,22 @@ export const getPatientByIdController = async (req, res) => {
 // สร้างผู้ป่วยใหม่
 export const createPatientController = async (req, res) => {
     try {
-      console.log('📥 Controller รับข้อมูลจาก Frontend:')
-      console.log('Request body:', req.body)
-      console.log('User ID:', req.user?.id)
-      
       const patient = await patientService.createPatient(req.body, req.user?.id)
       
-      console.log('✅ สร้าง Patient สำเร็จ:', patient.hn)
-      
+      // บันทึก log การสร้างผู้ป่วย
+      await createSystemLog(req, 'CREATE_PATIENT', {
+        patientId: patient.id,
+        patientName: `${patient.first_name} ${patient.last_name}`,
+        details: {
+          prefix: patient.prefix,
+          gender: patient.gender,
+          birthDate: patient.birth_date,
+          treatmentType: patient.treatment_type,
+          insuranceTypeId: patient.insurance_type_id,
+          patientGroupId: patient.patient_group_id
+        }
+      }, patient.branchId, patient.hn)
+            
       res.status(201).json({
         success: true,
         message: 'สร้างข้อมูลผู้ป่วยสำเร็จ',
@@ -75,7 +84,28 @@ export const createPatientController = async (req, res) => {
 export const updatePatientController = async (req, res) => {
     try {
       const { id } = req.params
+      
+      // ดึงข้อมูลผู้ป่วยเดิมก่อนแก้ไข
+      const oldPatient = await patientService.getPatientById(id)
+      
       const patient = await patientService.updatePatient(id, req.body, req.user?.id)
+      
+      // บันทึก log การแก้ไขผู้ป่วย
+      await createSystemLog(req, 'UPDATE_PATIENT', {
+        patientId: patient.id,
+        patientName: `${patient.first_name} ${patient.last_name}`,
+        updatedFields: Object.keys(req.body).filter(key => 
+          req.body[key] !== undefined && 
+          req.body[key] !== null && 
+          req.body[key] !== ''
+        ),
+        summary: {
+          name: `${oldPatient.first_name} ${oldPatient.last_name}`,
+          gender: oldPatient.gender,
+          treatmentType: oldPatient.treatment_type,
+          isActive: oldPatient.isActive
+        }
+      }, patient.branchId, patient.hn)
       
       res.json({
         success: true,
@@ -96,7 +126,21 @@ export const updatePatientActiveController = async (req, res) => {
       const { id } = req.params
       const { isActive } = req.body
       
+      // ดึงข้อมูลผู้ป่วยเดิมก่อนแก้ไข
+      const oldPatient = await patientService.getPatientById(id)
+      
       const patient = await patientService.updatePatientActive(id, isActive, req.user?.id)
+      
+      // บันทึก log การเปลี่ยนสถานะการใช้งาน
+      await createSystemLog(req, 'UPDATE_PATIENT_STATUS', {
+        patientId: patient.id,
+        patientName: `${patient.first_name} ${patient.last_name}`,
+        changes: {
+          before: { isActive: oldPatient.isActive },
+          after: { isActive: patient.isActive }
+        },
+        action: isActive ? 'ACTIVATE_PATIENT' : 'DEACTIVATE_PATIENT'
+      }, patient.branchId, patient.hn)
       
       res.json({
         success: true,

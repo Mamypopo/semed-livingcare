@@ -170,7 +170,7 @@ model Patient {
 
 model ContactPerson {
   id             Int       @id @default(autoincrement())
-  full_name      String     // ชื่อ–นามสกุล
+  name           String     // ชื่อ–นามสกุล
   phone          String?    // เบอร์โทรศัพท์
   relationship   String?    // ความสัมพันธ์ เช่น บิดา, มารดา, คู่สมรส
 
@@ -251,6 +251,9 @@ model PatientTag {
 model File {
   id          Int      @id @default(autoincrement())
   url         String
+  name        String?  // ชื่อไฟล์ที่ผู้ใช้กำหนด (ถ้าไม่กรอกใช้ชื่อไฟล์เดิม)
+  originalName String? // ชื่อไฟล์เดิมพร้อมนามสกุล
+  fileSize    Int?     // ขนาดไฟล์ (bytes)
   description String?
   uploadedBy  String?
   patient_id  Int
@@ -273,6 +276,7 @@ model SystemLog {
   user        User?      @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   branchId    Int?                        // ถ้ามีหลายสาขา
   branch      Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  hn          String?                     // หมายเลข HN ของผู้ป่วย (สำหรับกรอง log)
   
   createdAt   DateTime  @default(now())
 
@@ -281,4 +285,5 @@ model SystemLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+  @@index([hn])
 }

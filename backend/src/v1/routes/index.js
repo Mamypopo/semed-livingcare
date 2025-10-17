@@ -6,10 +6,11 @@ import patientGroupRoutes from "../patient-group/patient-group.routes.js";
 import tagRoutes from "../tag/tag.routes.js";
 import insuranceTypeRoutes from "../insurance-type/insurance-type.routes.js";
 import patientRoutes from "../patient/patient.routes.js";
+import fileRoutes from "../file/file.routes.js";
 
 const router = express.Router();
 
-// API Routes
+// Routes
 router.use("/auth", authRoutes);
 router.use("/branches", branchRoutes);
 router.use("/users", userRoutes);
@@ -17,5 +18,6 @@ router.use("/patient-groups", patientGroupRoutes);
 router.use("/tags", tagRoutes);
 router.use("/insurance-types", insuranceTypeRoutes);
 router.use("/patients", patientRoutes);
+router.use("/", fileRoutes);
 
 export default router;

@@ -90,9 +90,10 @@
                     <!-- Profile Picture -->
                     <div class="col-span-3">
                       <div
-                        class="w-32 h-32 mx-auto bg-gradient-to-br from-purple-400 to-teal-400 rounded-lg border-2 border-white shadow-lg flex items-center justify-center"
+                        class="w-32 h-32 mx-auto bg-gradient-to-br from-purple-400 to-teal-400 rounded-lg border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:shadow-xl transition-shadow duration-200"
+                        @click="triggerProfileImageUpload"
                       >
-                        <div class="text-white text-center">
+                        <div v-if="!profileImagePreview" class="text-white text-center">
                           <div
                             class="w-16 h-16 mx-auto mb-2 bg-white/20 rounded-lg flex items-center justify-center"
                           >
@@ -104,9 +105,30 @@
                               />
                             </svg>
                           </div>
-                          <div class="text-xs">รูปโปรไฟล์</div>
+                          <div class="text-xs">คลิกเพื่ออัปโหลด</div>
+                        </div>
+                        <div v-else class="relative w-full h-full">
+                          <img
+                            :src="profileImagePreview"
+                            alt="รูปโปรไฟล์"
+                            class="w-full h-full object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            @click.stop="removeProfileImage"
+                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                          >
+                            ×
+                          </button>
                         </div>
                       </div>
+                      <input
+                        ref="profileImageInput"
+                        type="file"
+                        accept="image/*"
+                        @change="handleProfileImageUpload"
+                        class="hidden"
+                      />
 
                       <!-- Status and Points under profile -->
                       <div class="mt-4 space-y-3">
@@ -1208,8 +1230,8 @@
                           >
                           <input
                             v-model="form.weight"
-                            type="number"
-                            step="0.1"
+                            type="text"
+                            @input="form.weight = $event.target.value"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
@@ -1220,8 +1242,8 @@
                           >
                           <input
                             v-model="form.height"
-                            type="number"
-                            step="0.1"
+                            type="text"
+                            @input="form.height = $event.target.value"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
@@ -1230,8 +1252,8 @@
                           <label class="block text-sm font-medium text-gray-700 mb-1">รอบเอว</label>
                           <input
                             v-model="form.waist"
-                            type="number"
-                            step="0.1"
+                            type="text"
+                            @input="form.waist = $event.target.value"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
@@ -1240,8 +1262,8 @@
                           <label class="block text-sm font-medium text-gray-700 mb-1">รอบอก</label>
                           <input
                             v-model="form.chest"
-                            type="number"
-                            step="0.1"
+                            type="text"
+                            @input="form.chest = $event.target.value"
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="0"
                           />
@@ -1359,12 +1381,12 @@
                       </div>
 
                       <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">หมายเหตุ</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">หมายเหตุทางการแพทย์</label>
                         <textarea
-                          v-model="form.note"
+                          v-model="form.health_note"
                           rows="3"
                           class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                          placeholder="ระบุหมายเหตุ"
+                          placeholder="ระบุหมายเหตุทางการแพทย์"
                         />
                       </div>
                     </div>
@@ -1928,16 +1950,29 @@
                     <div v-if="selectedFiles.length > 0" class="mt-3 p-3 bg-teal-50 rounded-lg border border-teal-200">
                       <p class="text-xs text-teal-800 mb-2">ไฟล์ที่เลือก: {{ selectedFiles.length }} ไฟล์</p>
                       <div class="space-y-2">
-                        <div>
-                          <label class="block text-sm font-medium text-gray-700 mb-1">
-                            คำอธิบาย <span class="text-xs text-gray-500">(ไม่บังคับ)</span> 
-                          </label>
-                          <input
-                            v-model="fileDescription"
-                            type="text"
-                            placeholder="เช่น บัตรประชาชน, เอกสารทางการแพทย์"
-                            class="w-full px-3 py-2 text-xs border border-gray-200 rounded shadow-sm bg-white text-gray-700 hover:border-teal-400 placeholder-gray-400 focus:border-teal-400 focus:ring-1 focus:ring-teal-300/80 focus:outline-none transition-colors duration-200"
-                          />
+                        <div class="grid grid-cols-2 gap-2">
+                          <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                              ชื่อไฟล์ <span class="text-xs text-gray-500">(ไม่บังคับ)</span> 
+                            </label>
+                            <input
+                              v-model="fileName"
+                              type="text"
+                              placeholder="เช่น บัตรประชาชน"
+                              class="w-full px-3 py-2 text-xs border border-gray-200 rounded shadow-sm bg-white text-gray-700 hover:border-teal-400 placeholder-gray-400 focus:border-teal-400 focus:ring-1 focus:ring-teal-300/80 focus:outline-none transition-colors duration-200"
+                            />
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                              คำอธิบาย <span class="text-xs text-gray-500">(ไม่บังคับ)</span> 
+                            </label>
+                            <input
+                              v-model="fileDescription"
+                              type="text"
+                              placeholder="เช่น เอกสารทางการแพทย์"
+                              class="w-full px-3 py-2 text-xs border border-gray-200 rounded shadow-sm bg-white text-gray-700 hover:border-teal-400 placeholder-gray-400 focus:border-teal-400 focus:ring-1 focus:ring-teal-300/80 focus:outline-none transition-colors duration-200"
+                            />
+                          </div>
                         </div>
                         
 
@@ -2001,7 +2036,8 @@
 
                           <!-- File Info -->
                           <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate">{{ file.description || 'เอกสาร' }}</p>
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ file.name || 'เอกสาร' }}</p>
+                            <p v-if="file.description" class="text-xs text-gray-500 mt-1">{{ file.description }}</p>
                             <p class="text-xs text-gray-400 mt-1">{{ formatFileSize(file.size) }} • {{ formatDate(file.createdAt) }}</p>
                           </div>
 
@@ -2009,17 +2045,18 @@
                           <div class="flex items-center space-x-1">
                             <button
                               type="button"
-                              @click="downloadFile(file)"
-                              class="p-1 text-gray-400 hover:text-blue-600 transition-colors duration-200"
-                              v-tooltip.bottom="'ดาวน์โหลด'"
+                              @click="viewFile(file)"
+                              class="p-1 text-gray-400 hover:text-green-600 transition-colors duration-200"
+                              v-tooltip.bottom="'ดูไฟล์'"
                             >
-                              <Download class="h-4 w-4" />
+                              <Eye class="h-4 w-4" />
                             </button>
                             <button
                               type="button"
                               @click="deleteFile(file)"
                               class="p-1 text-gray-400 hover:text-red-600 transition-colors duration-200"
-                              v-tooltip.bottom="'ลบ'"                            >
+                              v-tooltip.bottom="'ลบ'"
+                            >
                               <X class="h-4 w-4" />
                             </button>
                           </div>
@@ -2052,7 +2089,7 @@ import {
   TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, Check, Plus, Trash2, Upload, FileText, Download, X, Image as ImageIcon, File } from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, Trash2, Upload, FileText, X, Image as ImageIcon, File, Eye } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 import TagDropdown from '@/components/dropdown/TagDropdown.vue'
 import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
@@ -2062,6 +2099,7 @@ import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { addressService } from '@/services/external/address.service'
+import fileService from '@/services/file.js'
 
 export default {
   name: 'PatientModal',
@@ -2082,14 +2120,14 @@ export default {
     FileText,
     ImageIcon,
     File,
-    Download,
     X,
     TagDropdown,
     VueDatePicker,
     BranchDropdown,
     PatientGroupDropdown,
     InsuranceTypeDropdown,
-    ConfirmClosePopover
+    ConfirmClosePopover,
+    Eye
   },
   props: {
     modelValue: {
@@ -2123,6 +2161,8 @@ export default {
       ],
       nextContactId: 2,
       nationalIdDigits: Array(13).fill(''),
+      profileImageFile: null,
+      profileImagePreview: null,
       form: {
         hn: '',
         prefix: '',
@@ -2353,7 +2393,8 @@ export default {
       patientFiles: [],
       uploadingFiles: false,
       selectedFiles: [],
-      fileDescription: ''
+      fileDescription: '',
+      fileName: ''
     }
   },
   computed: {
@@ -2463,6 +2504,47 @@ export default {
       const nextIndex = Math.min(pastedData.length, 12)
       this.$refs.nationalIdInputs[nextIndex]?.focus()
     },
+    triggerProfileImageUpload() {
+      this.$refs.profileImageInput.click()
+    },
+    handleProfileImageUpload(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      // ตรวจสอบประเภทไฟล์
+      if (!file.type.startsWith('image/')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ไฟล์ไม่ถูกต้อง',
+          text: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น'
+        })
+        return
+      }
+
+      // ตรวจสอบขนาดไฟล์ (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ไฟล์ใหญ่เกินไป',
+          text: 'ขนาดไฟล์ต้องไม่เกิน 5MB'
+        })
+        return
+      }
+
+      this.profileImageFile = file
+      
+      // สร้าง preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        this.profileImagePreview = e.target.result
+      }
+      reader.readAsDataURL(file)
+    },
+    removeProfileImage() {
+      this.profileImageFile = null
+      this.profileImagePreview = null
+      this.$refs.profileImageInput.value = ''
+    },
     async handleSubmit() {
       try {
         // ตรวจสอบข้อมูลที่จำเป็นก่อนส่ง (ยอมรับค่า 'ไม่ระบุ')
@@ -2472,18 +2554,13 @@ export default {
           'blood_group', 'birth_date', 'treatment_type', 'insurance_type_id', 'address'
         ]
         
-        console.log('🔍 ตรวจสอบข้อมูลฟอร์ม:')
-        console.log('Form data:', this.form)
-        console.log('Selected tags:', this.selectedTags)
         
         const missingFields = requiredFields.filter(field => {
           const value = this.form[field]
           const isEmpty = !value || value === ''
-          console.log(`  ${field}: "${value}" ${isEmpty ? '❌ ขาด' : '✅ ครบ'}`)
           return isEmpty
         })
         
-        console.log('Missing fields:', missingFields)
         
         if (missingFields.length > 0) {
           Swal.fire({
@@ -2495,15 +2572,16 @@ export default {
           return
         }
         
-        // ไม่ส่ง HN ไป Backend เลย เพราะ HN ไม่สามารถแก้ไขได้
         const formData = {
           ...this.form,
-          hn: undefined, // ไม่ส่ง HN ไป Backend เลย
-          tagIds: this.selectedTags.map(tag => tag.id)
+          hn: undefined, 
+          tagIds: this.selectedTags.map(tag => tag.id),
+          profileImage: this.profileImageFile,
+          contactPersons: this.contactPersons.filter(contact => 
+            contact.name && contact.phone && contact.relationship
+          )
         }
         
-        console.log('📤 ข้อมูลที่จะส่งไป Backend:')
-        console.log('Form data to send:', formData)
 
         await this.$emit('save', formData)
       } catch (error) {
@@ -2767,6 +2845,9 @@ export default {
       ]
       this.nextContactId = 2
       this.showRelationshipDropdowns = {}
+      this.profileImageFile = null
+      this.profileImagePreview = null
+      this.nationalIdDigits = Array(13).fill('')
       
       // Reset Company Address
       this.selectedCompanyProvince = null
@@ -3184,6 +3265,7 @@ export default {
     cancelFileUpload() {
       this.selectedFiles = []
       this.fileDescription = ''
+      this.fileName = ''
       this.$refs.fileInput.value = ''
     },
 
@@ -3192,6 +3274,7 @@ export default {
       
       this.selectedFiles = []
       this.fileDescription = ''
+      this.fileName = ''
       this.$refs.fileInput.value = ''
       
       // แสดง Swal toast
@@ -3231,6 +3314,19 @@ export default {
       
       if (!result.isConfirmed) return
       
+      // ตรวจสอบว่า initialData มีอยู่หรือไม่ (ก่อนแสดง loading)
+      if (!this.initialData || !this.initialData.id) {
+        // แสดง Swal แจ้งเตือน
+        await Swal.fire({
+          icon: 'warning',
+          title: 'ไม่สามารถอัปโหลดไฟล์ได้',
+          text: 'กรุณาบันทึกข้อมูลผู้ป่วยก่อนอัปโหลดไฟล์',
+          confirmButtonColor: '#14b8a6',
+          confirmButtonText: 'เข้าใจแล้ว'
+        })
+        return
+      }
+      
       this.uploadingFiles = true
       
       // แสดง loading
@@ -3244,21 +3340,20 @@ export default {
       })
       
       try {
-      
-        // Simulate upload delay
-        await new Promise(resolve => setTimeout(resolve, 2000))
         
-        // Add mock files for demonstration
-        const mockFiles = this.selectedFiles.map((file, index) => ({
-          id: Date.now() + index,
-          url: URL.createObjectURL(file),
-          name: file.name, // เพิ่ม name field
-          description: this.fileDescription || file.name,
-          size: file.size,
-          createdAt: new Date().toISOString()
-        }))
         
-        this.patientFiles.push(...mockFiles)
+        // Upload each file
+        for (const file of this.selectedFiles) {
+          await fileService.uploadFile(
+            this.initialData.id,
+            file,
+            this.fileName || file.name,
+            this.fileDescription
+          )
+        }
+        
+        // Reload files after upload
+        await this.loadPatientFiles()
         
         // เก็บจำนวนไฟล์ก่อนล้างค่า
         const fileCount = this.selectedFiles.length
@@ -3305,12 +3400,15 @@ export default {
     },
 
     getFileIcon(file) {
-      const extension = file.name ? file.name.split('.').pop().toLowerCase() : ''
+      // ใช้ originalFileName สำหรับ icon (ชื่อไฟล์เดิมที่มี extension)
+      const fileName = file.originalFileName || file.name || ''
+      const extension = fileName.split('.').pop().toLowerCase()
+      
       if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
         return 'ImageIcon'
       }
       if (extension === 'pdf') {
-        return 'FileText' // ใช้ FileText สำหรับ PDF
+        return 'FileText'
       }
       if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
         return 'FileText'
@@ -3319,7 +3417,10 @@ export default {
     },
 
     getFileIconColor(file) {
-      const extension = file.name ? file.name.split('.').pop().toLowerCase() : ''
+      // ใช้ originalFileName สำหรับ icon color
+      const fileName = file.originalFileName || file.name || ''
+      const extension = fileName.split('.').pop().toLowerCase()
+      
       if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
         return 'text-green-400'
       }
@@ -3329,7 +3430,7 @@ export default {
       if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
         return 'text-sky-400'
       }
-      return 'text-teal-400'
+      return 'text-gray-400'
     },
     
     formatFileSize(bytes) {
@@ -3351,25 +3452,26 @@ export default {
       })
     },
 
-    downloadFile(file) {
-      console.log('Download file:', file)
-      // TODO: Implement file download logic
-      
-      // แสดง SweetAlert สำหรับการดาวน์โหลด
-      Swal.fire({
-        title: 'กำลังดาวน์โหลด...',
-        text: `กำลังดาวน์โหลดไฟล์ ${file.description || 'เอกสาร'}`,
-        icon: 'info',
-        timer: 1500,
-        timerProgressBar: true,
-        showConfirmButton: false
-      })
-      
-      // For now, open in new tab
-      setTimeout(() => {
-        window.open(file.url, '_blank')
-      }, 500)
+    async viewFile(file) {
+      try {
+        if (file.url && file.url.startsWith('http')) {
+          // เปิดไฟล์ในแท็บใหม่
+          window.open(file.url, '_blank')
+        } else {
+          throw new Error('ไม่พบ URL ของไฟล์')
+        }
+      } catch (error) {
+        console.error('❌ Error viewing file:', error)
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: error.message || 'ไม่สามารถดูไฟล์ได้',
+          confirmButtonColor: '#ef4444'
+        })
+      }
     },
+
 
     async deleteFile(file) {
       // แสดง SweetAlert ยืนยันการลบ
@@ -3388,13 +3490,12 @@ export default {
       if (!result.isConfirmed) return
       
       try {
-        // TODO: Implement file delete API
         
-        // ลบไฟล์จากรายการ
-        const index = this.patientFiles.findIndex(f => f.id === file.id)
-        if (index > -1) {
-          this.patientFiles.splice(index, 1)
-        }
+        // Call delete API
+        await fileService.deleteFile(file.id)
+        
+        // Reload files after deletion
+        await this.loadPatientFiles()
         
         // แสดง Swal toast
         const Toast = Swal.mixin({
@@ -3429,39 +3530,64 @@ export default {
     async loadPatientFiles() {
       if (this.activeTab === 'documents' && this.initialData?.id) {
         try {
-          // TODO: Implement API call to load patient files
           
-          // Mock data for demonstration
+          const response = await fileService.getPatientFiles(this.initialData.id)
+          
+          if (response.success) {
+            this.patientFiles = response.data.map(file => ({
+              id: file.id,
+              url: file.url,
+              name: file.name,
+              originalFileName: file.originalName || file.name,
+              description: file.description,
+              size: file.fileSize || 0,
+              createdAt: file.createdAt
+            }))
+          } else {
+            throw new Error(response.message || 'ไม่สามารถดึงข้อมูลไฟล์ได้')
+          }
+        } catch (error) {
+          console.error('❌ Error loading files:', error)
+          
+          // Fallback to mock data for development
           this.patientFiles = [
             {
               id: 1,
               url: '#',
-              name: 'id_card.jpg',
-              description: 'บัตรประชาชน',
+              name: 'บัตรประชาชน', // ชื่อที่ผู้ใช้กำหนด
+              originalFileName: 'id_card.jpg', // ชื่อไฟล์เดิมสำหรับ icon
+              description: 'เอกสารประจำตัว',
               size: 1024000,
               createdAt: '2024-01-15T10:30:00Z'
             },
             {
               id: 2,
               url: '#',
-              name: 'lab_result.pdf',
-              description: 'ผลแล็บเลือด',
+              name: 'ผลแล็บเลือด', // ชื่อที่ผู้ใช้กำหนด
+              originalFileName: 'lab_result.pdf', // ชื่อไฟล์เดิมสำหรับ icon
+              description: 'รายงานผลการตรวจ',
               size: 2048000,
               createdAt: '2024-01-14T14:20:00Z'
             },
             {
               id: 3,
               url: '#',
-              name: 'medical_cert.docx',
-              description: 'ใบรับรองแพทย์',
+              name: 'ใบรับรองแพทย์', // ชื่อที่ผู้ใช้กำหนด
+              originalFileName: 'medical_cert.docx', // ชื่อไฟล์เดิมสำหรับ icon
+              description: 'เอกสารทางการแพทย์',
               size: 512000,
               createdAt: '2024-01-13T09:15:00Z'
             }
           ]
-        } catch (error) {
-          console.error('Error loading patient files:', error)
         }
       }
+    },
+
+    // Method สำหรับเปลี่ยนไปที่ Documents Tab
+    switchToDocumentsTab() {
+      this.activeTab = 'documents'
+      // โหลดไฟล์หลังจากเปลี่ยน tab
+      this.loadPatientFiles()
     }
   },
   watch: {
@@ -3473,6 +3599,25 @@ export default {
             this.selectedTags = this.initialData.patientTags
               ? this.initialData.patientTags.map(pt => pt.tag)
               : []
+
+            // Load contact persons
+            if (this.initialData.contactPersons && this.initialData.contactPersons.length > 0) {
+              this.contactPersons = this.initialData.contactPersons.map((contact, index) => ({
+                id: index + 1,
+                name: contact.name || '',
+                phone: contact.phone || '',
+                relationship: contact.relationship || ''
+              }))
+              this.nextContactId = this.contactPersons.length + 1
+            } else {
+              this.contactPersons = [{
+                id: 1,
+                name: '',
+                phone: '',
+                relationship: ''
+              }]
+              this.nextContactId = 2
+            }
 
             // Set selected values for Listbox
             if (this.form.province) {

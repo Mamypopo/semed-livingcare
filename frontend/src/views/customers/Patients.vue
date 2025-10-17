@@ -211,7 +211,7 @@
                   <div class="flex items-center">
                     <div>
                       <div class="font-medium">
-                        {{ patient.prefix }}{{ patient.first_name }} {{ patient.last_name }}
+                        {{ patient.prefix }} {{ patient.first_name }} {{ patient.last_name }}
                       </div>
                       <div v-if="patient.nickname" class="text-xs text-gray-500">
                         ({{ patient.nickname }})
@@ -334,6 +334,7 @@
 
     <!-- Patient Modal -->
     <PatientModal
+      ref="patientModal"
       v-model="modalOpen"
       :initialData="editingPatient"
       :loading="modalLoading"
@@ -517,18 +518,35 @@ export default {
           })
           await this.reload()
         } else {
-          await patientService.createPatient(data)
-          this.modalOpen = false
+          const newPatient = await patientService.createPatient(data)
           this.modalLoading = false
-          Swal.fire({
+          
+          // แสดงข้อความถามว่าต้องการเพิ่มไฟล์หรือไม่
+          const addFiles = await Swal.fire({
+            title: 'สร้างลูกค้าสำเร็จ!',
+            text: 'ต้องการเพิ่มไฟล์เอกสารหรือไม่?',
             icon: 'success',
-            title: 'สร้างลูกค้าสำเร็จ',
-            timer: 1600,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end'
+            showCancelButton: true,
+            confirmButtonColor: '#14b8a6',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'เพิ่มไฟล์',
+            cancelButtonText: 'ปิด',
+            reverseButtons: true
           })
-          await this.reload()
+          
+          if (addFiles.isConfirmed) {
+            // เปลี่ยนเป็นโหมดแก้ไขและเปลี่ยนไปที่ Documents Tab
+            this.editingPatient = { ...newPatient.data }
+            this.modalOpen = true
+            // ส่ง event ไปยัง PatientModal เพื่อเปลี่ยน tab
+            this.$nextTick(() => {
+              this.$refs.patientModal?.switchToDocumentsTab?.()
+            })
+          } else {
+            // ปิด modal
+            this.modalOpen = false
+            await this.reload()
+          }
         }
       } catch (error) {
         this.modalLoading = false
