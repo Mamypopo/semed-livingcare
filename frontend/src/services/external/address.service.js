@@ -12,13 +12,13 @@ export const addressService = {
       const response = await addressApi.get('/raw_database.json')
       return {
         success: true,
-        data: response.data,
+        data: response.data
       }
     } catch (error) {
       console.error('Error fetching address data:', error)
       return {
         success: false,
-        error: error.message,
+        error: error.message
       }
     }
   },
@@ -29,16 +29,16 @@ export const addressService = {
       const result = await this.getAllAddressData()
       if (result.success) {
         // แยกจังหวัดออกมา (unique)
-        const provinces = [...new Set(result.data.map((item) => item.province))].map(
+        const provinces = [...new Set(result.data.map(item => item.province))].map(
           (province, index) => ({
             id: index + 1,
             name_th: province,
-            name_en: province,
-          }),
+            name_en: province
+          })
         )
         return {
           success: true,
-          data: provinces,
+          data: provinces
         }
       } else {
         return result
@@ -47,7 +47,7 @@ export const addressService = {
       console.error('Error fetching provinces:', error)
       return {
         success: false,
-        error: error.message,
+        error: error.message
       }
     }
   },
@@ -60,17 +60,17 @@ export const addressService = {
         // กรองอำเภอตามจังหวัด (ใช้ amphoe แทน district)
         const districts = [
           ...new Set(
-            result.data.filter((item) => item.province === provinceName).map((item) => item.amphoe),
-          ),
+            result.data.filter(item => item.province === provinceName).map(item => item.amphoe)
+          )
         ].map((amphoe, index) => ({
           id: index + 1,
           name_th: amphoe,
-          name_en: amphoe,
+          name_en: amphoe
         }))
 
         return {
           success: true,
-          data: districts,
+          data: districts
         }
       } else {
         return result
@@ -79,7 +79,7 @@ export const addressService = {
       console.error('Error fetching districts:', error)
       return {
         success: false,
-        error: error.message,
+        error: error.message
       }
     }
   },
@@ -92,16 +92,16 @@ export const addressService = {
         // กรองตำบลตามอำเภอ (ใช้ district แทน subdistrict)
         const subDistricts = [
           ...new Set(
-            result.data.filter((item) => item.amphoe === districtName).map((item) => item.district),
-          ),
+            result.data.filter(item => item.amphoe === districtName).map(item => item.district)
+          )
         ].map((district, index) => ({
           id: index + 1,
           name_th: district,
-          name_en: district,
+          name_en: district
         }))
         return {
           success: true,
-          data: subDistricts,
+          data: subDistricts
         }
       } else {
         return result
@@ -110,7 +110,7 @@ export const addressService = {
       console.error('Error fetching sub-districts:', error)
       return {
         success: false,
-        error: error.message,
+        error: error.message
       }
     }
   },
@@ -123,14 +123,12 @@ export const addressService = {
         // หารหัสไปรษณีย์ตามตำบล (ใช้ district แทน subdistrict)
         const postcodes = [
           ...new Set(
-            result.data
-              .filter((item) => item.district === subDistrictName)
-              .map((item) => item.zipcode),
-          ),
+            result.data.filter(item => item.district === subDistrictName).map(item => item.zipcode)
+          )
         ]
         return {
           success: true,
-          data: postcodes.map((postcode) => ({ postcode: String(postcode) })),
+          data: postcodes.map(postcode => ({ postcode: String(postcode) }))
         }
       } else {
         return result
@@ -139,10 +137,10 @@ export const addressService = {
       console.error('Error fetching postcodes:', error)
       return {
         success: false,
-        error: error.message,
+        error: error.message
       }
     }
-  },
+  }
 }
 
 export default addressService

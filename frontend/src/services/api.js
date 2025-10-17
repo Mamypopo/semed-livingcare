@@ -6,13 +6,13 @@ const api = axios.create({
   baseURL: config.API_BASE_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 })
 
 // Request interceptor
 api.interceptors.request.use(
-  (config) => {
+  config => {
     // Add auth token if available
     const token = localStorage.getItem('token')
     if (token) {
@@ -20,17 +20,17 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => {
+  error => {
     return Promise.reject(error)
-  },
+  }
 )
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
+  response => {
     return response
   },
-  (error) => {
+  error => {
     // Handle common errors
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
@@ -50,7 +50,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  },
+  }
 )
 
 // Generic API methods
@@ -59,7 +59,7 @@ export const apiClient = {
   post: (url, data) => api.post(url, data),
   put: (url, data) => api.put(url, data),
   patch: (url, data) => api.patch(url, data),
-  delete: (url) => api.delete(url),
+  delete: url => api.delete(url)
 }
 
 export const createHttp = (baseURL, extra = {}) =>
@@ -67,7 +67,7 @@ export const createHttp = (baseURL, extra = {}) =>
     baseURL,
     timeout: 10000,
     headers: { 'Content-Type': 'application/json' },
-    ...extra,
+    ...extra
   })
 
 // Export api instance for direct use

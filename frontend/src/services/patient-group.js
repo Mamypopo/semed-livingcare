@@ -54,7 +54,7 @@ const patientGroupService = {
 
     const response = await apiClient.get(`/patient-groups/dropdown?${params.toString()}`)
     return response.data.data
-  },
+  }
 }
 
 export default patientGroupService

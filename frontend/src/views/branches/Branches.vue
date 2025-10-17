@@ -44,7 +44,7 @@
                 <li
                   :class="[
                     'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
@@ -85,7 +85,7 @@
                 <li
                   :class="[
                     'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
@@ -283,7 +283,7 @@ import {
   Pencil,
   Trash2,
   ToggleLeft,
-  ToggleRight,
+  ToggleRight
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import BranchModal from '@/views/branches/components/modals/BranchModal.vue'
@@ -305,7 +305,7 @@ export default {
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    BranchModal,
+    BranchModal
   },
   setup() {
     const authStore = useAuthStore()
@@ -319,14 +319,14 @@ export default {
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
         { label: 'ใช้งาน', value: true },
-        { label: 'ปิดใช้งาน', value: false },
+        { label: 'ปิดใช้งาน', value: false }
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
       pageSize: 10,
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
-        { label: '50 ต่อหน้า', value: 50 },
+        { label: '50 ต่อหน้า', value: 50 }
       ],
       pageSizeOption: { label: '10 ต่อหน้า', value: 10 },
       meta: { page: 1, totalPages: 1, total: 0 },
@@ -337,7 +337,7 @@ export default {
       order: 'desc',
       modalOpen: false,
       modalLoading: false,
-      editingBranch: null,
+      editingBranch: null
     }
   },
   computed: {
@@ -357,7 +357,7 @@ export default {
     },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
-    },
+    }
   },
   methods: {
     // เมื่อเลือกสถานะใหม่ จะรีเฟรชอัตโนมัติผ่าน watch ด้านล่าง
@@ -370,7 +370,7 @@ export default {
           search: this.query || undefined,
           isActive: this.isActive === '' ? undefined : this.isActive,
           sort: this.sort,
-          order: this.order,
+          order: this.order
         })
         this.branches = data
         this.meta = meta
@@ -422,7 +422,7 @@ export default {
           name: '',
           address: '',
           phone: '',
-          isActive: true,
+          isActive: true
         }
       }
       this.modalOpen = true
@@ -443,7 +443,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true,
+        reverseButtons: true
       })
       if (!confirm.isConfirmed) return
 
@@ -452,7 +452,7 @@ export default {
         if (isEdit) {
           const res = await branchService.update(data.id, data)
           const updated = res.branch || res
-          this.branches = this.branches.map((x) => (x.id === updated.id ? { ...x, ...updated } : x))
+          this.branches = this.branches.map(x => (x.id === updated.id ? { ...x, ...updated } : x))
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
@@ -461,7 +461,7 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end',
+            position: 'top-end'
           })
         } else {
           const res = await branchService.create(data)
@@ -476,7 +476,7 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end',
+            position: 'top-end'
           })
         }
       } catch (e) {
@@ -484,7 +484,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
+          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้'
         })
       }
     },
@@ -499,7 +499,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true,
+        reverseButtons: true
       })
       if (!res.isConfirmed) return
 
@@ -507,7 +507,7 @@ export default {
         const updated = await branchService.updateActive(b.id, desired)
         // อัปเดตในตารางทันที
         const newVal = updated.branch || updated
-        const idx = this.branches.findIndex((x) => x.id === b.id)
+        const idx = this.branches.findIndex(x => x.id === b.id)
         if (idx !== -1)
           this.$set
             ? this.$set(this.branches, idx, { ...b, ...newVal })
@@ -518,16 +518,16 @@ export default {
           timer: 1200,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
       } catch (e) {
         Swal.fire({
           icon: 'error',
           title: 'อัปเดตสถานะไม่สำเร็จ',
-          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง',
+          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง'
         })
       }
-    },
+    }
   },
   mounted() {
     this.reload()
@@ -543,9 +543,9 @@ export default {
         this.pageSize = newVal.value
         this.meta.page = 1
         this.reload()
-      },
-    },
-  },
+      }
+    }
+  }
 }
 </script>
 

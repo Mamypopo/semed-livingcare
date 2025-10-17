@@ -46,7 +46,7 @@
               :class="[
                 active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                 'relative cursor-default select-none py-2 pr-4',
-                selected ? 'pl-10' : 'pl-3',
+                selected ? 'pl-10' : 'pl-3'
               ]"
             >
               <div class="flex items-center justify-between">
@@ -94,24 +94,24 @@ export default {
     ListboxOptions,
     ListboxOption,
     ChevronDown,
-    Check,
+    Check
   },
   props: {
     modelValue: {
       type: [String, Number],
-      default: null,
+      default: null
     },
     placeholder: {
       type: String,
-      default: 'เลือกสาขา...',
-    },
+      default: 'เลือกสาขา...'
+    }
   },
   emits: ['update:modelValue'],
   data() {
     return {
       searchQuery: '',
       branches: [],
-      searchTimeout: null,
+      searchTimeout: null
     }
   },
   computed: {
@@ -121,20 +121,20 @@ export default {
       },
       set(value) {
         this.$emit('update:modelValue', value)
-      },
+      }
     },
     selectedBranch() {
-      return this.branches.find((branch) => branch.id === this.modelValue)
+      return this.branches.find(branch => branch.id === this.modelValue)
     },
     filteredBranches() {
       return this.branches
-    },
+    }
   },
   watch: {
     searchQuery: {
       handler: 'debouncedSearch',
-      immediate: false,
-    },
+      immediate: false
+    }
   },
   async mounted() {
     await this.loadBranches()
@@ -169,7 +169,7 @@ export default {
     handleSelection(value) {
       this.selectedValue = value
       this.searchQuery = ''
-    },
-  },
+    }
+  }
 }
 </script>

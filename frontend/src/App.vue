@@ -13,13 +13,13 @@ export default {
     const authStore = useAuthStore()
 
     return {
-      authStore,
+      authStore
     }
   },
   mounted() {
     // Initialize auth when app starts
     this.authStore.initializeAuth()
-  },
+  }
 }
 </script>
 <style>

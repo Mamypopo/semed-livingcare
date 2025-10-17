@@ -41,5 +41,5 @@ export const userService = {
   async getStats() {
     const response = await apiClient.get('/users/stats')
     return response.data.data
-  },
+  }
 }

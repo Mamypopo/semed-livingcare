@@ -45,7 +45,7 @@
                     @blur="hideSearchResults"
                     type="text"
                     placeholder="ค้นหา..."
-                    class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 focus:outline-none hover:border-emerald-300"
+                    class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                   />
                   <SearchIcon
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -69,7 +69,7 @@
                         @click="selectSearchResult(result)"
                         :class="[
                           'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors',
-                          selectedSearchIndex === index ? 'bg-emerald-50' : '',
+                          selectedSearchIndex === index ? 'bg-emerald-50' : ''
                         ]"
                       >
                         <div class="flex items-center space-x-3">
@@ -112,7 +112,7 @@
                     <ChevronDown
                       :class="[
                         'w-4 h-4 text-gray-400 transition-transform duration-200',
-                        open ? 'rotate-180' : '',
+                        open ? 'rotate-180' : ''
                       ]"
                     />
                   </MenuButton>
@@ -134,7 +134,7 @@
                         <a
                           :class="[
                             'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer',
-                            active ? 'bg-emerald-50' : '',
+                            active ? 'bg-emerald-50' : ''
                           ]"
                         >
                           <User class="w-4 h-4" />
@@ -145,7 +145,7 @@
                         <a
                           :class="[
                             'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer',
-                            active ? 'bg-yellow-50' : '',
+                            active ? 'bg-yellow-50' : ''
                           ]"
                         >
                           <Settings class="w-4 h-4" />
@@ -157,7 +157,7 @@
                           @click="goLobby"
                           :class="[
                             'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer',
-                            active ? 'bg-sky-50' : '',
+                            active ? 'bg-sky-50' : ''
                           ]"
                         >
                           <Building2 class="w-4 h-4" />
@@ -170,7 +170,7 @@
                           @click="handleLogout"
                           :class="[
                             'flex items-center space-x-3 px-3 py-2 rounded-lg text-red-600 transition-colors cursor-pointer',
-                            active ? 'bg-red-50' : '',
+                            active ? 'bg-red-50' : ''
                           ]"
                         >
                           <LogOut class="w-4 h-4" />
@@ -250,7 +250,7 @@
                     @click="selectSearchResult(result)"
                     :class="[
                       'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors',
-                      selectedSearchIndex === index ? 'bg-emerald-50' : '',
+                      selectedSearchIndex === index ? 'bg-emerald-50' : ''
                     ]"
                   >
                     <div class="flex items-center space-x-3">
@@ -290,7 +290,7 @@ import {
   Tag,
   Shield,
   Plus,
-  X,
+  X
 } from 'lucide-vue-next'
 import { Menu as HMenu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
@@ -315,7 +315,7 @@ export default {
     HMenu,
     MenuButton,
     MenuItems,
-    MenuItem,
+    MenuItem
   },
   setup() {
     const authStore = useAuthStore()
@@ -340,44 +340,44 @@ export default {
           title: 'ภาพรวม',
           description: 'หน้าหลักของระบบ',
           path: '/main/overview',
-          icon: 'Home',
+          icon: 'Home'
         },
         {
           type: 'page',
           title: 'รายชื่อสาขา',
           description: 'จัดการข้อมูลสาขา',
           path: '/main/branches',
-          icon: 'Building',
+          icon: 'Building'
         },
         {
           type: 'page',
           title: 'กลุ่มลูกค้า',
           description: 'จัดการกลุ่มลูกค้า',
           path: '/main/customers/patient-groups',
-          icon: 'Users',
+          icon: 'Users'
         },
         {
           type: 'page',
           title: 'แท็ก',
           description: 'จัดการแท็กลูกค้า',
           path: '/main/customers/tags',
-          icon: 'Tag',
+          icon: 'Tag'
         },
         {
           type: 'page',
           title: 'ประเภทประกัน',
           description: 'จัดการประเภทประกัน',
           path: '/main/customers/insurance-types',
-          icon: 'Shield',
+          icon: 'Shield'
         },
         {
           type: 'page',
           title: 'ผู้ใช้งาน',
           description: 'จัดการผู้ใช้งานระบบ',
           path: '/main/users',
-          icon: 'Users',
-        },
-      ],
+          icon: 'Users'
+        }
+      ]
     }
   },
   computed: {
@@ -394,11 +394,10 @@ export default {
 
       const query = this.searchQuery.toLowerCase()
       return this.searchData.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query),
+        item =>
+          item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query)
       )
-    },
+    }
   },
   methods: {
     toggleSidebar() {
@@ -417,7 +416,7 @@ export default {
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
-        reverseButtons: true,
+        reverseButtons: true
       })
 
       if (result.isConfirmed) {
@@ -432,7 +431,7 @@ export default {
           timer: 2000,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
       }
     },
@@ -472,7 +471,7 @@ export default {
         event.preventDefault()
         this.selectedSearchIndex = Math.min(
           this.selectedSearchIndex + 1,
-          this.searchResults.length - 1,
+          this.searchResults.length - 1
         )
       } else if (event.key === 'ArrowUp') {
         event.preventDefault()
@@ -514,7 +513,7 @@ export default {
       this.searchQuery = ''
       this.showSearchResults = false
       this.selectedSearchIndex = -1
-    },
+    }
   },
   mounted() {
     // ตรวจสอบว่ามีสาขาที่เลือกแล้วหรือไม่
@@ -524,7 +523,7 @@ export default {
     window.addEventListener('resize', this.checkScreenSize)
 
     // Click outside to close user menu
-    this._onClickOutside = (e) => {
+    this._onClickOutside = e => {
       const el = this.$refs.userMenu
       if (!el) return
       if (this.userMenuOpen && !el.contains(e.target)) {
@@ -534,7 +533,7 @@ export default {
     window.addEventListener('click', this._onClickOutside)
 
     // Keyboard shortcut for search (Ctrl+K or Cmd+K)
-    this._onKeydown = (e) => {
+    this._onKeydown = e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault()
         this.$refs.searchInput.focus()
@@ -568,7 +567,7 @@ export default {
         // ตรวจสอบขนาดหน้าจอและย่อ sidebar อัตโนมัติ
         this.checkScreenSize()
       }
-    },
-  },
+    }
+  }
 }
 </script>

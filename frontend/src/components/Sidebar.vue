@@ -6,7 +6,7 @@
       // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
       'w-64',
       isCollapsed ? 'md:w-16 lg:w-16' : 'md:w-64 lg:w-64',
-      'md:translate-x-0', // แสดงบน tablet ขึ้นไป
+      'md:translate-x-0' // แสดงบน tablet ขึ้นไป
     ]"
   >
     <!-- Sidebar Header -->
@@ -76,7 +76,7 @@
                 'md:justify-center lg:justify-start',
                 isCollapsed
                   ? 'md:justify-center lg:justify-center'
-                  : 'md:justify-start lg:justify-start',
+                  : 'md:justify-start lg:justify-start'
               ]"
               v-tooltip:right="isCollapsed ? item.name : ''"
             >
@@ -91,7 +91,7 @@
                 v-if="!isCollapsed"
                 :class="[
                   'w-4 h-4 transition-transform duration-200',
-                  openSubmenu === index ? 'rotate-180' : '',
+                  openSubmenu === index ? 'rotate-180' : ''
                 ]"
               />
             </button>
@@ -109,7 +109,7 @@
                   'group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
                   $route.path === subItem.href
                     ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 shadow-sm'
-                    : 'text-slate-600 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 hover:text-slate-800',
+                    : 'text-slate-600 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 hover:text-slate-800'
                 ]"
               >
                 <span>{{ subItem.name }}</span>
@@ -130,7 +130,7 @@
               'md:justify-center lg:justify-start',
               isCollapsed
                 ? 'md:justify-center lg:justify-center'
-                : 'md:justify-start lg:justify-start',
+                : 'md:justify-start lg:justify-start'
             ]"
             v-tooltip:right="isCollapsed ? item.name : ''"
           >
@@ -193,7 +193,7 @@ import {
   Home,
   BarChart3,
   Users,
-  Settings,
+  Settings
 } from 'lucide-vue-next'
 
 export default {
@@ -208,21 +208,21 @@ export default {
     Users,
     Building2,
     Building,
-    Settings,
+    Settings
   },
   props: {
     sidebarOpen: {
       type: Boolean,
-      default: false,
+      default: false
     },
     isCollapsed: {
       type: Boolean,
-      default: false,
+      default: false
     },
     currentBranch: {
       type: Object,
-      default: null,
-    },
+      default: null
+    }
   },
   emits: ['toggle-sidebar', 'toggle-collapse'],
   data() {
@@ -237,20 +237,20 @@ export default {
             { name: 'ลูกค้า', href: '/main/customers/patients' },
             { name: 'กลุ่มลูกค้า', href: '/main/customers/patient-groups' },
             { name: 'แท็ก', href: '/main/customers/tags' },
-            { name: 'ประเภทประกัน', href: '/main/customers/insurance-types' },
-          ],
+            { name: 'ประเภทประกัน', href: '/main/customers/insurance-types' }
+          ]
         },
         {
           name: 'สาขา',
           icon: 'Building',
-          submenu: [{ name: 'รายชื่อสาขา', href: '/main/branches' }],
+          submenu: [{ name: 'รายชื่อสาขา', href: '/main/branches' }]
         },
         {
           name: 'จัดการ',
           icon: 'Settings',
-          submenu: [{ name: 'ผู้ใช้งาน', href: '/main/users' }],
-        },
-      ],
+          submenu: [{ name: 'ผู้ใช้งาน', href: '/main/users' }]
+        }
+      ]
     }
   },
   methods: {
@@ -267,7 +267,7 @@ export default {
       // หาก route ปัจจุบันอยู่ใน submenu ใด ให้เปิดเมนูนั้นไว้
       const path = this.$route.path
       const idx = this.navigation.findIndex(
-        (item) => Array.isArray(item.submenu) && item.submenu.some((sub) => sub.href === path),
+        item => Array.isArray(item.submenu) && item.submenu.some(sub => sub.href === path)
       )
       if (idx !== -1) {
         this.openSubmenu = idx
@@ -279,8 +279,8 @@ export default {
       if (!item.submenu) return false
 
       const currentPath = this.$route.path
-      return item.submenu.some((sub) => sub.href === currentPath)
-    },
+      return item.submenu.some(sub => sub.href === currentPath)
+    }
   },
   mounted() {
     this.ensureOpenSubmenuForRoute()
@@ -288,7 +288,7 @@ export default {
   watch: {
     '$route.path'() {
       this.ensureOpenSubmenuForRoute()
-    },
-  },
+    }
+  }
 }
 </script>

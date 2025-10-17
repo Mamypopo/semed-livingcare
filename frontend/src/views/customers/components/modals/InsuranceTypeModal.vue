@@ -157,12 +157,12 @@ export default {
     TransitionRoot,
     TransitionChild,
     X,
-    ConfirmClosePopover,
+    ConfirmClosePopover
   },
   props: {
     modelValue: { type: Boolean, required: true },
     initialData: { type: Object, default: null },
-    loading: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   emits: ['update:modelValue', 'save'],
   data() {
@@ -172,17 +172,17 @@ export default {
         code: '',
         name: '',
         note: '',
-        isActive: true,
+        isActive: true
       },
       errors: {},
       originalSnapshot: null,
-      showConfirmClose: false,
+      showConfirmClose: false
     }
   },
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    },
+    }
   },
   watch: {
     initialData: {
@@ -194,15 +194,15 @@ export default {
             code: v.code || '',
             name: v.name || '',
             note: v.note || '',
-            isActive: v.isActive ?? true,
+            isActive: v.isActive ?? true
           }
         } else {
           this.resetForm()
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
-      },
-    },
+      }
+    }
   },
   methods: {
     resetForm() {
@@ -212,7 +212,7 @@ export default {
           code: this.initialData.code || '',
           name: this.initialData.name || '',
           note: this.initialData.note || '',
-          isActive: this.initialData.isActive ?? true,
+          isActive: this.initialData.isActive ?? true
         }
       } else {
         this.form = {
@@ -220,7 +220,7 @@ export default {
           code: '',
           name: '',
           note: '',
-          isActive: true,
+          isActive: true
         }
       }
       this.originalSnapshot = JSON.stringify(this.form)
@@ -262,7 +262,7 @@ export default {
       this.resetForm()
       this.showConfirmClose = false
       this.$emit('update:modelValue', false)
-    },
-  },
+    }
+  }
 }
 </script>

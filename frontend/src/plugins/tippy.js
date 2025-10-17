@@ -28,7 +28,7 @@ export default {
           zIndex: 9999,
           trigger: 'mouseenter',
           hideOnClick: true,
-          allowHTML: false,
+          allowHTML: false
         }
 
         const instance = tippy(el, options)
@@ -72,7 +72,7 @@ export default {
         if (instance) {
           instance.destroy()
         }
-      },
+      }
     })
-  },
+  }
 }

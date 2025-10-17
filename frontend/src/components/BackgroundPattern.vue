@@ -143,7 +143,7 @@ import {
   Mail,
   Phone,
   MapPin,
-  Camera,
+  Camera
 } from 'lucide-vue-next'
 
 export default {
@@ -178,8 +178,8 @@ export default {
     Mail,
     Phone,
     MapPin,
-    Camera,
-  },
+    Camera
+  }
 }
 </script>
 

@@ -24,7 +24,7 @@
               'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200',
               activeTab === 'login'
                 ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800',
+                : 'text-gray-600 hover:text-gray-800'
             ]"
           >
             เข้าสู่ระบบ
@@ -35,7 +35,7 @@
               'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200',
               activeTab === 'register'
                 ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800',
+                : 'text-gray-600 hover:text-gray-800'
             ]"
           >
             สมัครสมาชิก
@@ -377,7 +377,7 @@ export default {
     Lock,
     Eye,
     EyeOff,
-    KeyRound,
+    KeyRound
   },
   setup() {
     const router = useRouter()
@@ -385,7 +385,7 @@ export default {
 
     return {
       router,
-      authStore,
+      authStore
     }
   },
   data() {
@@ -394,14 +394,14 @@ export default {
       loginForm: {
         email: '',
         password: '',
-        rememberMe: false,
+        rememberMe: false
       },
       registerForm: {
         registrationCode: '',
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        confirmPassword: ''
       },
       showPassword: false,
       showConfirmPassword: false,
@@ -412,8 +412,8 @@ export default {
         password: '',
         registrationCode: '',
         name: '',
-        confirmPassword: '',
-      },
+        confirmPassword: ''
+      }
     }
   },
   methods: {
@@ -437,7 +437,7 @@ export default {
 
     // Register validation
     validateRegisterForm() {
-      Object.keys(this.errors).forEach((key) => (this.errors[key] = ''))
+      Object.keys(this.errors).forEach(key => (this.errors[key] = ''))
 
       if (!this.registerForm.registrationCode) {
         this.errors.registrationCode = 'กรุณากรอกรหัสสมัครสมาชิก'
@@ -495,7 +495,7 @@ export default {
           timer: 2000,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
 
         this.router.push('/lobby')
@@ -505,7 +505,7 @@ export default {
           icon: 'error',
           title: 'เข้าสู่ระบบไม่สำเร็จ',
           text: error.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ',
-          confirmButtonText: 'ลองใหม่',
+          confirmButtonText: 'ลองใหม่'
         })
       } finally {
         this.isLoading = false
@@ -529,8 +529,8 @@ export default {
           text: 'กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่านที่สมัครไว้',
           confirmButtonText: 'เข้าสู่ระบบ',
           showCancelButton: true,
-          cancelButtonText: 'ปิด',
-        }).then((result) => {
+          cancelButtonText: 'ปิด'
+        }).then(result => {
           if (result.isConfirmed) {
             this.activeTab = 'login'
             // Clear register form
@@ -539,7 +539,7 @@ export default {
               name: '',
               email: '',
               password: '',
-              confirmPassword: '',
+              confirmPassword: ''
             }
           }
         })
@@ -549,7 +549,7 @@ export default {
           icon: 'error',
           title: 'สมัครสมาชิกไม่สำเร็จ',
           text: error.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก',
-          confirmButtonText: 'ลองใหม่',
+          confirmButtonText: 'ลองใหม่'
         })
       } finally {
         this.isLoading = false
@@ -562,9 +562,9 @@ export default {
         icon: 'info',
         title: 'Google Login',
         text: 'ฟีเจอร์นี้กำลังพัฒนา กรุณาใช้การเข้าสู่ระบบปกติ',
-        confirmButtonText: 'เข้าใจแล้ว',
+        confirmButtonText: 'เข้าใจแล้ว'
       })
-    },
-  },
+    }
+  }
 }
 </script>

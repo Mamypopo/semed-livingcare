@@ -43,7 +43,7 @@
               :class="[
                 active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                 'relative cursor-default select-none py-2 pr-4',
-                selected ? 'pl-10' : 'pl-3',
+                selected ? 'pl-10' : 'pl-3'
               ]"
             >
               <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
@@ -84,17 +84,17 @@ export default {
     ListboxOptions,
     ListboxOption,
     ChevronDown,
-    Check,
+    Check
   },
   props: {
     modelValue: {
       type: [String, Number],
-      default: null,
+      default: null
     },
     placeholder: {
       type: String,
-      default: 'เลือกประเภทสิทธิ์การรักษา...',
-    },
+      default: 'เลือกประเภทสิทธิ์การรักษา...'
+    }
   },
   emits: ['update:modelValue'],
   data() {
@@ -102,7 +102,7 @@ export default {
       searchQuery: '',
       insuranceTypes: [],
       searchTimeout: null,
-      showDropdown: false,
+      showDropdown: false
     }
   },
   computed: {
@@ -112,20 +112,20 @@ export default {
       },
       set(value) {
         this.$emit('update:modelValue', value)
-      },
+      }
     },
     selectedType() {
-      return this.insuranceTypes.find((type) => type.id === this.modelValue)
+      return this.insuranceTypes.find(type => type.id === this.modelValue)
     },
     filteredTypes() {
       return this.insuranceTypes
-    },
+    }
   },
   watch: {
     searchQuery: {
       handler: 'debouncedSearch',
-      immediate: false,
-    },
+      immediate: false
+    }
   },
   async mounted() {
     await this.loadInsuranceTypes()
@@ -155,7 +155,7 @@ export default {
       this.selectedValue = value
       this.searchQuery = ''
       this.showDropdown = false
-    },
-  },
+    }
+  }
 }
 </script>

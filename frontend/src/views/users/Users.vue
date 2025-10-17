@@ -44,7 +44,7 @@
                 <li
                   :class="[
                     'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
@@ -85,7 +85,7 @@
                 <li
                   :class="[
                     'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
@@ -148,7 +148,7 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                     ]"
                   >
                     <div class="flex items-center gap-2">
@@ -206,7 +206,7 @@
                 <li
                   :class="[
                     'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
@@ -417,7 +417,7 @@ import {
   ChevronRight,
   Pencil,
   ToggleLeft,
-  ToggleRight,
+  ToggleRight
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import UserModal from '@/views/users/components/modals/UserModal.vue'
@@ -438,7 +438,7 @@ export default {
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    UserModal,
+    UserModal
   },
   setup() {
     const authStore = useAuthStore()
@@ -453,14 +453,14 @@ export default {
         { label: 'บทบาททั้งหมด', value: '' },
         { label: 'ผู้ดูแลระบบ', value: 'ADMIN' },
         { label: 'พนักงาน', value: 'STAFF' },
-        { label: 'ผู้เยี่ยมชม', value: 'GUEST' },
+        { label: 'ผู้เยี่ยมชม', value: 'GUEST' }
       ],
       roleOption: { label: 'บทบาททั้งหมด', value: '' },
       // Status options
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
         { label: 'ใช้งาน', value: true },
-        { label: 'ปิดใช้งาน', value: false },
+        { label: 'ปิดใช้งาน', value: false }
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
       // Branch options
@@ -473,7 +473,7 @@ export default {
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
-        { label: '50 ต่อหน้า', value: 50 },
+        { label: '50 ต่อหน้า', value: 50 }
       ],
       pageSizeOption: { label: '10 ต่อหน้า', value: 10 },
       meta: { page: 1, totalPages: 1, total: 0 },
@@ -484,7 +484,7 @@ export default {
       order: 'desc',
       modalOpen: false,
       modalLoading: false,
-      editingUser: null,
+      editingUser: null
     }
   },
   computed: {
@@ -510,7 +510,7 @@ export default {
     },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
-    },
+    }
   },
   methods: {
     async reload() {
@@ -524,7 +524,7 @@ export default {
           isActive: this.isActive === '' ? undefined : this.isActive,
           branchId: this.branchId === '' ? undefined : this.branchId,
           sort: this.sort,
-          order: this.order,
+          order: this.order
         })
         this.users = data
         this.meta = meta
@@ -579,7 +579,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true,
+        reverseButtons: true
       })
       if (!confirm.isConfirmed) return
 
@@ -595,7 +595,7 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end',
+            position: 'top-end'
           })
           // Reload data to get latest information
           await this.reload()
@@ -609,7 +609,7 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end',
+            position: 'top-end'
           })
           // Reload data to get latest information
           await this.reload()
@@ -619,7 +619,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
+          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้'
         })
       }
     },
@@ -632,7 +632,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true,
+        reverseButtons: true
       })
       if (!res.isConfirmed) return
 
@@ -644,7 +644,7 @@ export default {
           timer: 1200,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
         // Reload data to get latest information
         await this.reload()
@@ -652,7 +652,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'อัปเดตสถานะไม่สำเร็จ',
-          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง',
+          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง'
         })
       }
     },
@@ -660,7 +660,7 @@ export default {
       const labels = {
         ADMIN: 'ผู้ดูแลระบบ',
         STAFF: 'พนักงาน',
-        GUEST: 'ผู้เยี่ยมชม',
+        GUEST: 'ผู้เยี่ยมชม'
       }
       return labels[role] || role
     },
@@ -668,7 +668,7 @@ export default {
       const classes = {
         ADMIN: 'bg-red-50 text-red-700',
         STAFF: 'bg-blue-50 text-blue-700',
-        GUEST: 'bg-gray-50 text-gray-700',
+        GUEST: 'bg-gray-50 text-gray-700'
       }
       return classes[role] || 'bg-gray-50 text-gray-700'
     },
@@ -681,11 +681,11 @@ export default {
         const branches = await branchService.getAllForDropdown('', 20)
         this.branchOptions = [
           { label: 'ทุกสาขา', value: '' },
-          ...branches.map((branch) => ({
+          ...branches.map(branch => ({
             label: branch.name,
             code: branch.code,
-            value: branch.id,
-          })),
+            value: branch.id
+          }))
         ]
         this.filteredBranchOptions = this.branchOptions
       } catch (error) {
@@ -704,11 +704,11 @@ export default {
           const branches = await branchService.getAllForDropdown(this.branchSearchQuery, 20)
           this.filteredBranchOptions = [
             { label: 'ทุกสาขา', value: '' },
-            ...branches.map((branch) => ({
+            ...branches.map(branch => ({
               label: branch.name,
               code: branch.code,
-              value: branch.id,
-            })),
+              value: branch.id
+            }))
           ]
         } catch (error) {
           console.error('Error searching branches:', error)
@@ -721,7 +721,7 @@ export default {
         // Only "ทุกสาขา" option
         await this.loadBranches()
       }
-    },
+    }
   },
   mounted() {
     this.reload()
@@ -754,9 +754,9 @@ export default {
         this.pageSize = newVal.value
         this.meta.page = 1
         this.reload()
-      },
-    },
-  },
+      }
+    }
+  }
 }
 </script>
 

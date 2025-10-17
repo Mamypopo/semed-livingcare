@@ -59,5 +59,5 @@ export default {
 
     const response = await apiClient.get(`/insurance-types/dropdown?${params.toString()}`)
     return response.data.data
-  },
+  }
 }

@@ -29,7 +29,7 @@
 <script>
 export default {
   name: 'ConfirmClosePopover',
-  emits: ['cancel', 'confirm'],
+  emits: ['cancel', 'confirm']
 }
 </script>
 

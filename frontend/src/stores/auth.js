@@ -7,17 +7,17 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('token') || null,
     selectedBranch: JSON.parse(localStorage.getItem('selectedBranch')) || null,
     isLoading: false,
-    error: null,
+    error: null
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
-    userRole: (state) => state.user?.role || 'GUEST',
-    userName: (state) => state.user?.name || '',
-    userEmail: (state) => state.user?.email || '',
-    currentBranch: (state) => state.selectedBranch,
-    hasBranch: (state) => !!state.user?.branchId,
-    needsBranchAssignment: (state) => state.user?.role === 'GUEST' && !state.user?.branchId,
+    isAuthenticated: state => !!state.token,
+    userRole: state => state.user?.role || 'GUEST',
+    userName: state => state.user?.name || '',
+    userEmail: state => state.user?.email || '',
+    currentBranch: state => state.selectedBranch,
+    hasBranch: state => !!state.user?.branchId,
+    needsBranchAssignment: state => state.user?.role === 'GUEST' && !state.user?.branchId
   },
 
   actions: {
@@ -133,6 +133,6 @@ export const useAuthStore = defineStore('auth', {
           this.logout()
         }
       }
-    },
-  },
+    }
+  }
 })

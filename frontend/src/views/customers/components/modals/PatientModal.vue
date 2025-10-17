@@ -70,7 +70,7 @@
                       activeTab === tab.id
                         ? 'border-emerald-500 text-emerald-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
                     ]"
                   >
                     {{ tab.name }}
@@ -163,13 +163,13 @@
                               @click="form.isActive = !form.isActive"
                               :class="[
                                 form.isActive ? 'bg-emerald-600' : 'bg-gray-200',
-                                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
+                                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
                               ]"
                             >
                               <span
                                 :class="[
                                   form.isActive ? 'translate-x-5' : 'translate-x-0',
-                                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
                                 ]"
                               />
                             </button>
@@ -225,7 +225,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.prefix && form.prefix !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุคำนำหน้า"
                                 @focus="showPrefixDropdown = true"
@@ -289,7 +289,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.gender && form.gender !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุเพศ"
                                 @focus="showGenderDropdown = true"
@@ -353,7 +353,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.nationality && form.nationality !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุสัญชาติ"
                                 @focus="showNationalityDropdown = true"
@@ -417,7 +417,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.religion && form.religion !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุศาสนา"
                                 @focus="showReligionDropdown = true"
@@ -485,7 +485,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.education_level && form.education_level !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุระดับการศึกษา"
                                 @focus="showEducationLevelDropdown = true"
@@ -549,7 +549,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.marital_status && form.marital_status !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุสถานะภาพสมรส"
                                 @focus="showMaritalStatusDropdown = true"
@@ -613,7 +613,7 @@
                                   'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
                                   form.blood_group && form.blood_group !== ''
                                     ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-white text-gray-700 placeholder-gray-400',
+                                    : 'bg-white text-gray-700 placeholder-gray-400'
                                 ]"
                                 placeholder="ระบุกรุ๊บเลือด"
                                 @focus="showBloodGroupDropdown = true"
@@ -882,13 +882,13 @@
                                           ? 'bg-emerald-100 text-emerald-900'
                                           : 'text-gray-900',
                                         'relative cursor-default select-none py-2 pr-4',
-                                        selected ? 'pl-10' : 'pl-3',
+                                        selected ? 'pl-10' : 'pl-3'
                                       ]"
                                     >
                                       <span
                                         :class="[
                                           selected ? 'font-medium' : 'font-normal',
-                                          'block truncate',
+                                          'block truncate'
                                         ]"
                                       >
                                         {{ province.name_th }}
@@ -926,7 +926,7 @@
                                       : 'bg-white text-gray-400',
                                     !form.province
                                       ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                                      : '',
+                                      : ''
                                   ]"
                                   @click="showDistrictDropdown = !showDistrictDropdown"
                                 >
@@ -970,13 +970,13 @@
                                           ? 'bg-emerald-100 text-emerald-900'
                                           : 'text-gray-900',
                                         'relative cursor-default select-none py-2 pr-4',
-                                        selected ? 'pl-10' : 'pl-3',
+                                        selected ? 'pl-10' : 'pl-3'
                                       ]"
                                     >
                                       <span
                                         :class="[
                                           selected ? 'font-medium' : 'font-normal',
-                                          'block truncate',
+                                          'block truncate'
                                         ]"
                                       >
                                         {{ district.name_th }}
@@ -1011,7 +1011,7 @@
                                       : 'bg-white text-gray-400',
                                     !form.district
                                       ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                                      : '',
+                                      : ''
                                   ]"
                                   @click="showSubDistrictDropdown = !showSubDistrictDropdown"
                                 >
@@ -1055,13 +1055,13 @@
                                           ? 'bg-emerald-100 text-emerald-900'
                                           : 'text-gray-900',
                                         'relative cursor-default select-none py-2 pr-4',
-                                        selected ? 'pl-10' : 'pl-3',
+                                        selected ? 'pl-10' : 'pl-3'
                                       ]"
                                     >
                                       <span
                                         :class="[
                                           selected ? 'font-medium' : 'font-normal',
-                                          'block truncate',
+                                          'block truncate'
                                         ]"
                                       >
                                         {{ subDistrict.name_th }}
@@ -1096,7 +1096,7 @@
                                       : 'bg-white text-gray-400',
                                     !form.sub_district
                                       ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                                      : '',
+                                      : ''
                                   ]"
                                   @click="showPostalCodeDropdown = !showPostalCodeDropdown"
                                 >
@@ -1140,13 +1140,13 @@
                                           ? 'bg-emerald-100 text-emerald-900'
                                           : 'text-gray-900',
                                         'relative cursor-default select-none py-2 pr-4',
-                                        selected ? 'pl-10' : 'pl-3',
+                                        selected ? 'pl-10' : 'pl-3'
                                       ]"
                                     >
                                       <span
                                         :class="[
                                           selected ? 'font-medium' : 'font-normal',
-                                          'block truncate',
+                                          'block truncate'
                                         ]"
                                       >
                                         {{ postcode.postcode }}
@@ -1274,13 +1274,13 @@
                                 <li
                                   :class="[
                                     active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
-                                    'relative cursor-default select-none py-2 pl-10 pr-4',
+                                    'relative cursor-default select-none py-2 pl-10 pr-4'
                                   ]"
                                 >
                                   <span
                                     :class="[
                                       selected ? 'font-medium' : 'font-normal',
-                                      'block truncate',
+                                      'block truncate'
                                     ]"
                                     >{{ type }}</span
                                   >
@@ -1530,7 +1530,7 @@ import {
   Dialog as HeadlessDialog,
   DialogPanel,
   TransitionRoot,
-  TransitionChild,
+  TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { ChevronDown, Check, Plus } from 'lucide-vue-next'
@@ -1562,21 +1562,21 @@ export default {
     BranchDropdown,
     PatientGroupDropdown,
     InsuranceTypeDropdown,
-    ConfirmClosePopover,
+    ConfirmClosePopover
   },
   props: {
     modelValue: {
       type: Boolean,
-      default: false,
+      default: false
     },
     initialData: {
       type: Object,
-      default: null,
+      default: null
     },
     loading: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   emits: ['update:modelValue', 'save'],
   data() {
@@ -1584,12 +1584,12 @@ export default {
       activeTab: 'personal',
       familyMember: {
         name: '',
-        relationship: '',
+        relationship: ''
       },
       contactPerson: {
         name: '',
         phone: '',
-        relationship: '',
+        relationship: ''
       },
       form: {
         hn: '',
@@ -1641,7 +1641,7 @@ export default {
         balance: 0.0,
         isActive: true,
         note: '',
-        tagIds: [],
+        tagIds: []
       },
       selectedTags: [],
       showPrefixDropdown: false,
@@ -1657,11 +1657,11 @@ export default {
         { id: 'personal', name: 'ข้อมูลส่วนตัว' },
         { id: 'health', name: 'ข้อมูลสุขภาพ' },
         { id: 'contact', name: 'ข้อมูลติดต่อ' },
-        { id: 'company', name: 'ข้อมูลบริษัท' },
+        { id: 'company', name: 'ข้อมูลบริษัท' }
       ],
       statusOptions: [
         { label: 'ปกติ', value: true },
-        { label: 'ปิดใช้งาน', value: false },
+        { label: 'ปิดใช้งาน', value: false }
       ],
       prefixOptions: [
         'ไม่ระบุ',
@@ -1695,7 +1695,7 @@ export default {
         'ผศ.ดร.',
         'ดร.',
         'พลเอก',
-        'พลตำรวจเอก',
+        'พลตำรวจเอก'
       ],
       genderOptions: ['ไม่ระบุ', 'ชาย', 'หญิง'],
       nationalityOptions: [
@@ -1723,7 +1723,7 @@ export default {
         'สหรัฐอเมริกา',
         'แคนาดา',
         'ออสเตรเลีย',
-        'รัสเซีย',
+        'รัสเซีย'
       ],
       religionOptions: ['ไม่ระบุ', 'พุทธ', 'คริสต์', 'อิสลาม', 'ฮินดู', 'ซิกข์'],
       educationLevelOptions: [
@@ -1735,7 +1735,7 @@ export default {
         'ประกาศนียบัตรวิชาชีพชั้นสูง',
         'ปริญญาตรี',
         'ปริญญาโท',
-        'ปริญญาเอก',
+        'ปริญญาเอก'
       ],
       maritalStatusOptions: ['ไม่ระบุ', 'โสด', 'สมรส', 'หย่า', 'หม้าย'],
       bloodGroupOptions: ['ไม่ระบุ', 'A', 'B', 'AB', 'O'],
@@ -1767,7 +1767,7 @@ export default {
 
       // Dropdown states for animation
       showProvinceDropdown: false,
-      showTreatmentTypeDropdown: false,
+      showTreatmentTypeDropdown: false
     }
   },
   computed: {
@@ -1777,44 +1777,44 @@ export default {
 
     filteredProvinces() {
       if (!this.provinceSearchQuery) return this.provinces
-      return this.provinces.filter((province) =>
-        province.name_th.toLowerCase().includes(this.provinceSearchQuery.toLowerCase()),
+      return this.provinces.filter(province =>
+        province.name_th.toLowerCase().includes(this.provinceSearchQuery.toLowerCase())
       )
     },
 
     filteredDistricts() {
       if (!this.districtSearchQuery) return this.districts
-      return this.districts.filter((district) =>
-        district.name_th.toLowerCase().includes(this.districtSearchQuery.toLowerCase()),
+      return this.districts.filter(district =>
+        district.name_th.toLowerCase().includes(this.districtSearchQuery.toLowerCase())
       )
     },
 
     filteredSubDistricts() {
       if (!this.subDistrictSearchQuery) return this.subDistricts
-      return this.subDistricts.filter((subDistrict) =>
-        subDistrict.name_th.toLowerCase().includes(this.subDistrictSearchQuery.toLowerCase()),
+      return this.subDistricts.filter(subDistrict =>
+        subDistrict.name_th.toLowerCase().includes(this.subDistrictSearchQuery.toLowerCase())
       )
     },
 
     filteredPostcodes() {
       if (!this.postalCodeSearchQuery) return this.postcodes
-      return this.postcodes.filter((postcode) =>
-        postcode.postcode.includes(this.postalCodeSearchQuery),
+      return this.postcodes.filter(postcode =>
+        postcode.postcode.includes(this.postalCodeSearchQuery)
       )
-    },
+    }
   },
   mounted() {
     this.loadProvinces()
   },
   methods: {
     isTagSelected(tagId) {
-      return this.selectedTags.some((t) => t.id === tagId)
+      return this.selectedTags.some(t => t.id === tagId)
     },
     async handleSubmit() {
       try {
         const formData = {
           ...this.form,
-          tagIds: this.selectedTags.map((tag) => tag.id),
+          tagIds: this.selectedTags.map(tag => tag.id)
         }
 
         await this.$emit('save', formData)
@@ -1851,7 +1851,7 @@ export default {
     handlePrefixInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.prefixOptions.some(
-        (option) => option.toLowerCase() === this.form.prefix.toLowerCase(),
+        option => option.toLowerCase() === this.form.prefix.toLowerCase()
       )
 
       if (!isMatching && this.form.prefix.length > 0) {
@@ -1876,7 +1876,7 @@ export default {
     handleGenderInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.genderOptions.some(
-        (option) => option.toLowerCase() === this.form.gender.toLowerCase(),
+        option => option.toLowerCase() === this.form.gender.toLowerCase()
       )
 
       if (!isMatching && this.form.gender.length > 0) {
@@ -1901,7 +1901,7 @@ export default {
     handleNationalityInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.nationalityOptions.some(
-        (option) => option.toLowerCase() === this.form.nationality.toLowerCase(),
+        option => option.toLowerCase() === this.form.nationality.toLowerCase()
       )
 
       if (!isMatching && this.form.nationality.length > 0) {
@@ -1926,7 +1926,7 @@ export default {
     handleReligionInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.religionOptions.some(
-        (option) => option.toLowerCase() === this.form.religion.toLowerCase(),
+        option => option.toLowerCase() === this.form.religion.toLowerCase()
       )
 
       if (!isMatching && this.form.religion.length > 0) {
@@ -1951,7 +1951,7 @@ export default {
     handleEducationLevelInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.educationLevelOptions.some(
-        (option) => option.toLowerCase() === this.form.education_level.toLowerCase(),
+        option => option.toLowerCase() === this.form.education_level.toLowerCase()
       )
 
       if (!isMatching && this.form.education_level.length > 0) {
@@ -1976,7 +1976,7 @@ export default {
     handleMaritalStatusInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.maritalStatusOptions.some(
-        (option) => option.toLowerCase() === this.form.marital_status.toLowerCase(),
+        option => option.toLowerCase() === this.form.marital_status.toLowerCase()
       )
 
       if (!isMatching && this.form.marital_status.length > 0) {
@@ -2001,7 +2001,7 @@ export default {
     handleBloodGroupInput() {
       // ถ้าพิมพ์คำที่ไม่ตรงกับรายการ ให้ปิด dropdown
       const isMatching = this.bloodGroupOptions.some(
-        (option) => option.toLowerCase() === this.form.blood_group.toLowerCase(),
+        option => option.toLowerCase() === this.form.blood_group.toLowerCase()
       )
 
       if (!isMatching && this.form.blood_group.length > 0) {
@@ -2065,7 +2065,7 @@ export default {
         balance: 0.0,
         isActive: true,
         note: '',
-        tagIds: [],
+        tagIds: []
       }
       this.selectedTags = []
       this.activeTab = 'personal'
@@ -2283,7 +2283,7 @@ export default {
     clearPostalCode() {
       this.form.postal_code = ''
       this.showPostalCodeDropdown = true
-    },
+    }
   },
   watch: {
     modelValue: {
@@ -2292,13 +2292,13 @@ export default {
           if (this.initialData) {
             this.form = { ...this.initialData }
             this.selectedTags = this.initialData.patientTags
-              ? this.initialData.patientTags.map((pt) => pt.tag)
+              ? this.initialData.patientTags.map(pt => pt.tag)
               : []
 
             // Set selected values for Listbox
             if (this.form.province) {
               this.selectedProvince =
-                this.provinces.find((p) => p.name_th === this.form.province) || null
+                this.provinces.find(p => p.name_th === this.form.province) || null
             }
           } else {
             this.resetForm()
@@ -2307,9 +2307,9 @@ export default {
           this.originalSnapshot = JSON.stringify(this.form)
         }
       },
-      immediate: false,
-    },
-  },
+      immediate: false
+    }
+  }
 }
 </script>
 

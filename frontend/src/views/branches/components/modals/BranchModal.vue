@@ -150,12 +150,12 @@ export default {
     TransitionRoot,
     TransitionChild,
     ConfirmClosePopover,
-    X,
+    X
   },
   props: {
     modelValue: { type: Boolean, required: true },
     initialData: { type: Object, default: null },
-    loading: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   emits: ['update:modelValue', 'save'],
   data() {
@@ -163,13 +163,13 @@ export default {
       form: { id: null, code: '', name: '', address: '', phone: '', isActive: true },
       errors: {},
       originalSnapshot: null,
-      showConfirmClose: false,
+      showConfirmClose: false
     }
   },
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    },
+    }
   },
   watch: {
     initialData: {
@@ -182,15 +182,15 @@ export default {
             name: v.name || '',
             address: v.address || '',
             phone: v.phone || '',
-            isActive: v.isActive ?? true,
+            isActive: v.isActive ?? true
           }
         } else {
           this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
-      },
-    },
+      }
+    }
   },
   methods: {
     async onClose() {
@@ -207,7 +207,7 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
-          isActive: this.initialData.isActive ?? true,
+          isActive: this.initialData.isActive ?? true
         }
       } else {
         this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
@@ -227,7 +227,7 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
-          isActive: this.initialData.isActive ?? true,
+          isActive: this.initialData.isActive ?? true
         }
       } else {
         this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
@@ -246,8 +246,8 @@ export default {
     onSave() {
       if (!this.validate()) return
       this.$emit('save', { ...this.form })
-    },
-  },
+    }
+  }
 }
 </script>
 

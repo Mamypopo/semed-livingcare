@@ -59,7 +59,7 @@
                 :class="[
                   active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                   'relative cursor-default select-none py-2 pr-4',
-                  selected ? 'pl-10' : 'pl-3',
+                  selected ? 'pl-10' : 'pl-3'
                 ]"
               >
                 <div class="flex items-center">
@@ -108,24 +108,24 @@ export default {
     Listbox,
     ListboxButton,
     ListboxOptions,
-    ListboxOption,
+    ListboxOption
   },
   props: {
     modelValue: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     placeholder: {
       type: String,
-      default: 'เลือกแท็ก...',
-    },
+      default: 'เลือกแท็ก...'
+    }
   },
   emits: ['update:modelValue'],
   data() {
     return {
       searchQuery: '',
       availableTags: [],
-      searchTimeout: null,
+      searchTimeout: null
     }
   },
   computed: {
@@ -135,7 +135,7 @@ export default {
       },
       set(value) {
         this.$emit('update:modelValue', value)
-      },
+      }
     },
     selectedValue: {
       get() {
@@ -143,17 +143,17 @@ export default {
       },
       set(value) {
         // ไม่ต้องทำอะไร เพราะเป็น multi-select
-      },
+      }
     },
     filteredTags() {
       return this.availableTags
-    },
+    }
   },
   watch: {
     searchQuery: {
       handler: 'debouncedSearch',
-      immediate: false,
-    },
+      immediate: false
+    }
   },
   async mounted() {
     await this.loadTags()
@@ -190,14 +190,14 @@ export default {
       this.searchQuery = ''
     },
     addTag(tagId) {
-      const tag = this.availableTags.find((t) => t.id === tagId)
-      if (tag && !this.selectedTags.find((t) => t.id === tagId)) {
+      const tag = this.availableTags.find(t => t.id === tagId)
+      if (tag && !this.selectedTags.find(t => t.id === tagId)) {
         this.selectedTags = [...this.selectedTags, tag]
       }
     },
     removeTag(tag) {
-      this.selectedTags = this.selectedTags.filter((t) => t.id !== tag.id)
-    },
-  },
+      this.selectedTags = this.selectedTags.filter(t => t.id !== tag.id)
+    }
+  }
 }
 </script>

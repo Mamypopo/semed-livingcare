@@ -46,7 +46,7 @@
               :class="[
                 active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                 'relative cursor-default select-none py-2 pr-4',
-                selected ? 'pl-10' : 'pl-3',
+                selected ? 'pl-10' : 'pl-3'
               ]"
             >
               <div class="flex items-center">
@@ -94,24 +94,24 @@ export default {
     ListboxOptions,
     ListboxOption,
     ChevronDown,
-    Check,
+    Check
   },
   props: {
     modelValue: {
       type: [String, Number],
-      default: null,
+      default: null
     },
     placeholder: {
       type: String,
-      default: 'เลือกกลุ่มลูกค้า...',
-    },
+      default: 'เลือกกลุ่มลูกค้า...'
+    }
   },
   emits: ['update:modelValue'],
   data() {
     return {
       searchQuery: '',
       patientGroups: [],
-      searchTimeout: null,
+      searchTimeout: null
     }
   },
   computed: {
@@ -121,20 +121,20 @@ export default {
       },
       set(value) {
         this.$emit('update:modelValue', value)
-      },
+      }
     },
     selectedGroup() {
-      return this.patientGroups.find((group) => group.id === this.modelValue)
+      return this.patientGroups.find(group => group.id === this.modelValue)
     },
     filteredGroups() {
       return this.patientGroups
-    },
+    }
   },
   watch: {
     searchQuery: {
       handler: 'debouncedSearch',
-      immediate: false,
-    },
+      immediate: false
+    }
   },
   async mounted() {
     await this.loadPatientGroups()
@@ -163,7 +163,7 @@ export default {
     handleSelection(value) {
       this.selectedValue = value
       this.searchQuery = ''
-    },
-  },
+    }
+  }
 }
 </script>

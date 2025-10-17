@@ -57,5 +57,5 @@ export const branchService = {
 
     const response = await apiClient.get(`/branches/dropdown?${params.toString()}`)
     return response.data.data
-  },
+  }
 }

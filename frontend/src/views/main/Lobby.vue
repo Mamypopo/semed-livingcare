@@ -11,7 +11,7 @@
             'flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
             activeTab === tab.id
               ? 'bg-white text-emerald-700 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800 hover:bg-white/50',
+              : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
           ]"
         >
           <component :is="tab.icon" class="w-4 h-4" />
@@ -103,7 +103,7 @@ import {
   FileText,
   Users,
   Calendar,
-  Shield,
+  Shield
 } from 'lucide-vue-next'
 
 export default {
@@ -119,7 +119,7 @@ export default {
     FileText,
     Users,
     Calendar,
-    Shield,
+    Shield
   },
   setup() {
     const authStore = useAuthStore()
@@ -135,23 +135,23 @@ export default {
           id: 'overview',
           name: 'ภาพรวม',
           icon: 'BarChart3',
-          description: 'ภาพรวมระบบและสถิติ',
+          description: 'ภาพรวมระบบและสถิติ'
         },
         {
           id: 'branches',
           name: 'สาขา',
           icon: 'Building2',
-          description: 'จัดการสาขาและแพ็กเกจ',
-        },
+          description: 'จัดการสาขาและแพ็กเกจ'
+        }
       ],
       branches: [],
-      maxBranches: 1,
+      maxBranches: 1
     }
   },
   computed: {
     currentTab() {
-      return this.navigationTabs.find((tab) => tab.id === this.activeTab) || this.navigationTabs[0]
-    },
+      return this.navigationTabs.find(tab => tab.id === this.activeTab) || this.navigationTabs[0]
+    }
   },
   async mounted() {
     await this.loadBranches()
@@ -189,10 +189,10 @@ export default {
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
           text: 'ไม่สามารถโหลดข้อมูลสาขาได้ กรุณาลองใหม่อีกครั้ง',
-          confirmButtonText: 'ตกลง',
+          confirmButtonText: 'ตกลง'
         })
       }
-    },
-  },
+    }
+  }
 }
 </script>

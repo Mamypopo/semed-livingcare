@@ -35,7 +35,7 @@ const patientService = {
   async getPatientStats() {
     const response = await apiClient.get('/patients/stats')
     return response.data
-  },
+  }
 }
 
 export default patientService

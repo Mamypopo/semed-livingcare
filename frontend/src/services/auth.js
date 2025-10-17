@@ -29,5 +29,5 @@ export const authService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'ไม่สามารถดึงข้อมูลผู้ใช้ได้')
     }
-  },
+  }
 }

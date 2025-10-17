@@ -62,35 +62,35 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: '#22C55E',
+      default: '#22C55E'
     },
     label: {
       type: String,
-      default: '',
+      default: ''
     },
     placeholder: {
       type: String,
-      default: '#22C55E',
+      default: '#22C55E'
     },
     showPreview: {
       type: Boolean,
-      default: true,
+      default: true
     },
     error: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   emits: ['update:modelValue'],
   data() {
     return {
-      colorValue: this.modelValue,
+      colorValue: this.modelValue
     }
   },
   watch: {
     modelValue(newValue) {
       this.colorValue = newValue
-    },
+    }
   },
   methods: {
     onColorChange(event) {
@@ -149,11 +149,11 @@ export default {
         '#FFC0CB': 'ชมพู',
         '#A52A2A': 'น้ำตาล',
         '#FFD700': 'ทอง',
-        '#E6E6FA': 'ม่วงอ่อน',
+        '#E6E6FA': 'ม่วงอ่อน'
       }
 
       return colorNames[hex] || 'สีกำหนดเอง'
-    },
-  },
+    }
+  }
 }
 </script>

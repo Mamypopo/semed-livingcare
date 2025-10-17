@@ -95,7 +95,7 @@
                     ? 'bg-green-100'
                     : activity.type === 'warning'
                       ? 'bg-yellow-100'
-                      : 'bg-blue-100',
+                      : 'bg-blue-100'
                 ]"
               >
                 <component
@@ -106,7 +106,7 @@
                       ? 'text-green-600'
                       : activity.type === 'warning'
                         ? 'text-yellow-600'
-                        : 'text-blue-600',
+                        : 'text-blue-600'
                   ]"
                 />
               </div>
@@ -188,7 +188,7 @@ import {
   Settings,
   CheckCircle,
   AlertTriangle,
-  Info,
+  Info
 } from 'lucide-vue-next'
 
 export default {
@@ -204,7 +204,7 @@ export default {
     Settings,
     CheckCircle,
     AlertTriangle,
-    Info,
+    Info
   },
   data() {
     return {
@@ -213,7 +213,7 @@ export default {
         totalUsers: 156,
         totalBranches: 3,
         todayAppointments: 12,
-        notifications: 5,
+        notifications: 5
       },
       recentActivities: [
         {
@@ -221,31 +221,31 @@ export default {
           type: 'success',
           icon: 'CheckCircle',
           message: 'ผู้ใช้ใหม่สมัครสมาชิกสำเร็จ',
-          time: '5 นาทีที่แล้ว',
+          time: '5 นาทีที่แล้ว'
         },
         {
           id: 2,
           type: 'warning',
           icon: 'AlertTriangle',
           message: 'แพ็กเกจจะหมดอายุใน 3 วัน',
-          time: '15 นาทีที่แล้ว',
+          time: '15 นาทีที่แล้ว'
         },
         {
           id: 3,
           type: 'info',
           icon: 'Info',
           message: 'มีการอัปเดตระบบใหม่',
-          time: '1 ชั่วโมงที่แล้ว',
+          time: '1 ชั่วโมงที่แล้ว'
         },
         {
           id: 4,
           type: 'success',
           icon: 'CheckCircle',
           message: 'นัดหมายใหม่ถูกสร้าง',
-          time: '2 ชั่วโมงที่แล้ว',
-        },
-      ],
+          time: '2 ชั่วโมงที่แล้ว'
+        }
+      ]
     }
-  },
+  }
 }
 </script>

@@ -132,13 +132,13 @@
                             <li
                               :class="[
                                 active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
-                                'cursor-pointer select-none relative py-2 pl-3 pr-9',
+                                'cursor-pointer select-none relative py-2 pl-3 pr-9'
                               ]"
                             >
                               <span
                                 :class="[
                                   selected ? 'font-semibold' : 'font-normal',
-                                  'block truncate',
+                                  'block truncate'
                                 ]"
                               >
                                 {{ role.label }}
@@ -147,7 +147,7 @@
                                 v-if="selected"
                                 :class="[
                                   active ? 'text-emerald-600' : 'text-emerald-600',
-                                  'absolute inset-y-0 right-0 flex items-center pr-4',
+                                  'absolute inset-y-0 right-0 flex items-center pr-4'
                                 ]"
                               >
                                 <CheckIcon class="w-4 h-4" />
@@ -211,13 +211,13 @@
                             <li
                               :class="[
                                 active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
-                                'cursor-pointer select-none relative py-2 pl-3 pr-9',
+                                'cursor-pointer select-none relative py-2 pl-3 pr-9'
                               ]"
                             >
                               <span
                                 :class="[
                                   selected ? 'font-semibold' : 'font-normal',
-                                  'block truncate',
+                                  'block truncate'
                                 ]"
                               >
                                 ไม่ระบุสาขา
@@ -226,7 +226,7 @@
                                 v-if="selected"
                                 :class="[
                                   active ? 'text-emerald-600' : 'text-emerald-600',
-                                  'absolute inset-y-0 right-0 flex items-center pr-4',
+                                  'absolute inset-y-0 right-0 flex items-center pr-4'
                                 ]"
                               >
                                 <CheckIcon class="w-4 h-4" />
@@ -243,14 +243,14 @@
                             <li
                               :class="[
                                 active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
-                                'cursor-pointer select-none relative py-2 pl-3 pr-9',
+                                'cursor-pointer select-none relative py-2 pl-3 pr-9'
                               ]"
                             >
                               <div class="flex items-center gap-2">
                                 <span
                                   :class="[
                                     selected ? 'font-semibold' : 'font-normal',
-                                    'block truncate',
+                                    'block truncate'
                                   ]"
                                 >
                                   {{ branch.name }}
@@ -265,7 +265,7 @@
                                 v-if="selected"
                                 :class="[
                                   active ? 'text-emerald-600' : 'text-emerald-600',
-                                  'absolute inset-y-0 right-0 flex items-center pr-4',
+                                  'absolute inset-y-0 right-0 flex items-center pr-4'
                                 ]"
                               >
                                 <CheckIcon class="w-4 h-4" />
@@ -460,12 +460,12 @@ export default {
     CheckIcon,
     X,
     Key,
-    ConfirmClosePopover,
+    ConfirmClosePopover
   },
   props: {
     modelValue: { type: Boolean, required: true },
     initialData: { type: Object, default: null },
-    loading: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false }
   },
   emits: ['update:modelValue', 'save', 'passwordChanged'],
   data() {
@@ -477,7 +477,7 @@ export default {
         password: '',
         role: 'GUEST',
         branchId: null,
-        isActive: true,
+        isActive: true
       },
       errors: {},
       originalSnapshot: null,
@@ -495,14 +495,14 @@ export default {
       roleOptions: [
         { label: 'ผู้เยี่ยมชม', value: 'GUEST' },
         { label: 'พนักงาน', value: 'STAFF' },
-        { label: 'ผู้ดูแลระบบ', value: 'ADMIN' },
-      ],
+        { label: 'ผู้ดูแลระบบ', value: 'ADMIN' }
+      ]
     }
   },
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    },
+    }
   },
   watch: {
     initialData: {
@@ -516,7 +516,7 @@ export default {
             password: '',
             role: v.role || 'GUEST',
             branchId: v.branchId || null,
-            isActive: v.isActive ?? true,
+            isActive: v.isActive ?? true
           }
         } else {
           this.form = {
@@ -526,17 +526,17 @@ export default {
             password: '',
             role: 'GUEST',
             branchId: null,
-            isActive: true,
+            isActive: true
           }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
-      },
+      }
     },
     branchSearchQuery() {
       // Trigger search when query changes
       this.onBranchSearchInput()
-    },
+    }
   },
   async mounted() {
     await this.loadData()
@@ -589,7 +589,7 @@ export default {
           role: this.initialData.role || 'GUEST',
           branchId: this.initialData.branchId || null,
           staffLevelId: this.initialData.staffLevelId || null,
-          isActive: this.initialData.isActive ?? true,
+          isActive: this.initialData.isActive ?? true
         }
       } else {
         this.form = {
@@ -599,7 +599,7 @@ export default {
           password: '',
           role: 'GUEST',
           branchId: null,
-          isActive: true,
+          isActive: true
         }
       }
       this.originalSnapshot = JSON.stringify(this.form)
@@ -640,17 +640,17 @@ export default {
       this.$emit('save', dataToSave)
     },
     getRoleLabel(role) {
-      const option = this.roleOptions.find((opt) => opt.value === role)
+      const option = this.roleOptions.find(opt => opt.value === role)
       return option ? option.label : role
     },
     getBranchName(branchId) {
       if (!branchId) return 'ไม่ระบุสาขา'
-      const branch = this.branches.find((b) => b.id === branchId)
+      const branch = this.branches.find(b => b.id === branchId)
       return branch ? branch.name : 'ไม่ระบุสาขา'
     },
     getBranchCode(branchId) {
       if (!branchId) return null
-      const branch = this.branches.find((b) => b.id === branchId)
+      const branch = this.branches.find(b => b.id === branchId)
       return branch ? branch.code : null
     },
     openChangePasswordModal() {
@@ -716,7 +716,7 @@ export default {
           timer: 1600,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
       } catch (error) {
         this.passwordError =
@@ -747,8 +747,8 @@ export default {
           console.error('Error searching branches:', error)
         }
       }, 300) // 300ms delay
-    },
-  },
+    }
+  }
 }
 </script>
 
