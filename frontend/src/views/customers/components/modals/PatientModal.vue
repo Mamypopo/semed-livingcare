@@ -1390,6 +1390,7 @@
                         <input
                           v-model="contact.phone"
                           type="tel"
+                          maxlength="10"
                           class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="เบอร์โทร"
                         />
@@ -1449,28 +1450,31 @@
 
                       <!-- ปุ่มดำเนินการ -->
                       <div class="col-span-2 flex justify-center">
-                        <!-- ปุ่มเพิ่ม (แสดงเฉพาะแถวสุดท้าย) -->
+                        <!-- ปุ่มเพิ่ม (แสดงเฉพาะแถวสุดท้ายและกรอกข้อมูลครบแล้ว) -->
                         <button
                           v-if="index === contactPersons.length - 1"
                           type="button"
-                          @click="addContactPerson"
-                          class="px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors duration-200 flex items-center justify-center"
-                          title="เพิ่มผู้ติดต่อ"
-                        >
+                          @click="(!contact.name || !contact.phone || !contact.relationship) ? null : addContactPerson()"
+                          :class="[
+                            'px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-colors duration-200 flex items-center justify-center',
+                            (!contact.name || !contact.phone || !contact.relationship)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-auto'
+                              : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
+                          ]"
+                          v-tooltip.bottom="(!contact.name || !contact.phone || !contact.relationship) ? 'กรุณากรอกข้อมูลให้ครบถ้วน' : 'เพิ่มผู้ติดต่อ'"
+                          >
                           <Plus class="h-5 w-5" />
                         </button>
 
-                        <!-- ปุ่มลบ (แสดงเฉพาะเมื่อมีมากกว่า 1 คน) -->
+                        <!-- ปุ่มลบ (แสดงเฉพาะแถวที่มีข้อมูลแล้วและไม่ใช่แถวสุดท้าย) -->
                         <button
-                          v-if="contactPersons.length > 1"
+                          v-if="index !== contactPersons.length - 1 && (contact.name || contact.phone || contact.relationship)"
                           type="button"
                           @click="removeContactPerson(contact.id)"
-                          class="px-4 py-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200 flex items-center justify-center"
-                          title="ลบผู้ติดต่อ"
+                          class="px-4 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-400 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                          v-tooltip.bottom="'ลบผู้ติดต่อ'"
                         >
-                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                          </svg>
+                          <Trash2 class="h-5 w-5" />
                         </button>
                       </div>
                     </div>
@@ -1605,7 +1609,7 @@ import {
   TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, Check, Plus } from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, Trash2 } from 'lucide-vue-next'
 import TagDropdown from '@/components/dropdown/TagDropdown.vue'
 import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
 import PatientGroupDropdown from '@/components/dropdown/PatientGroupDropdown.vue'
@@ -1629,6 +1633,7 @@ export default {
     ChevronDown,
     Check,
     Plus,
+    Trash2,
     TagDropdown,
     VueDatePicker,
     BranchDropdown,
