@@ -688,26 +688,34 @@
                         </div>
 
                         <!-- Row 3: 2 columns -->
-                        <div class="grid grid-cols-2 gap-4">
-                          <div>
+                        <div class="grid grid-cols-5 gap-2">
+                          <div class="col-span-3">
                             <label class="block text-sm font-medium text-gray-700 mb-1"
                               >เลขบัตรประชาชน</label
                             >
-                            <input
-                              v-model="form.national_id"
-                              type="text"
-                              placeholder="ระบุเลขบัตรประชาชน"
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            />
+                            <div class="flex gap-1 justify-center">
+                              <input
+                                v-for="(digit, index) in nationalIdDigits"
+                                :key="index"
+                                :ref="`nationalIdInputs`"
+                                v-model="nationalIdDigits[index]"
+                                type="text"
+                                maxlength="1"
+                                class="w-8 h-8 mt-1 text-center border border-gray-300 rounded shadow-sm text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm font-mono"
+                                @input="handleNationalIdInput(index, $event)"
+                                @keydown="handleNationalIdKeydown(index, $event)"
+                                @paste="handleNationalIdPaste"
+                              />
+                            </div>
                           </div>
-                          <div>
+                          <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1"
                               >หนังสือเดินทาง</label
                             >
                             <input
                               v-model="form.passport_no"
                               type="text"
-                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                              class="w-full px-2 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm"
                               placeholder="ระบุหนังสือเดินทาง"
                             />
                           </div>
@@ -2114,6 +2122,7 @@ export default {
         }
       ],
       nextContactId: 2,
+      nationalIdDigits: Array(13).fill(''),
       form: {
         hn: '',
         prefix: '',
@@ -2416,6 +2425,43 @@ export default {
   methods: {
     isTagSelected(tagId) {
       return this.selectedTags.some(t => t.id === tagId)
+    },
+    handleNationalIdInput(index, event) {
+      // รับเฉพาะตัวเลข
+      let value = event.target.value.replace(/\D/g, '')
+      this.nationalIdDigits[index] = value
+      
+      // อัปเดต form.national_id
+      this.form.national_id = this.nationalIdDigits.join('')
+      
+      // ไปช่องถัดไปถ้าใส่ครบ
+      if (value && index < 12) {
+        this.$refs.nationalIdInputs[index + 1]?.focus()
+      }
+    },
+    handleNationalIdKeydown(index, event) {
+      // ลบและไปช่องก่อนหน้า
+      if (event.key === 'Backspace' && !this.nationalIdDigits[index] && index > 0) {
+        this.$refs.nationalIdInputs[index - 1]?.focus()
+      }
+      // ลบและไปช่องถัดไป
+      else if (event.key === 'Delete' && this.nationalIdDigits[index] && index < 12) {
+        this.$refs.nationalIdInputs[index + 1]?.focus()
+      }
+    },
+    handleNationalIdPaste(event) {
+      event.preventDefault()
+      let pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 13)
+      
+      for (let i = 0; i < pastedData.length && i < 13; i++) {
+        this.nationalIdDigits[i] = pastedData[i]
+      }
+      
+      this.form.national_id = this.nationalIdDigits.join('')
+      
+      // Focus ช่องถัดจากข้อมูลที่ paste
+      const nextIndex = Math.min(pastedData.length, 12)
+      this.$refs.nationalIdInputs[nextIndex]?.focus()
     },
     async handleSubmit() {
       try {
@@ -3449,6 +3495,21 @@ export default {
           this.loadPatientFiles()
         }
       }
+    },
+    
+    'form.national_id': {
+      handler(newVal) {
+        // Sync จาก form.national_id ไป nationalIdDigits
+        if (newVal) {
+          const digits = newVal.toString().split('')
+          for (let i = 0; i < 13; i++) {
+            this.nationalIdDigits[i] = digits[i] || ''
+          }
+        } else {
+          this.nationalIdDigits = Array(13).fill('')
+        }
+      },
+      immediate: true
     }
   }
 }
