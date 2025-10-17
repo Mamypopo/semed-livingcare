@@ -6,20 +6,47 @@
         <p class="text-md text-gray-500">จัดการข้อมูลสาขาทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
-        <input v-model.trim="query" @input="onFilterInput" type="text" placeholder="ค้นหา รหัส/ชื่อ/ที่อยู่..." class="px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-56 hover:border-emerald-300 focus:outline-none" />
+        <input
+          v-model.trim="query"
+          @input="onFilterInput"
+          type="text"
+          placeholder="ค้นหา รหัส/ชื่อ/ที่อยู่..."
+          class="px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-56 hover:border-emerald-300 focus:outline-none"
+        />
 
         <!-- Status dropdown (Headless UI Listbox) -->
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
-            <ListboxButton class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full">
+            <ListboxButton
+              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+            >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
             </ListboxButton>
           </div>
-          <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-            <ListboxOptions class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none">
-              <ListboxOption v-for="opt in statusOptions" :key="String(opt.value)" :value="opt" v-slot="{ active, selected }">
-                <li :class="[ 'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between', active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700' ]">
+          <transition
+            enter-active-class="transition ease-out duration-100"
+            enter-from-class="transform opacity-0 scale-95"
+            enter-to-class="transform opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-from-class="transform opacity-100 scale-100"
+            leave-to-class="transform opacity-0 scale-95"
+          >
+            <ListboxOptions
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+            >
+              <ListboxOption
+                v-for="opt in statusOptions"
+                :key="String(opt.value)"
+                :value="opt"
+                v-slot="{ active, selected }"
+              >
+                <li
+                  :class="[
+                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                  ]"
+                >
                   <span>{{ opt.label }}</span>
                   <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
                 </li>
@@ -29,17 +56,38 @@
         </Listbox>
 
         <!-- Page size (Headless UI Listbox) merged into filter row -->
-        <Listbox v-model="pageSizeOption" as="div" class="relative ">
+        <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
-            <ListboxButton class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2">
+            <ListboxButton
+              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+            >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
             </ListboxButton>
           </div>
-          <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-            <ListboxOptions class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none">
-              <ListboxOption v-for="opt in pageSizeOptions" :key="opt.value" :value="opt" v-slot="{ active, selected }">
-                <li :class="[ 'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between', active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700' ]">
+          <transition
+            enter-active-class="transition ease-out duration-100"
+            enter-from-class="transform opacity-0 scale-95"
+            enter-to-class="transform opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-from-class="transform opacity-100 scale-100"
+            leave-to-class="transform opacity-0 scale-95"
+          >
+            <ListboxOptions
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+            >
+              <ListboxOption
+                v-for="opt in pageSizeOptions"
+                :key="opt.value"
+                :value="opt"
+                v-slot="{ active, selected }"
+              >
+                <li
+                  :class="[
+                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
+                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                  ]"
+                >
                   <span>{{ opt.label }}</span>
                   <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
                 </li>
@@ -48,7 +96,12 @@
           </transition>
         </Listbox>
 
-        <button class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2" @click="openCreate">เพิ่มสาขา</button>
+        <button
+          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          @click="openCreate"
+        >
+          เพิ่มสาขา
+        </button>
       </div>
     </div>
 
@@ -59,18 +112,32 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">รหัส</th>
-              <th @click="toggleSort('name')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600">
-                <span class="inline-flex items-center">ชื่อสาขา
-                  <ChevronUp v-if="sort==='name' && order==='asc'" class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+              <th
+                @click="toggleSort('name')"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+              >
+                <span class="inline-flex items-center"
+                  >ชื่อสาขา
+                  <ChevronUp
+                    v-if="sort === 'name' && order === 'asc'"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                  />
                   <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
                 </span>
               </th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ที่อยู่</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">โทร</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
-              <th @click="toggleSort('createdAt')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600">
-                <span class="inline-flex items-center">วันที่สร้าง
-                  <ChevronUp v-if="sort==='createdAt' && order==='asc'" class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+              <th
+                @click="toggleSort('createdAt')"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+              >
+                <span class="inline-flex items-center"
+                  >วันที่สร้าง
+                  <ChevronUp
+                    v-if="sort === 'createdAt' && order === 'asc'"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                  />
                   <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
                 </span>
               </th>
@@ -79,27 +146,48 @@
           </thead>
           <tbody class="divide-y divide-gray-100">
             <!-- Loading skeleton -->
-            <tr v-if="loading" v-for="n in 6" :key="'skeleton-'+n">
-              <td class="px-4 py-3"><div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-40 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-64 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-5 w-20 bg-gray-100 animate-pulse rounded-full"></div></td>
-              <td class="px-4 py-3 text-right"><div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div></td>
+            <tr v-if="loading" v-for="n in 6" :key="'skeleton-' + n">
+              <td class="px-4 py-3">
+                <div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-40 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-64 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-5 w-20 bg-gray-100 animate-pulse rounded-full"></div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div>
+              </td>
             </tr>
 
             <!-- Rows -->
             <tr v-for="b in branches" :key="b.id" class="hover:bg-gray-50" v-show="!loading">
               <td class="px-4 py-2 text-sm text-gray-700">{{ b.code }}</td>
               <td class="px-4 py-2 text-sm text-gray-900 font-medium">{{ b.name }}</td>
-              <td class="px-4 py-2 text-sm text-gray-700 truncate max-w-[28ch]">{{ b.address || '-' }}</td>
+              <td class="px-4 py-2 text-sm text-gray-700 truncate max-w-[28ch]">
+                {{ b.address || '-' }}
+              </td>
               <td class="px-4 py-2 text-sm text-gray-700">{{ b.phone || '-' }}</td>
               <td class="px-4 py-2 text-sm">
-                <span :class="b.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'" class="px-2 py-1 rounded-full text-xs font-medium">
+                <span
+                  :class="
+                    b.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                  "
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                >
                   {{ b.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                 </span>
               </td>
-              <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">{{ formatDate(b.createdAt) }}</td>
+              <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                {{ formatDate(b.createdAt) }}
+              </td>
               <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
                 <template v-if="isAdmin">
                   <button
@@ -112,9 +200,11 @@
                   </button>
                   <button
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md ml-2 transition-colors"
-                    :class="b.isActive 
-                      ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500' 
-                      : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'"
+                    :class="
+                      b.isActive
+                        ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                        : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'
+                    "
                     @click="toggleActive(b)"
                     v-tooltip:top="b.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
                   >
@@ -135,7 +225,9 @@
       </div>
 
       <!-- Footer: pagination -->
-      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm">
+      <div
+        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+      >
         <div class="text-gray-600">
           แสดง
           <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
@@ -147,20 +239,22 @@
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none  disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="meta.page<=1 || loading"
-            @click="go(meta.page-1)"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="meta.page <= 1 || loading"
+            @click="go(meta.page - 1)"
           >
             <ChevronLeft class="w-3.5 h-3.5" />
             ก่อนหน้า
           </button>
-          <span class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700">
+          <span
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+          >
             หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="meta.page>=totalPages || loading"
-            @click="go(meta.page+1)"
+            :disabled="meta.page >= totalPages || loading"
+            @click="go(meta.page + 1)"
           >
             ถัดไป
             <ChevronRight class="w-3.5 h-3.5" />
@@ -181,7 +275,16 @@
 
 <script>
 import { branchService } from '@/services/branch'
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-vue-next'
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import BranchModal from '@/views/branches/components/modals/BranchModal.vue'
 import Swal from 'sweetalert2'
@@ -189,7 +292,21 @@ import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'Branches',
-  components: { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, Trash2, ToggleLeft, ToggleRight, Listbox, ListboxButton, ListboxOptions, ListboxOption, BranchModal },
+  components: {
+    ChevronDown,
+    ChevronUp,
+    ChevronLeft,
+    ChevronRight,
+    Pencil,
+    Trash2,
+    ToggleLeft,
+    ToggleRight,
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+    BranchModal,
+  },
   setup() {
     const authStore = useAuthStore()
     return { authStore }
@@ -202,14 +319,14 @@ export default {
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
         { label: 'ใช้งาน', value: true },
-        { label: 'ปิดใช้งาน', value: false }
+        { label: 'ปิดใช้งาน', value: false },
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
       pageSize: 10,
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
-        { label: '50 ต่อหน้า', value: 50 }
+        { label: '50 ต่อหน้า', value: 50 },
       ],
       pageSizeOption: { label: '10 ต่อหน้า', value: 10 },
       meta: { page: 1, totalPages: 1, total: 0 },
@@ -220,7 +337,7 @@ export default {
       order: 'desc',
       modalOpen: false,
       modalLoading: false,
-      editingBranch: null
+      editingBranch: null,
     }
   },
   computed: {
@@ -240,7 +357,7 @@ export default {
     },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
-    }
+    },
   },
   methods: {
     // เมื่อเลือกสถานะใหม่ จะรีเฟรชอัตโนมัติผ่าน watch ด้านล่าง
@@ -253,7 +370,7 @@ export default {
           search: this.query || undefined,
           isActive: this.isActive === '' ? undefined : this.isActive,
           sort: this.sort,
-          order: this.order
+          order: this.order,
         })
         this.branches = data
         this.meta = meta
@@ -299,7 +416,14 @@ export default {
         const code = await branchService.getLatestCode()
         this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true }
       } catch (e) {
-        this.editingBranch = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
+        this.editingBranch = {
+          id: null,
+          code: '',
+          name: '',
+          address: '',
+          phone: '',
+          isActive: true,
+        }
       }
       this.modalOpen = true
     },
@@ -312,12 +436,14 @@ export default {
       const isEdit = !!data.id
       const confirm = await Swal.fire({
         title: isEdit ? 'ยืนยันการแก้ไขสาขา?' : 'ยืนยันการสร้างสาขาใหม่?',
-        text: isEdit ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${data.name}" หรือไม่` : `ต้องการสร้างสาขา "${data.name}" หรือไม่`,
+        text: isEdit
+          ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${data.name}" หรือไม่`
+          : `ต้องการสร้างสาขา "${data.name}" หรือไม่`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
+        reverseButtons: true,
       })
       if (!confirm.isConfirmed) return
 
@@ -326,10 +452,17 @@ export default {
         if (isEdit) {
           const res = await branchService.update(data.id, data)
           const updated = res.branch || res
-          this.branches = this.branches.map(x => x.id === updated.id ? { ...x, ...updated } : x)
+          this.branches = this.branches.map((x) => (x.id === updated.id ? { ...x, ...updated } : x))
           this.modalOpen = false
           this.modalLoading = false
-          Swal.fire({ icon: 'success', title: 'แก้ไขสาขาสำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+          Swal.fire({
+            icon: 'success',
+            title: 'แก้ไขสาขาสำเร็จ',
+            timer: 1600,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+          })
         } else {
           const res = await branchService.create(data)
           const created = res.branch || res
@@ -337,14 +470,25 @@ export default {
           this.meta.total += 1
           this.modalOpen = false
           this.modalLoading = false
-          Swal.fire({ icon: 'success', title: 'สร้างสาขาสำเร็จ', timer: 1600, showConfirmButton: false, toast: true, position: 'top-end' })
+          Swal.fire({
+            icon: 'success',
+            title: 'สร้างสาขาสำเร็จ',
+            timer: 1600,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+          })
         }
       } catch (e) {
         this.modalLoading = false
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้' })
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
+        })
       }
     },
- 
+
     async toggleActive(b) {
       const desired = !b.isActive
       // แสดงยืนยันแบบย่อ
@@ -355,7 +499,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
+        reverseButtons: true,
       })
       if (!res.isConfirmed) return
 
@@ -363,13 +507,27 @@ export default {
         const updated = await branchService.updateActive(b.id, desired)
         // อัปเดตในตารางทันที
         const newVal = updated.branch || updated
-        const idx = this.branches.findIndex(x => x.id === b.id)
-        if (idx !== -1) this.$set ? this.$set(this.branches, idx, { ...b, ...newVal }) : (this.branches[idx] = { ...b, ...newVal })
-        Swal.fire({ icon: 'success', title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว', timer: 1200, showConfirmButton: false, toast: true, position: 'top-end' })
+        const idx = this.branches.findIndex((x) => x.id === b.id)
+        if (idx !== -1)
+          this.$set
+            ? this.$set(this.branches, idx, { ...b, ...newVal })
+            : (this.branches[idx] = { ...b, ...newVal })
+        Swal.fire({
+          icon: 'success',
+          title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว',
+          timer: 1200,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+        })
       } catch (e) {
-        Swal.fire({ icon: 'error', title: 'อัปเดตสถานะไม่สำเร็จ', text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง' })
+        Swal.fire({
+          icon: 'error',
+          title: 'อัปเดตสถานะไม่สำเร็จ',
+          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง',
+        })
       }
-    }
+    },
   },
   mounted() {
     this.reload()
@@ -385,13 +543,10 @@ export default {
         this.pageSize = newVal.value
         this.meta.page = 1
         this.reload()
-      }
-    }
-  }
+      },
+    },
+  },
 }
 </script>
 
-<style scoped>
-</style>
-
-
+<style scoped></style>

@@ -6,97 +6,96 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/auth'
+      redirect: '/auth',
     },
     {
       path: '/auth',
       name: 'Auth',
       component: () => import('@/views/Auth.vue'),
-      meta: { requiresGuest: true }
+      meta: { requiresGuest: true },
     },
     {
       path: '/login',
-      redirect: '/auth'
+      redirect: '/auth',
     },
     {
       path: '/register',
-      redirect: '/auth'
+      redirect: '/auth',
     },
+    {
+      path: '/lobby',
+      redirect: '/main/lobby',
+    },
+    {
+      path: '/main',
+      component: () => import('@/layouts/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
         {
-          path: '/lobby',
-          redirect: '/main/lobby'
+          path: '',
+          redirect: '/main/lobby',
         },
         {
-          path: '/main',
-          component: () => import('@/layouts/MainLayout.vue'),
-          meta: { requiresAuth: true },
-          children: [
-            {
-              path: '',
-              redirect: '/main/lobby'
-            },
-            {
-              path: 'lobby',
-              name: 'Lobby',
-              component: () => import('@/views/main/Lobby.vue')
-            },
-            {
-              path: 'overview',
-              name: 'Overview',
-              component: () => import('@/views/main/Overview.vue'),
-              meta: { requiresBranch: true, title: 'ภาพรวม' }
-            },
-            {
-              path: 'branches',
-              name: 'Branches',
-              component: () => import('@/views/branches/Branches.vue'),
-              meta: { requiresBranch: true, title: 'สาขา' }
-            },
-            {
-              path: 'users',
-              name: 'Users',
-              component: () => import('@/views/users/Users.vue'),
-              meta: { requiresBranch: true, title: 'ผู้ใช้' }
-            },
-            // Customer Management
-            {
-              path: 'customers/patients',
-              name: 'Patients',
-              component: () => import('@/views/customers/Patients.vue'),
-              meta: { requiresBranch: true, title: 'ลูกค้า' }
-            },
-            {
-              path: 'customers/patient-groups',
-              name: 'PatientGroups',
-              component: () => import('@/views/customers/PatientGroups.vue'),
-              meta: { requiresBranch: true, title: 'กลุ่มลูกค้า' }
-            },
-            {
-              path: 'customers/tags',
-              name: 'Tags',
-              component: () => import('@/views/customers/Tags.vue'),
-              meta: { requiresBranch: true, title: 'แท็ก' }
-            },
-            {
-              path: 'customers/insurance-types',
-              name: 'InsuranceTypes',
-              component: () => import('@/views/customers/InsuranceTypes.vue'),
-              meta: { requiresBranch: true, title: 'ประเภทประกัน' }
-            },
-      
-          ]
+          path: 'lobby',
+          name: 'Lobby',
+          component: () => import('@/views/main/Lobby.vue'),
         },
         {
-          path: '/dashboard',
-          redirect: '/lobby'
-        }
+          path: 'overview',
+          name: 'Overview',
+          component: () => import('@/views/main/Overview.vue'),
+          meta: { requiresBranch: true, title: 'ภาพรวม' },
+        },
+        {
+          path: 'branches',
+          name: 'Branches',
+          component: () => import('@/views/branches/Branches.vue'),
+          meta: { requiresBranch: true, title: 'สาขา' },
+        },
+        {
+          path: 'users',
+          name: 'Users',
+          component: () => import('@/views/users/Users.vue'),
+          meta: { requiresBranch: true, title: 'ผู้ใช้' },
+        },
+        // Customer Management
+        {
+          path: 'customers/patients',
+          name: 'Patients',
+          component: () => import('@/views/customers/Patients.vue'),
+          meta: { requiresBranch: true, title: 'ลูกค้า' },
+        },
+        {
+          path: 'customers/patient-groups',
+          name: 'PatientGroups',
+          component: () => import('@/views/customers/PatientGroups.vue'),
+          meta: { requiresBranch: true, title: 'กลุ่มลูกค้า' },
+        },
+        {
+          path: 'customers/tags',
+          name: 'Tags',
+          component: () => import('@/views/customers/Tags.vue'),
+          meta: { requiresBranch: true, title: 'แท็ก' },
+        },
+        {
+          path: 'customers/insurance-types',
+          name: 'InsuranceTypes',
+          component: () => import('@/views/customers/InsuranceTypes.vue'),
+          meta: { requiresBranch: true, title: 'ประเภทประกัน' },
+        },
+      ],
+    },
+    {
+      path: '/dashboard',
+      redirect: '/lobby',
+    },
   ],
 })
 
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // Initialize auth if token exists
   if (authStore.token && !authStore.user) {
     try {

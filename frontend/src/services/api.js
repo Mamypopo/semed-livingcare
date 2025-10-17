@@ -22,7 +22,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 // Response interceptor
@@ -38,19 +38,19 @@ api.interceptors.response.use(
       localStorage.removeItem('user')
       window.location.href = '/login'
     }
-    
+
     if (error.response?.status === 403) {
       // Forbidden - show error message
       console.error('Access denied')
     }
-    
+
     if (error.response?.status >= 500) {
       // Server error
       console.error('Server error:', error.response.data)
     }
-    
+
     return Promise.reject(error)
-  }
+  },
 )
 
 // Generic API methods
@@ -69,7 +69,6 @@ export const createHttp = (baseURL, extra = {}) =>
     headers: { 'Content-Type': 'application/json' },
     ...extra,
   })
-  
+
 // Export api instance for direct use
 export { api }
-

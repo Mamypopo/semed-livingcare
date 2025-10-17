@@ -49,14 +49,13 @@ export const branchService = {
     return response.data.data
   },
 
-  // Get all branches for dropdown 
+  // Get all branches for dropdown
   async getAllForDropdown(search = '', limit = 20) {
     const params = new URLSearchParams()
     if (search) params.append('search', search)
     if (limit) params.append('limit', limit)
-    
+
     const response = await apiClient.get(`/branches/dropdown?${params.toString()}`)
     return response.data.data
-  }
+  },
 }
-

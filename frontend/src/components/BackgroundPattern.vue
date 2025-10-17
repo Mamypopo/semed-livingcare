@@ -2,7 +2,7 @@
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-sky-50"></div>
-    
+
     <!-- Floating icons -->
     <div class="absolute inset-0">
       <!-- Top left area -->
@@ -113,23 +113,73 @@
 </template>
 
 <script>
-import { 
-  Building2, FileText, RefreshCw, Users, Settings, TestTube,
-  Globe, Heart, BarChart3, Droplets, Plus, Hand,
-  Shield, Calendar, Clock, Database, Layers, Zap,
-  PieChart, TrendingUp, Target, Star, Activity, Award,
-  Bookmark, Flag, Mail, Phone, MapPin, Camera
+import {
+  Building2,
+  FileText,
+  RefreshCw,
+  Users,
+  Settings,
+  TestTube,
+  Globe,
+  Heart,
+  BarChart3,
+  Droplets,
+  Plus,
+  Hand,
+  Shield,
+  Calendar,
+  Clock,
+  Database,
+  Layers,
+  Zap,
+  PieChart,
+  TrendingUp,
+  Target,
+  Star,
+  Activity,
+  Award,
+  Bookmark,
+  Flag,
+  Mail,
+  Phone,
+  MapPin,
+  Camera,
 } from 'lucide-vue-next'
 
 export default {
   name: 'BackgroundPattern',
   components: {
-    Building2, FileText, RefreshCw, Users, Settings, TestTube,
-    Globe, Heart, BarChart3, Droplets, Plus, Hand,
-    Shield, Calendar, Clock, Database, Layers, Zap,
-    PieChart, TrendingUp, Target, Star, Activity, Award,
-    Bookmark, Flag, Mail, Phone, MapPin, Camera
-  }
+    Building2,
+    FileText,
+    RefreshCw,
+    Users,
+    Settings,
+    TestTube,
+    Globe,
+    Heart,
+    BarChart3,
+    Droplets,
+    Plus,
+    Hand,
+    Shield,
+    Calendar,
+    Clock,
+    Database,
+    Layers,
+    Zap,
+    PieChart,
+    TrendingUp,
+    Target,
+    Star,
+    Activity,
+    Award,
+    Bookmark,
+    Flag,
+    Mail,
+    Phone,
+    MapPin,
+    Camera,
+  },
 }
 </script>
 

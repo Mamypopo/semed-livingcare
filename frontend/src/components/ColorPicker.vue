@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-2">
     <label v-if="label" class="block text-sm font-medium text-gray-700">{{ label }}</label>
-    
+
     <div class="flex items-center space-x-2">
       <!-- Color Input -->
       <input
@@ -10,7 +10,7 @@
         class="h-10 w-16 border border-gray-200 rounded-md cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300"
         @input="onColorChange"
       />
-      
+
       <!-- Text Input -->
       <input
         v-model="colorValue"
@@ -19,7 +19,7 @@
         class="flex-1 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none font-mono text-sm"
         @input="onTextChange"
       />
-      
+
       <!-- Random Color Button -->
       <button
         type="button"
@@ -30,15 +30,15 @@
         <Shuffle class="w-4 h-4" />
       </button>
     </div>
-    
+
     <!-- Error Message -->
     <p v-if="error" class="text-xs text-red-600">{{ error }}</p>
-    
+
     <!-- Color Preview -->
     <div v-if="showPreview" class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div 
+          <div
             class="w-8 h-8 rounded-lg border-2 border-white shadow-md"
             :style="{ backgroundColor: colorValue }"
           ></div>
@@ -47,9 +47,7 @@
             <div class="text-xs text-gray-500">{{ getColorName(colorValue) }}</div>
           </div>
         </div>
-        <div class="text-xs text-gray-400">
-          ตัวอย่างสี
-        </div>
+        <div class="text-xs text-gray-400">ตัวอย่างสี</div>
       </div>
     </div>
   </div>
@@ -64,50 +62,50 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: '#22C55E'
+      default: '#22C55E',
     },
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     placeholder: {
       type: String,
-      default: '#22C55E'
+      default: '#22C55E',
     },
     showPreview: {
       type: Boolean,
-      default: true
+      default: true,
     },
     error: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   emits: ['update:modelValue'],
   data() {
     return {
-      colorValue: this.modelValue
+      colorValue: this.modelValue,
     }
   },
   watch: {
     modelValue(newValue) {
       this.colorValue = newValue
-    }
+    },
   },
   methods: {
     onColorChange(event) {
       this.colorValue = event.target.value
       this.$emit('update:modelValue', this.colorValue)
     },
-    
+
     onTextChange(event) {
       let value = event.target.value
-      
+
       // Add # if missing
       if (value && !value.startsWith('#')) {
         value = '#' + value
       }
-      
+
       // Validate hex color format
       if (value && /^#[0-9A-F]{6}$/i.test(value)) {
         this.colorValue = value.toUpperCase()
@@ -116,10 +114,15 @@ export default {
         this.colorValue = value
       }
     },
-    
+
     generateRandomColor() {
       // Generate random hex color
-      const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).toUpperCase().padStart(6, '0')
+      const randomColor =
+        '#' +
+        Math.floor(Math.random() * 16777215)
+          .toString(16)
+          .toUpperCase()
+          .padStart(6, '0')
       this.colorValue = randomColor
       this.$emit('update:modelValue', this.colorValue)
     },
@@ -146,11 +149,11 @@ export default {
         '#FFC0CB': 'ชมพู',
         '#A52A2A': 'น้ำตาล',
         '#FFD700': 'ทอง',
-        '#E6E6FA': 'ม่วงอ่อน'
+        '#E6E6FA': 'ม่วงอ่อน',
       }
-      
+
       return colorNames[hex] || 'สีกำหนดเอง'
-    }
-  }
+    },
+  },
 }
 </script>

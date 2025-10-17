@@ -4,14 +4,14 @@ const patientGroupService = {
   // Get all patient groups
   async getAll(params = {}) {
     const queryParams = new URLSearchParams()
-    
+
     if (params.search) queryParams.append('search', params.search)
     if (params.page) queryParams.append('page', params.page)
     if (params.pageSize) queryParams.append('pageSize', params.pageSize)
     if (params.sort) queryParams.append('sort', params.sort)
     if (params.order) queryParams.append('order', params.order)
     if (params.isActive !== undefined) queryParams.append('isActive', params.isActive)
-    
+
     const response = await apiClient.get(`/patient-groups?${queryParams.toString()}`)
     return response.data
   },
@@ -51,10 +51,10 @@ const patientGroupService = {
     const params = new URLSearchParams()
     if (search) params.append('search', search)
     if (limit) params.append('limit', limit)
-    
+
     const response = await apiClient.get(`/patient-groups/dropdown?${params.toString()}`)
     return response.data.data
-  }
+  },
 }
 
 export default patientGroupService

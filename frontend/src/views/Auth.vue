@@ -5,7 +5,9 @@
     <div class="w-full max-w-md relative z-10">
       <!-- Logo Section -->
       <div v-if="activeTab === 'login'" class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-500 rounded-xl mb-6">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 bg-emerald-500 rounded-xl mb-6"
+        >
           <Heart class="w-8 h-8 text-white" />
         </div>
         <h1 class="text-3xl font-bold text-slate-800 mb-2">Semed Livingcare</h1>
@@ -13,16 +15,16 @@
       </div>
 
       <!-- Auth Card -->
-      <div class="bg-white rounded-2xl shadow-xl p-8 ">
+      <div class="bg-white rounded-2xl shadow-xl p-8">
         <!-- Tab Navigation -->
         <div class="flex bg-gray-100 rounded-xl p-1 mb-8">
           <button
             @click="activeTab = 'login'"
             :class="[
               'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200',
-              activeTab === 'login' 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-600 hover:text-gray-800'
+              activeTab === 'login'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800',
             ]"
           >
             เข้าสู่ระบบ
@@ -31,9 +33,9 @@
             @click="activeTab = 'register'"
             :class="[
               'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200',
-              activeTab === 'register' 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-600 hover:text-gray-800'
+              activeTab === 'register'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800',
             ]"
           >
             สมัครสมาชิก
@@ -99,7 +101,9 @@
                 />
                 <span class="ml-2 text-sm text-gray-700">Remember me</span>
               </label>
-              <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Forgot password?</a>
+              <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >Forgot password?</a
+              >
             </div>
 
             <!-- Login Button -->
@@ -109,9 +113,26 @@
               class="w-full bg-gray-800 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 h-12 flex items-center justify-center"
               :class="{ 'opacity-70 cursor-not-allowed': isLoading }"
             >
-              <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                v-if="isLoading"
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               <span v-if="!isLoading">Sign In</span>
               <span v-else>กำลังเข้าสู่ระบบ...</span>
@@ -132,19 +153,21 @@
               <label class="block text-sm font-semibold text-gray-900">Registration Code</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <KeyRound  class="w-4 h-4 text-gray-500" />
+                  <KeyRound class="w-4 h-4 text-gray-500" />
                 </div>
-              <input
-                v-model="registerForm.registrationCode"
-                type="text"
-                placeholder="Enter registration code"
-                class="w-full pl-10 pr-12 py-3 text-gray-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:shadow-lg transition-all duration-200 h-12 bg-white hover:border-emerald-300 focus:outline-none"
-                :class="{ 'border-red-500': errors.registrationCode }"
-                required
-              />
-              <p v-if="errors.registrationCode" class="text-sm text-red-500">{{ errors.registrationCode }}</p>
+                <input
+                  v-model="registerForm.registrationCode"
+                  type="text"
+                  placeholder="Enter registration code"
+                  class="w-full pl-10 pr-12 py-3 text-gray-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:shadow-lg transition-all duration-200 h-12 bg-white hover:border-emerald-300 focus:outline-none"
+                  :class="{ 'border-red-500': errors.registrationCode }"
+                  required
+                />
+                <p v-if="errors.registrationCode" class="text-sm text-red-500">
+                  {{ errors.registrationCode }}
+                </p>
+              </div>
             </div>
-          </div>
 
             <!-- Name Field -->
             <div class="space-y-2">
@@ -230,7 +253,9 @@
                   <EyeOff v-else class="w-5 h-5" />
                 </button>
               </div>
-              <p v-if="errors.confirmPassword" class="text-sm text-red-500">{{ errors.confirmPassword }}</p>
+              <p v-if="errors.confirmPassword" class="text-sm text-red-500">
+                {{ errors.confirmPassword }}
+              </p>
             </div>
 
             <!-- Register Button -->
@@ -240,9 +265,26 @@
               class="w-full bg-gray-800 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 h-12 flex items-center justify-center"
               :class="{ 'opacity-70 cursor-not-allowed': isLoading }"
             >
-              <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                v-if="isLoading"
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               <span v-if="!isLoading">Sign Up</span>
               <span v-else>กำลังสมัครสมาชิก...</span>
@@ -253,8 +295,13 @@
         <!-- Account Creation Link -->
         <div v-if="activeTab === 'login'" class="text-center mt-6">
           <p class="text-gray-600">
-            Don't have an account? 
-            <a href="#" @click="activeTab = 'register'" class="text-blue-600 hover:text-blue-800 font-medium">Sign Up</a>
+            Don't have an account?
+            <a
+              href="#"
+              @click="activeTab = 'register'"
+              class="text-blue-600 hover:text-blue-800 font-medium"
+              >Sign Up</a
+            >
           </p>
         </div>
 
@@ -296,9 +343,16 @@
         </button>
 
         <!-- Error Message -->
-        <div v-if="errorMessage" class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+        <div
+          v-if="errorMessage"
+          class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center"
+        >
           <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            ></path>
           </svg>
           <span class="text-red-700">{{ errorMessage }}</span>
         </div>
@@ -311,7 +365,7 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BackgroundPattern from '@/components/BackgroundPattern.vue'
-import { Heart, Mail, Lock, Eye, EyeOff,KeyRound } from 'lucide-vue-next'
+import { Heart, Mail, Lock, Eye, EyeOff, KeyRound } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 
 export default {
@@ -323,15 +377,15 @@ export default {
     Lock,
     Eye,
     EyeOff,
-    KeyRound 
+    KeyRound,
   },
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
-    
+
     return {
       router,
-      authStore
+      authStore,
     }
   },
   data() {
@@ -340,14 +394,14 @@ export default {
       loginForm: {
         email: '',
         password: '',
-        rememberMe: false
+        rememberMe: false,
       },
       registerForm: {
         registrationCode: '',
         name: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
       },
       showPassword: false,
       showConfirmPassword: false,
@@ -358,8 +412,8 @@ export default {
         password: '',
         registrationCode: '',
         name: '',
-        confirmPassword: ''
-      }
+        confirmPassword: '',
+      },
     }
   },
   methods: {
@@ -367,72 +421,72 @@ export default {
     validateLoginForm() {
       this.errors.email = ''
       this.errors.password = ''
-      
+
       if (!this.loginForm.email) {
         this.errors.email = 'กรุณากรอกอีเมล'
         return false
       }
-      
+
       if (!this.loginForm.password) {
         this.errors.password = 'กรุณากรอกรหัสผ่าน'
         return false
       }
-      
+
       return true
     },
 
     // Register validation
     validateRegisterForm() {
-      Object.keys(this.errors).forEach(key => this.errors[key] = '')
-      
+      Object.keys(this.errors).forEach((key) => (this.errors[key] = ''))
+
       if (!this.registerForm.registrationCode) {
         this.errors.registrationCode = 'กรุณากรอกรหัสสมัครสมาชิก'
         return false
       }
-      
+
       if (!this.registerForm.name) {
         this.errors.name = 'กรุณากรอกชื่อ-นามสกุล'
         return false
       }
-      
+
       if (!this.registerForm.email) {
         this.errors.email = 'กรุณากรอกอีเมล'
         return false
       }
-      
+
       if (!this.registerForm.password) {
         this.errors.password = 'กรุณากรอกรหัสผ่าน'
         return false
       }
-      
+
       if (this.registerForm.password.length < 6) {
         this.errors.password = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'
         return false
       }
-      
+
       if (!this.registerForm.confirmPassword) {
         this.errors.confirmPassword = 'กรุณายืนยันรหัสผ่าน'
         return false
       }
-      
+
       if (this.registerForm.password !== this.registerForm.confirmPassword) {
         this.errors.confirmPassword = 'รหัสผ่านไม่ตรงกัน'
         return false
       }
-      
+
       return true
     },
 
     // Handle login
     async handleLogin() {
       if (!this.validateLoginForm()) return
-      
+
       this.isLoading = true
       this.errorMessage = ''
-      
+
       try {
         await this.authStore.login(this.loginForm)
-        
+
         // Success alert
         await Swal.fire({
           icon: 'success',
@@ -441,9 +495,9 @@ export default {
           timer: 2000,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
         })
-        
+
         this.router.push('/lobby')
       } catch (error) {
         // Error alert
@@ -451,7 +505,7 @@ export default {
           icon: 'error',
           title: 'เข้าสู่ระบบไม่สำเร็จ',
           text: error.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ',
-          confirmButtonText: 'ลองใหม่'
+          confirmButtonText: 'ลองใหม่',
         })
       } finally {
         this.isLoading = false
@@ -461,13 +515,13 @@ export default {
     // Handle register
     async handleRegister() {
       if (!this.validateRegisterForm()) return
-      
+
       this.isLoading = true
       this.errorMessage = ''
-      
+
       try {
         await this.authStore.register(this.registerForm)
-        
+
         // Success alert
         await Swal.fire({
           icon: 'success',
@@ -475,7 +529,7 @@ export default {
           text: 'กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่านที่สมัครไว้',
           confirmButtonText: 'เข้าสู่ระบบ',
           showCancelButton: true,
-          cancelButtonText: 'ปิด'
+          cancelButtonText: 'ปิด',
         }).then((result) => {
           if (result.isConfirmed) {
             this.activeTab = 'login'
@@ -485,18 +539,17 @@ export default {
               name: '',
               email: '',
               password: '',
-              confirmPassword: ''
+              confirmPassword: '',
             }
           }
         })
-        
       } catch (error) {
         // Error alert
         await Swal.fire({
           icon: 'error',
           title: 'สมัครสมาชิกไม่สำเร็จ',
           text: error.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก',
-          confirmButtonText: 'ลองใหม่'
+          confirmButtonText: 'ลองใหม่',
         })
       } finally {
         this.isLoading = false
@@ -509,10 +562,9 @@ export default {
         icon: 'info',
         title: 'Google Login',
         text: 'ฟีเจอร์นี้กำลังพัฒนา กรุณาใช้การเข้าสู่ระบบปกติ',
-        confirmButtonText: 'เข้าใจแล้ว'
+        confirmButtonText: 'เข้าใจแล้ว',
       })
-    }
-  }
+    },
+  },
 }
 </script>
-

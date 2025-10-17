@@ -5,7 +5,10 @@
 /* Set default font */
 body {
   font-family: 'Prompt', sans-serif;
-  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  font-feature-settings:
+    'kern' 1,
+    'liga' 1,
+    'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -52,4 +55,3 @@ body {
 .tippy-box {
   pointer-events: auto;
 }
-

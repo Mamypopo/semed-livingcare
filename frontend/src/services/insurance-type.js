@@ -4,19 +4,19 @@ export default {
   // Get all insurance types with pagination and filters
   async getAll(params = {}) {
     const queryParams = new URLSearchParams()
-    
+
     // Add pagination
     if (params.page) queryParams.append('page', params.page)
     if (params.pageSize) queryParams.append('pageSize', params.pageSize)
-    
+
     // Add filters
     if (params.search) queryParams.append('search', params.search)
     if (params.isActive !== undefined) queryParams.append('isActive', params.isActive)
-    
+
     // Add sorting
     if (params.sort) queryParams.append('sort', params.sort)
     if (params.order) queryParams.append('order', params.order)
-    
+
     const response = await apiClient.get(`/insurance-types?${queryParams.toString()}`)
     return response.data
   },
@@ -56,8 +56,8 @@ export default {
     const params = new URLSearchParams()
     if (search) params.append('search', search)
     if (limit) params.append('limit', limit)
-    
+
     const response = await apiClient.get(`/insurance-types/dropdown?${params.toString()}`)
     return response.data.data
-  }
+  },
 }

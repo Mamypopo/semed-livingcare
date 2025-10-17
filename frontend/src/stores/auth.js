@@ -7,7 +7,7 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('token') || null,
     selectedBranch: JSON.parse(localStorage.getItem('selectedBranch')) || null,
     isLoading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
     userEmail: (state) => state.user?.email || '',
     currentBranch: (state) => state.selectedBranch,
     hasBranch: (state) => !!state.user?.branchId,
-    needsBranchAssignment: (state) => state.user?.role === 'GUEST' && !state.user?.branchId
+    needsBranchAssignment: (state) => state.user?.role === 'GUEST' && !state.user?.branchId,
   },
 
   actions: {
@@ -28,14 +28,14 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await authService.login(credentials)
-        
+
         if (response.success) {
           this.token = response.data.token
           this.user = response.data.user
-          
+
           // Store token in localStorage
           localStorage.setItem('token', this.token)
-          
+
           // Store remember me
           if (credentials.rememberMe) {
             localStorage.setItem('rememberMe', 'true')
@@ -58,11 +58,11 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await authService.register(userData)
-        
+
         if (!response.success) {
           throw new Error(response.message || 'สมัครสมาชิกไม่สำเร็จ')
         }
-        
+
         return response
       } catch (error) {
         this.error = error.message
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await authService.getProfile()
-        
+
         if (response.success) {
           this.user = response.data.user
         } else {
@@ -111,7 +111,7 @@ export const useAuthStore = defineStore('auth', {
       this.token = null
       this.selectedBranch = null
       this.error = null
-      
+
       // Clear localStorage
       localStorage.removeItem('token')
       localStorage.removeItem('rememberMe')
@@ -133,6 +133,6 @@ export const useAuthStore = defineStore('auth', {
           this.logout()
         }
       }
-    }
-  }
+    },
+  },
 })
