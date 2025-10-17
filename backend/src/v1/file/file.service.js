@@ -99,28 +99,6 @@ export const getPatientFiles = async (patientId, options = {}) => {
   }
 }
 
-// Get single file
-export const getFileById = async (fileId) => {
-  try {
-    const file = await prisma.file.findUnique({
-      where: { id: parseInt(fileId) },
-      include: {
-        patient: {
-          select: { id: true, hn: true, first_name: true, last_name: true }
-        }
-      }
-    })
-    
-    if (!file) {
-      throw new Error('ไม่พบไฟล์ที่ต้องการ')
-    }
-    
-    return file
-  } catch (error) {
-    console.error('Error getting file by ID:', error)
-    throw new Error(error.message || 'ไม่สามารถดึงข้อมูลไฟล์ได้')
-  }
-}
 
 // Upload file
 export const uploadFile = async (fileData, uploadedBy) => {
@@ -187,40 +165,6 @@ export const uploadFile = async (fileData, uploadedBy) => {
   }
 }
 
-// Update file
-export const updateFile = async (fileId, updateData) => {
-  try {
-    const { name, description } = updateData
-    
-    // Check if file exists
-    const existingFile = await prisma.file.findUnique({
-      where: { id: parseInt(fileId) }
-    })
-    
-    if (!existingFile) {
-      throw new Error('ไม่พบไฟล์ที่ต้องการแก้ไข')
-    }
-    
-    // Update file
-    const file = await prisma.file.update({
-      where: { id: parseInt(fileId) },
-      data: {
-        ...(name && { name }),
-        ...(description !== undefined && { description })
-      },
-      include: {
-        patient: {
-          select: { id: true, hn: true, first_name: true, last_name: true }
-        }
-      }
-    })
-    
-    return file
-  } catch (error) {
-    console.error('Error updating file:', error)
-    throw new Error(error.message || 'ไม่สามารถแก้ไขไฟล์ได้')
-  }
-}
 
 // Delete file
 export const deleteFile = async (fileId) => {

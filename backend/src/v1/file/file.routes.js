@@ -2,9 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import {
   getPatientFilesController,
-  getFileByIdController,
   uploadFileController,
-  updateFileController,
   deleteFileController
 } from './file.controller.js'
 import { authenticateToken } from '../middlewares/auth.middleware.js'
@@ -44,7 +42,6 @@ router.use(authenticateToken)
 
 // File routes
 router.get('/patients/:id/files', getPatientFilesController)
-router.get('/files/:id', getFileByIdController)
 router.post('/patients/:id/files', upload.single('file'), (err, req, res, next) => {
   if (err) {
     console.error('❌ Multer Error:', err.message)
@@ -55,7 +52,6 @@ router.post('/patients/:id/files', upload.single('file'), (err, req, res, next) 
   }
   next()
 }, uploadFileController)
-router.put('/files/:id', updateFileController)
 router.delete('/files/:id', deleteFileController)
 
 export default router

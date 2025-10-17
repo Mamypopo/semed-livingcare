@@ -90,35 +90,29 @@
                     <!-- Profile Picture -->
                     <div class="col-span-3">
                       <div
-                        class="w-32 h-32 mx-auto bg-gradient-to-br from-purple-400 to-teal-400 rounded-lg border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:shadow-xl transition-shadow duration-200"
+                        class="w-32 h-32 mx-auto bg-gradient-to-br from-emerald-100/80 to-emerald-200/80 rounded-xl border-2 border-emerald-300 shadow-sm flex items-center justify-center cursor-pointer hover:shadow-md hover:border-emerald-400 transition-all duration-200"
                         @click="triggerProfileImageUpload"
                       >
-                        <div v-if="!profileImagePreview" class="text-white text-center">
+                        <div v-if="!profileImagePreview" class="text-emerald-700 text-center">
                           <div
-                            class="w-16 h-16 mx-auto mb-2 bg-white/20 rounded-lg flex items-center justify-center"
+                            class="w-16 h-16 mx-auto mb-2 bg-emerald-500/10 rounded-lg flex items-center justify-center"
                           >
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fill-rule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                clip-rule="evenodd"
-                              />
-                            </svg>
+                            <ImageIcon class="w-8 h-8 text-emerald-600" />
                           </div>
-                          <div class="text-xs">คลิกเพื่ออัปโหลด</div>
+                          <div class="text-xs font-medium">คลิกเพื่ออัปโหลด</div>
                         </div>
                         <div v-else class="relative w-full h-full">
                           <img
                             :src="profileImagePreview"
                             alt="รูปโปรไฟล์"
-                            class="w-full h-full object-cover rounded-lg"
+                            class="w-full h-full object-cover rounded-xl"
                           />
                           <button
                             type="button"
                             @click.stop="removeProfileImage"
-                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                            class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-md flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm"
                           >
-                            ×
+                            <X class="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -1998,9 +1992,66 @@
 
                   <!-- Files List -->
                   <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                      <h3 class="text-lg font-semibold text-gray-900">ไฟล์แนบ</h3>
-                      <span class="text-sm text-gray-500">{{ patientFiles.length }} ไฟล์</span>
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <!-- Left side: Title and count -->
+                      <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-semibold text-gray-900">ไฟล์แนบ</h3>
+                        <span class="text-sm text-gray-500">{{ patientFiles.length }} ไฟล์</span>
+                      </div>
+
+                      <!-- Right side: Search and Sort Controls -->
+                      <div class="flex items-center gap-3">
+                        <!-- Search Input -->
+                        <div class="relative w-64">
+                          <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            v-model="fileSearchQuery"
+                            @input="onFileSearch"
+                            type="text"
+                            placeholder="ค้นหาไฟล์..."
+                            class="w-full px-3 py-2 pl-10 pr-4 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                          />
+                        </div>
+                      
+                        <!-- Sort Dropdown -->
+                        <div class="flex items-center gap-2">
+                          <Listbox v-model="fileSortOption" @update:modelValue="onFileSortChange">
+                          <div class="relative">
+                            <ListboxButton class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2">
+                              <span>{{ getSortLabel(fileSortOption) }}</span>
+                              <ChevronDown class="w-3.5 h-3.5 opacity-60" />
+                            </ListboxButton>
+                            <transition
+                              enter-active-class="transition ease-out duration-100"
+                              enter-from-class="transform opacity-0 scale-95"
+                              enter-to-class="transform opacity-100 scale-100"
+                              leave-active-class="transition ease-in duration-75"
+                              leave-from-class="transform opacity-100 scale-100"
+                              leave-to-class="transform opacity-0 scale-95"
+                            >
+                              <ListboxOptions class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-40 focus:outline-none">
+                                <ListboxOption
+                                  v-for="option in sortOptions"
+                                  :key="option.value"
+                                  :value="option.value"
+                                  v-slot="{ active, selected }"
+                                >
+                                  <li
+                                    :class="[
+                                      'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
+                                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                                    ]"
+                                  >
+                                    <span>{{ option.label }}</span>
+                                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                                  </li>
+                                </ListboxOption>
+                              </ListboxOptions>
+                            </transition>
+                          </div>
+                          </Listbox>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- Loading State -->
@@ -2089,7 +2140,7 @@ import {
   TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, Check, Plus, Trash2, Upload, FileText, X, Image as ImageIcon, File, Eye } from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, Trash2, Upload, FileText, X, Image as ImageIcon, File, Eye, Search as SearchIcon} from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 import TagDropdown from '@/components/dropdown/TagDropdown.vue'
 import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
@@ -2127,7 +2178,8 @@ export default {
     PatientGroupDropdown,
     InsuranceTypeDropdown,
     ConfirmClosePopover,
-    Eye
+    Eye,
+    SearchIcon
   },
   props: {
     modelValue: {
@@ -2394,7 +2446,19 @@ export default {
       uploadingFiles: false,
       selectedFiles: [],
       fileDescription: '',
-      fileName: ''
+      fileName: '',
+      
+      // File search and sort
+      fileSearchQuery: '',
+      fileSortOption: 'newest',
+      fileSearchTimeout: null,
+      
+      // Sort options for dropdown
+      sortOptions: [
+        { value: 'newest', label: 'ใหม่ล่าสุด' },
+        { value: 'oldest', label: 'เก่าที่สุด' },
+        { value: 'name', label: 'ชื่อไฟล์' }
+      ]
     }
   },
   computed: {
@@ -3299,7 +3363,6 @@ export default {
     async confirmFileUpload() {
       if (this.selectedFiles.length === 0) return
       
-      // แสดง SweetAlert ยืนยันการอัปโหลด
       const result = await Swal.fire({
         title: 'ยืนยันการอัปโหลดไฟล์',
         text: `ต้องการอัปโหลด ${this.selectedFiles.length} ไฟล์${this.fileDescription ? ` (${this.fileDescription})` : ''} หรือไม่?`,
@@ -3314,9 +3377,7 @@ export default {
       
       if (!result.isConfirmed) return
       
-      // ตรวจสอบว่า initialData มีอยู่หรือไม่ (ก่อนแสดง loading)
       if (!this.initialData || !this.initialData.id) {
-        // แสดง Swal แจ้งเตือน
         await Swal.fire({
           icon: 'warning',
           title: 'ไม่สามารถอัปโหลดไฟล์ได้',
@@ -3329,7 +3390,6 @@ export default {
       
       this.uploadingFiles = true
       
-      // แสดง loading
       Swal.fire({
         title: 'กำลังอัปโหลด...',
         text: 'กรุณารอสักครู่',
@@ -3342,7 +3402,6 @@ export default {
       try {
         
         
-        // Upload each file
         for (const file of this.selectedFiles) {
           await fileService.uploadFile(
             this.initialData.id,
@@ -3352,14 +3411,11 @@ export default {
           )
         }
         
-        // Reload files after upload
         await this.loadPatientFiles()
         
-        // เก็บจำนวนไฟล์ก่อนล้างค่า
         const fileCount = this.selectedFiles.length
         this.cancelFileUpload()
         
-        // แสดง Swal toast
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -3379,7 +3435,6 @@ export default {
       } catch (error) {
         console.error('Error uploading files:', error)
         
-        // แสดง error message
         Swal.fire({
           title: 'เกิดข้อผิดพลาด!',
           text: 'ไม่สามารถอัปโหลดไฟล์ได้ กรุณาลองใหม่อีกครั้ง',
@@ -3400,7 +3455,6 @@ export default {
     },
 
     getFileIcon(file) {
-      // ใช้ originalFileName สำหรับ icon (ชื่อไฟล์เดิมที่มี extension)
       const fileName = file.originalFileName || file.name || ''
       const extension = fileName.split('.').pop().toLowerCase()
       
@@ -3417,7 +3471,6 @@ export default {
     },
 
     getFileIconColor(file) {
-      // ใช้ originalFileName สำหรับ icon color
       const fileName = file.originalFileName || file.name || ''
       const extension = fileName.split('.').pop().toLowerCase()
       
@@ -3455,7 +3508,6 @@ export default {
     async viewFile(file) {
       try {
         if (file.url && file.url.startsWith('http')) {
-          // เปิดไฟล์ในแท็บใหม่
           window.open(file.url, '_blank')
         } else {
           throw new Error('ไม่พบ URL ของไฟล์')
@@ -3474,7 +3526,6 @@ export default {
 
 
     async deleteFile(file) {
-      // แสดง SweetAlert ยืนยันการลบ
       const result = await Swal.fire({
         title: 'ยืนยันการลบไฟล์',
         text: `ต้องการลบไฟล์ "${file.description || 'เอกสาร'}" หรือไม่?`,
@@ -3491,13 +3542,10 @@ export default {
       
       try {
         
-        // Call delete API
         await fileService.deleteFile(file.id)
         
-        // Reload files after deletion
         await this.loadPatientFiles()
         
-        // แสดง Swal toast
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -3517,7 +3565,6 @@ export default {
       } catch (error) {
         console.error('Error deleting file:', error)
         
-        // แสดง error message
         Swal.fire({
           title: 'เกิดข้อผิดพลาด!',
           text: 'ไม่สามารถลบไฟล์ได้ กรุณาลองใหม่อีกครั้ง',
@@ -3530,8 +3577,12 @@ export default {
     async loadPatientFiles() {
       if (this.activeTab === 'documents' && this.initialData?.id) {
         try {
+          const options = {
+            search: this.fileSearchQuery || undefined,
+            sort: this.fileSortOption
+          }
           
-          const response = await fileService.getPatientFiles(this.initialData.id)
+          const response = await fileService.getPatientFiles(this.initialData.id, options)
           
           if (response.success) {
             this.patientFiles = response.data.map(file => ({
@@ -3548,39 +3599,30 @@ export default {
           }
         } catch (error) {
           console.error('❌ Error loading files:', error)
-          
-          // Fallback to mock data for development
-          this.patientFiles = [
-            {
-              id: 1,
-              url: '#',
-              name: 'บัตรประชาชน', // ชื่อที่ผู้ใช้กำหนด
-              originalFileName: 'id_card.jpg', // ชื่อไฟล์เดิมสำหรับ icon
-              description: 'เอกสารประจำตัว',
-              size: 1024000,
-              createdAt: '2024-01-15T10:30:00Z'
-            },
-            {
-              id: 2,
-              url: '#',
-              name: 'ผลแล็บเลือด', // ชื่อที่ผู้ใช้กำหนด
-              originalFileName: 'lab_result.pdf', // ชื่อไฟล์เดิมสำหรับ icon
-              description: 'รายงานผลการตรวจ',
-              size: 2048000,
-              createdAt: '2024-01-14T14:20:00Z'
-            },
-            {
-              id: 3,
-              url: '#',
-              name: 'ใบรับรองแพทย์', // ชื่อที่ผู้ใช้กำหนด
-              originalFileName: 'medical_cert.docx', // ชื่อไฟล์เดิมสำหรับ icon
-              description: 'เอกสารทางการแพทย์',
-              size: 512000,
-              createdAt: '2024-01-13T09:15:00Z'
-            }
-          ]
         }
       }
+    },
+
+    // File search with debounce
+    onFileSearch() {
+      if (this.fileSearchTimeout) {
+        clearTimeout(this.fileSearchTimeout)
+      }
+      
+      this.fileSearchTimeout = setTimeout(() => {
+        this.loadPatientFiles()
+      }, 500) // 500ms delay
+    },
+
+    // File sort change
+    onFileSortChange() {
+      this.loadPatientFiles()
+    },
+
+    // Get sort label for display
+    getSortLabel(value) {
+      const option = this.sortOptions.find(opt => opt.value === value)
+      return option ? option.label : 'ใหม่ล่าสุด'
     },
 
     // Method สำหรับเปลี่ยนไปที่ Documents Tab
@@ -3626,6 +3668,10 @@ export default {
             }
           } else {
             this.resetForm()
+            // ล้างข้อมูลไฟล์เมื่อเพิ่มลูกค้าใหม่
+            this.patientFiles = []
+            this.fileSearchQuery = ''
+            this.fileSortOption = 'newest'
           }
           // บันทึก originalSnapshot เพื่อเปรียบเทียบการเปลี่ยนแปลง
           this.originalSnapshot = JSON.stringify(this.form)

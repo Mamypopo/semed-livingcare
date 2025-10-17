@@ -21,17 +21,6 @@ export const getPatientFiles = async (patientId, options = {}) => {
   }
 }
 
-// Get single file
-export const getFileById = async (fileId) => {
-  try {
-    const response = await apiClient.get(`/files/${fileId}`)
-    return response.data
-  } catch (error) {
-    console.error('Error getting file:', error)
-    throw new Error(error.response?.data?.message || 'ไม่สามารถดึงข้อมูลไฟล์ได้')
-  }
-}
-
 // Upload file
 export const uploadFile = async (patientId, file, name, description) => {
   try {
@@ -54,23 +43,6 @@ export const uploadFile = async (patientId, file, name, description) => {
   }
 }
 
-// Update file
-export const updateFile = async (fileId, updateData) => {
-  try {
-    const { name, description } = updateData
-    
-    const response = await apiClient.put(`/files/${fileId}`, {
-      name,
-      description
-    })
-    
-    return response.data
-  } catch (error) {
-    console.error('Error updating file:', error)
-    throw new Error(error.response?.data?.message || 'ไม่สามารถแก้ไขไฟล์ได้')
-  }
-}
-
 // Delete file
 export const deleteFile = async (fileId) => {
   try {
@@ -86,8 +58,6 @@ export const deleteFile = async (fileId) => {
 
 export default {
   getPatientFiles,
-  getFileById,
   uploadFile,
-  updateFile,
   deleteFile
 }
