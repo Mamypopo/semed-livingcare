@@ -121,7 +121,7 @@
         text-gray-700 placeholder-gray-400 
        focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
        focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            placeholder="ระบบจะสร้างให้อัตโนมัติ"
+                            :placeholder="isEdit ? 'HN ไม่สามารถแก้ไขได้' : 'ระบบจะสร้างให้อัตโนมัติ'"
                           />
                         </div>
 
@@ -1540,7 +1540,7 @@
                       <div class="grid grid-cols-2 gap-4">
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >จังหวัด <span class="text-red-500">*</span></label
+                            >จังหวัด </label
                           >
                           <Listbox
                             v-model="selectedCompanyProvince"
@@ -1616,7 +1616,7 @@
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >อำเภอ/เขต <span class="text-red-500">*</span></label
+                            >อำเภอ/เขต </label
                           >
                           <Listbox
                             v-model="selectedCompanyDistrict"
@@ -1701,7 +1701,7 @@
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >ตำบล/แขวง <span class="text-red-500">*</span></label
+                            >ตำบล/แขวง </label
                           >
                           <Listbox
                             v-model="selectedCompanySubDistrict"
@@ -1786,7 +1786,7 @@
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >รหัสไปรษณีย์ <span class="text-red-500">*</span></label
+                            >รหัสไปรษณีย์</label
                           >
                           <Listbox
                             v-model="selectedCompanyPostcode"
@@ -2156,7 +2156,7 @@ export default {
         mental_health: '',
         underlying_disease: '',
         health_note: '',
-        treatment_type: '',
+        treatment_type: 'OPD ผู้ป่วยนอก',
         insurance_type_id: null,
         patient_group_id: null,
         branchId: null,
@@ -2419,10 +2419,45 @@ export default {
     },
     async handleSubmit() {
       try {
+        // ตรวจสอบข้อมูลที่จำเป็นก่อนส่ง (ยอมรับค่า 'ไม่ระบุ')
+        const requiredFields = [
+          'prefix', 'first_name', 'last_name', 'patient_group_id', 'gender',
+          'nationality', 'religion', 'education_level', 'marital_status', 
+          'blood_group', 'birth_date', 'treatment_type', 'insurance_type_id', 'address'
+        ]
+        
+        console.log('🔍 ตรวจสอบข้อมูลฟอร์ม:')
+        console.log('Form data:', this.form)
+        console.log('Selected tags:', this.selectedTags)
+        
+        const missingFields = requiredFields.filter(field => {
+          const value = this.form[field]
+          const isEmpty = !value || value === ''
+          console.log(`  ${field}: "${value}" ${isEmpty ? '❌ ขาด' : '✅ ครบ'}`)
+          return isEmpty
+        })
+        
+        console.log('Missing fields:', missingFields)
+        
+        if (missingFields.length > 0) {
+          Swal.fire({
+            title: 'ข้อมูลไม่ครบถ้วน',
+            text: `ข้อมูลที่ขาดหายไป: ${missingFields.join(', ')}`,
+            icon: 'warning',
+            confirmButtonColor: '#ef4444'
+          })
+          return
+        }
+        
+        // ไม่ส่ง HN ไป Backend เลย เพราะ HN ไม่สามารถแก้ไขได้
         const formData = {
           ...this.form,
+          hn: undefined, // ไม่ส่ง HN ไป Backend เลย
           tagIds: this.selectedTags.map(tag => tag.id)
         }
+        
+        console.log('📤 ข้อมูลที่จะส่งไป Backend:')
+        console.log('Form data to send:', formData)
 
         await this.$emit('save', formData)
       } catch (error) {
@@ -2664,7 +2699,7 @@ export default {
         mental_health: '',
         underlying_disease: '',
         health_note: '',
-        treatment_type: '',
+        treatment_type: 'OPD ผู้ป่วยนอก',
         insurance_type_id: null,
         patient_group_id: null,
         branchId: null,

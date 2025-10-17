@@ -195,19 +195,53 @@ export const createPatient = async (data, createdBy) => {
       tagIds = []
     } = data
 
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!hn || !prefix || !first_name || !last_name || !patient_group_id || !gender || 
+    // ตรวจสอบข้อมูลที่จำเป็น (ไม่รวม HN เพราะจะสร้างให้)
+    console.log('🔍 Backend ตรวจสอบข้อมูลที่ได้รับ:')
+    console.log('Data received:', data)
+    
+    const requiredFields = {
+      prefix, first_name, last_name, patient_group_id, gender,
+      nationality, religion, education_level, marital_status, blood_group,
+      birth_date, treatment_type, insurance_type_id, address
+    }
+    
+    console.log('Required fields check:')
+    Object.entries(requiredFields).forEach(([key, value]) => {
+      const isEmpty = !value || value === ''
+      console.log(`  ${key}: "${value}" ${isEmpty ? '❌ ขาด' : '✅ ครบ'}`)
+    })
+    
+    if (!prefix || !first_name || !last_name || !patient_group_id || !gender || 
         !nationality || !religion || !education_level || !marital_status || !blood_group || 
         !birth_date || !treatment_type || !insurance_type_id || !address) {
-      throw new Error('กรุณากรอกข้อมูลที่จำเป็นครบถ้วน (HN, คำนำหน้า, ชื่อ, นามสกุล, กลุ่มลูกค้า, เพศ, สัญชาติ, ศาสนา, ระดับการศึกษา, สถานะภาพสมรส, กรุ๊บเลือด, วันเกิด, ประเภทการรักษา, ประเภทสิทธิ์การรักษา, ที่อยู่)')
+      throw new Error('กรุณากรอกข้อมูลที่จำเป็นครบถ้วน (คำนำหน้า, ชื่อ, นามสกุล, กลุ่มลูกค้า, เพศ, สัญชาติ, ศาสนา, ระดับการศึกษา, สถานะภาพสมรส, กรุ๊บเลือด, วันเกิด, ประเภทการรักษา, ประเภทสิทธิ์การรักษา, ที่อยู่)')
     }
 
-    // ตรวจสอบ HN ซ้ำ
-    const existingHn = await prisma.patient.findFirst({
-      where: { hn }
-    })
-    if (existingHn) {
-      throw new Error('หมายเลข HN นี้มีผู้ใช้งานแล้ว')
+    // สร้าง HN อัตโนมัติ
+    let generatedHn
+    let isUnique = false
+    let attempts = 0
+    const maxAttempts = 10
+    
+    while (!isUnique && attempts < maxAttempts) {
+      // สร้าง HN แบบง่ายๆ: HN + timestamp + random
+      const timestamp = Date.now().toString().slice(-6)
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+      generatedHn = `HN${timestamp}${random}`
+      
+      // ตรวจสอบว่า HN นี้มีอยู่แล้วหรือไม่
+      const existingHn = await prisma.patient.findFirst({
+        where: { hn: generatedHn }
+      })
+      
+      if (!existingHn) {
+        isUnique = true
+      }
+      attempts++
+    }
+    
+    if (!isUnique) {
+      throw new Error('ไม่สามารถสร้างหมายเลข HN ได้ กรุณาลองใหม่อีกครั้ง')
     }
 
     // ตรวจสอบอีเมลซ้ำ (ถ้ามี)
@@ -232,7 +266,7 @@ export const createPatient = async (data, createdBy) => {
 
     const patient = await prisma.patient.create({
       data: {
-        hn,
+        hn: generatedHn,
         prefix,
         first_name,
         last_name,
@@ -304,7 +338,7 @@ export const createPatient = async (data, createdBy) => {
           }
         },
         createdByUser: {
-          select: { id: true, firstName: true, lastName: true }
+          select: { id: true, name: true, email: true }
         }
       }
     })
@@ -364,24 +398,13 @@ export const updatePatient = async (id, data, updatedBy) => {
       tagIds = []
     } = data
 
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!hn || !prefix || !first_name || !last_name || !patient_group_id || !gender || 
+    // ตรวจสอบข้อมูลที่จำเป็น (ไม่รวม HN เพราะใช้ HN เดิม)
+    if (!prefix || !first_name || !last_name || !patient_group_id || !gender || 
         !nationality || !religion || !education_level || !marital_status || !blood_group || 
         !birth_date || !treatment_type || !insurance_type_id || !address) {
-      throw new Error('กรุณากรอกข้อมูลที่จำเป็นครบถ้วน (HN, คำนำหน้า, ชื่อ, นามสกุล, กลุ่มลูกค้า, เพศ, สัญชาติ, ศาสนา, ระดับการศึกษา, สถานะภาพสมรส, กรุ๊บเลือด, วันเกิด, ประเภทการรักษา, ประเภทสิทธิ์การรักษา, ที่อยู่)')
+      throw new Error('กรุณากรอกข้อมูลที่จำเป็นครบถ้วน (คำนำหน้า, ชื่อ, นามสกุล, กลุ่มลูกค้า, เพศ, สัญชาติ, ศาสนา, ระดับการศึกษา, สถานะภาพสมรส, กรุ๊บเลือด, วันเกิด, ประเภทการรักษา, ประเภทสิทธิ์การรักษา, ที่อยู่)')
     }
-
-    // ตรวจสอบ HN ซ้ำ (ยกเว้นตัวเอง)
-    const existingHn = await prisma.patient.findFirst({
-      where: { 
-        hn,
-        id: { not: parseInt(id) }
-      }
-    })
-    if (existingHn) {
-      throw new Error('หมายเลข HN นี้มีผู้ใช้งานแล้ว')
-    }
-
+    
     // ตรวจสอบอีเมลซ้ำ (ถ้ามี)
     if (email) {
       const existingEmail = await prisma.patient.findFirst({
@@ -411,7 +434,7 @@ export const updatePatient = async (id, data, updatedBy) => {
     const patient = await prisma.patient.update({
       where: { id: parseInt(id) },
       data: {
-        hn,
+        // ไม่อัปเดต hn เพราะ HN ไม่สามารถแก้ไขได้
         prefix,
         first_name,
         last_name,

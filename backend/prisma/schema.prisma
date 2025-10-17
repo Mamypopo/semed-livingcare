@@ -8,10 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TreatmentType {
-  IPD
-  OPD
-}
 
 enum RoleEnum {
   ADMIN
@@ -119,17 +115,17 @@ model Patient {
   company_postal_code String?
 
   //  ข้อมูลสุขภาพ
-  weight             Float?
-  height             Float?
-  waist              Float?
-  chest              Float?
+  weight             String?
+  height             String?
+  waist              String?
+  chest              String?
   allergy_history    String?
   mental_health      String?
   underlying_disease String?
   health_note        String?
 
   //  ข้อมูลการรักษา
-  treatment_type     TreatmentType
+  treatment_type     String
   insurance_type_id  Int?
   insuranceType      InsuranceType? @relation(fields: [insurance_type_id], references: [id])
   patient_group_id   Int?

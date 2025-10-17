@@ -49,7 +49,13 @@ export const getPatientByIdController = async (req, res) => {
 // สร้างผู้ป่วยใหม่
 export const createPatientController = async (req, res) => {
     try {
+      console.log('📥 Controller รับข้อมูลจาก Frontend:')
+      console.log('Request body:', req.body)
+      console.log('User ID:', req.user?.id)
+      
       const patient = await patientService.createPatient(req.body, req.user?.id)
+      
+      console.log('✅ สร้าง Patient สำเร็จ:', patient.hn)
       
       res.status(201).json({
         success: true,
@@ -57,6 +63,7 @@ export const createPatientController = async (req, res) => {
         data: patient
       })
     } catch (error) {
+      console.error('❌ Controller Error:', error.message)
       res.status(400).json({
         success: false,
         message: error.message || 'เกิดข้อผิดพลาดในการสร้างข้อมูลผู้ป่วย'
