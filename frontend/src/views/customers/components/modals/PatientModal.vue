@@ -1482,7 +1482,7 @@
                 </div>
 
                 <!-- Company Information Tab -->
-                <div v-if="activeTab === 'company'" class="space-y-6 py-8">
+                <div v-if="activeTab === 'company'" class="space-y-6">
                   <div class="grid grid-cols-2 gap-6">
                     <div class="space-y-4">
                       <div>
@@ -1512,6 +1512,7 @@
                         <input
                           v-model="form.company_phone"
                           type="tel"
+                          maxlength="10"
                           class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ระบุเบอร์โทรบริษัท"
                         />
@@ -1539,47 +1540,334 @@
                       <div class="grid grid-cols-2 gap-4">
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >ตำบล/แขวง</label
+                            >จังหวัด <span class="text-red-500">*</span></label
                           >
-                          <input
-                            v-model="form.company_subdistrict"
-                            type="text"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            placeholder="ระบุตำบล/แขวง"
-                          />
+                          <Listbox
+                            v-model="selectedCompanyProvince"
+                            @update:modelValue="onCompanyProvinceChange"
+                          >
+                            <div class="relative">
+                              <ListboxButton
+                                class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                @click="showCompanyProvinceDropdown = !showCompanyProvinceDropdown"
+                              >
+                                <span class="block truncate">{{
+                                  selectedCompanyProvince?.name_th || 'เลือกจังหวัด'
+                                }}</span>
+                                <span
+                                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                                >
+                                  <ChevronDown
+                                    class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': showCompanyProvinceDropdown }"
+                                  />
+                                </span>
+                              </ListboxButton>
+
+                              <ListboxOptions
+                                class="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+                                @click-outside="showCompanyProvinceDropdown = false"
+                              >
+                                <!-- Search Input -->
+                                <div class="px-3 py-2 border-b border-gray-200">
+                                  <input
+                                    v-model="companyProvinceSearchQuery"
+                                    type="text"
+                                    placeholder="ค้นหาจังหวัด..."
+                                    class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                    @click.stop
+                                  />
+                                </div>
+
+                                <ListboxOption
+                                  v-for="province in filteredCompanyProvinces"
+                                  :key="province.id"
+                                  :value="province"
+                                  v-slot="{ active, selected }"
+                                >
+                                  <li
+                                    :class="[
+                                      active
+                                        ? 'bg-emerald-100 text-emerald-900'
+                                        : 'text-gray-900',
+                                      'relative cursor-default select-none py-2 pr-4',
+                                      selected ? 'pl-10' : 'pl-3'
+                                    ]"
+                                  >
+                                    <span
+                                      :class="[
+                                        selected ? 'font-medium' : 'font-normal',
+                                        'block truncate'
+                                      ]"
+                                    >
+                                      {{ province.name_th }}
+                                    </span>
+                                    <span
+                                      v-if="selected"
+                                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
+                                    >
+                                      <Check class="h-5 w-5" />
+                                    </span>
+                                  </li>
+                                </ListboxOption>
+                              </ListboxOptions>
+                            </div>
+                          </Listbox>
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >อำเภอ/เขต</label
+                            >อำเภอ/เขต <span class="text-red-500">*</span></label
                           >
-                          <input
-                            v-model="form.company_district"
-                            type="text"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            placeholder="ระบุอำเภอ/เขต"
-                          />
+                          <Listbox
+                            v-model="selectedCompanyDistrict"
+                            @update:modelValue="onCompanyDistrictChange"
+                            :disabled="!form.company_province"
+                          >
+                            <div class="relative">
+                              <ListboxButton
+                                :class="[
+                                  'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.company_district
+                                    ? 'bg-white text-gray-700'
+                                    : 'bg-white text-gray-400',
+                                  !form.company_province
+                                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                                    : ''
+                                ]"
+                                @click="showCompanyDistrictDropdown = !showCompanyDistrictDropdown"
+                              >
+                                <span class="block truncate">{{
+                                  form.company_district || 'เลือกอำเภอ/เขต'
+                                }}</span>
+                                <span
+                                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                                >
+                                  <ChevronDown
+                                    class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': showCompanyDistrictDropdown }"
+                                  />
+                                </span>
+                              </ListboxButton>
+
+                              <ListboxOptions
+                                class="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+                                @click-outside="showCompanyDistrictDropdown = false"
+                              >
+                                <!-- Search Input -->
+                                <div class="px-3 py-2 border-b border-gray-200">
+                                  <input
+                                    v-model="companyDistrictSearchQuery"
+                                    type="text"
+                                    placeholder="ค้นหาอำเภอ/เขต..."
+                                    class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                    @click.stop
+                                  />
+                                </div>
+
+                                <ListboxOption
+                                  v-for="district in filteredCompanyDistricts"
+                                  :key="district.id"
+                                  :value="district"
+                                  v-slot="{ active, selected }"
+                                >
+                                  <li
+                                    :class="[
+                                      active
+                                        ? 'bg-emerald-100 text-emerald-900'
+                                        : 'text-gray-900',
+                                      'relative cursor-default select-none py-2 pr-4',
+                                      selected ? 'pl-10' : 'pl-3'
+                                    ]"
+                                  >
+                                    <span
+                                      :class="[
+                                        selected ? 'font-medium' : 'font-normal',
+                                        'block truncate'
+                                      ]"
+                                    >
+                                      {{ district.name_th }}
+                                    </span>
+                                    <span
+                                      v-if="selected"
+                                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
+                                    >
+                                      <Check class="h-5 w-5" />
+                                    </span>
+                                  </li>
+                                </ListboxOption>
+                              </ListboxOptions>
+                            </div>
+                          </Listbox>
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >จังหวัด</label
+                            >ตำบล/แขวง <span class="text-red-500">*</span></label
                           >
-                          <input
-                            v-model="form.company_province"
-                            type="text"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            placeholder="ระบุจังหวัด"
-                          />
+                          <Listbox
+                            v-model="selectedCompanySubDistrict"
+                            @update:modelValue="onCompanySubDistrictChange"
+                            :disabled="!form.company_district"
+                          >
+                            <div class="relative">
+                              <ListboxButton
+                                :class="[
+                                  'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.company_subdistrict
+                                    ? 'bg-white text-gray-700'
+                                    : 'bg-white text-gray-400',
+                                  !form.company_district
+                                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                                    : ''
+                                ]"
+                                @click="showCompanySubDistrictDropdown = !showCompanySubDistrictDropdown"
+                              >
+                                <span class="block truncate">{{
+                                  form.company_subdistrict || 'เลือกตำบล/แขวง'
+                                }}</span>
+                                <span
+                                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                                >
+                                  <ChevronDown
+                                    class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': showCompanySubDistrictDropdown }"
+                                  />
+                                </span>
+                              </ListboxButton>
+
+                              <ListboxOptions
+                                class="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+                                @click-outside="showCompanySubDistrictDropdown = false"
+                              >
+                                <!-- Search Input -->
+                                <div class="px-3 py-2 border-b border-gray-200">
+                                  <input
+                                    v-model="companySubDistrictSearchQuery"
+                                    type="text"
+                                    placeholder="ค้นหาตำบล/แขวง..."
+                                    class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                    @click.stop
+                                  />
+                                </div>
+
+                                <ListboxOption
+                                  v-for="subDistrict in filteredCompanySubDistricts"
+                                  :key="subDistrict.id"
+                                  :value="subDistrict"
+                                  v-slot="{ active, selected }"
+                                >
+                                  <li
+                                    :class="[
+                                      active
+                                        ? 'bg-emerald-100 text-emerald-900'
+                                        : 'text-gray-900',
+                                      'relative cursor-default select-none py-2 pr-4',
+                                      selected ? 'pl-10' : 'pl-3'
+                                    ]"
+                                  >
+                                    <span
+                                      :class="[
+                                        selected ? 'font-medium' : 'font-normal',
+                                        'block truncate'
+                                      ]"
+                                    >
+                                      {{ subDistrict.name_th }}
+                                    </span>
+                                    <span
+                                      v-if="selected"
+                                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
+                                    >
+                                      <Check class="h-5 w-5" />
+                                    </span>
+                                  </li>
+                                </ListboxOption>
+                              </ListboxOptions>
+                            </div>
+                          </Listbox>
                         </div>
                         <div>
                           <label class="block text-sm font-medium text-gray-700 mb-1"
-                            >รหัสไปรษณีย์</label
+                            >รหัสไปรษณีย์ <span class="text-red-500">*</span></label
                           >
-                          <input
-                            v-model="form.company_postal_code"
-                            type="text"
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                            placeholder="ระบุรหัสไปรษณีย์"
-                          />
+                          <Listbox
+                            v-model="selectedCompanyPostcode"
+                            @update:modelValue="onCompanyPostalCodeChange"
+                            :disabled="!form.company_subdistrict"
+                          >
+                            <div class="relative">
+                              <ListboxButton
+                                :class="[
+                                  'relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                                  form.company_postal_code
+                                    ? 'bg-white text-gray-700'
+                                    : 'bg-white text-gray-400',
+                                  !form.company_subdistrict
+                                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                                    : ''
+                                ]"
+                                @click="showCompanyPostalCodeDropdown = !showCompanyPostalCodeDropdown"
+                              >
+                                <span class="block truncate">{{
+                                  form.company_postal_code || 'เลือกรหัสไปรษณีย์'
+                                }}</span>
+                                <span
+                                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                                >
+                                  <ChevronDown
+                                    class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': showCompanyPostalCodeDropdown }"
+                                  />
+                                </span>
+                              </ListboxButton>
+
+                              <ListboxOptions
+                                class="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-colors duration-200"
+                                @click-outside="showCompanyPostalCodeDropdown = false"
+                              >
+                                <!-- Search Input -->
+                                <div class="px-3 py-2 border-b border-gray-200">
+                                  <input
+                                    v-model="companyPostalCodeSearchQuery"
+                                    type="text"
+                                    placeholder="ค้นหารหัสไปรษณีย์..."
+                                    class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                    @click.stop
+                                  />
+                                </div>
+
+                                <ListboxOption
+                                  v-for="postcode in filteredCompanyPostcodes"
+                                  :key="postcode.postcode"
+                                  :value="postcode"
+                                  v-slot="{ active, selected }"
+                                >
+                                  <li
+                                    :class="[
+                                      active
+                                        ? 'bg-emerald-100 text-emerald-900'
+                                        : 'text-gray-900',
+                                      'relative cursor-default select-none py-2 pr-4',
+                                      selected ? 'pl-10' : 'pl-3'
+                                    ]"
+                                  >
+                                    <span
+                                      :class="[
+                                        selected ? 'font-medium' : 'font-normal',
+                                        'block truncate'
+                                      ]"
+                                    >
+                                      {{ postcode.postcode }}
+                                    </span>
+                                    <span
+                                      v-if="selected"
+                                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
+                                    >
+                                      <Check class="h-5 w-5" />
+                                    </span>
+                                  </li>
+                                </ListboxOption>
+                              </ListboxOptions>
+                            </div>
+                          </Listbox>
                         </div>
                       </div>
                     </div>
@@ -1852,11 +2140,23 @@ export default {
       showSubDistrictDropdown: false,
       showPostalCodeDropdown: false,
 
+      // Company Address dropdown states
+      showCompanyProvinceDropdown: false,
+      showCompanyDistrictDropdown: false,
+      showCompanySubDistrictDropdown: false,
+      showCompanyPostalCodeDropdown: false,
+
       // Address data
       provinces: [],
       districts: [],
       subDistricts: [],
       postcodes: [],
+
+      // Company Address data
+      companyProvinces: [],
+      companyDistricts: [],
+      companySubDistricts: [],
+      companyPostcodes: [],
 
       // Selected values for Listbox
       selectedProvince: null,
@@ -1864,11 +2164,23 @@ export default {
       selectedSubDistrict: null,
       selectedPostcode: null,
 
+      // Selected values for Company Listbox
+      selectedCompanyProvince: null,
+      selectedCompanyDistrict: null,
+      selectedCompanySubDistrict: null,
+      selectedCompanyPostcode: null,
+
       // Search queries
       provinceSearchQuery: '',
       districtSearchQuery: '',
       subDistrictSearchQuery: '',
       postalCodeSearchQuery: '',
+
+      // Company Search queries
+      companyProvinceSearchQuery: '',
+      companyDistrictSearchQuery: '',
+      companySubDistrictSearchQuery: '',
+      companyPostalCodeSearchQuery: '',
 
       // Dropdown states for animation
       showTreatmentTypeDropdown: false
@@ -1905,10 +2217,40 @@ export default {
       return this.postcodes.filter(postcode =>
         postcode.postcode.includes(this.postalCodeSearchQuery)
       )
+    },
+
+    // Company Address computed properties
+    filteredCompanyProvinces() {
+      if (!this.companyProvinceSearchQuery) return this.companyProvinces
+      return this.companyProvinces.filter(province =>
+        province.name_th.toLowerCase().includes(this.companyProvinceSearchQuery.toLowerCase())
+      )
+    },
+
+    filteredCompanyDistricts() {
+      if (!this.companyDistrictSearchQuery) return this.companyDistricts
+      return this.companyDistricts.filter(district =>
+        district.name_th.toLowerCase().includes(this.companyDistrictSearchQuery.toLowerCase())
+      )
+    },
+
+    filteredCompanySubDistricts() {
+      if (!this.companySubDistrictSearchQuery) return this.companySubDistricts
+      return this.companySubDistricts.filter(subDistrict =>
+        subDistrict.name_th.toLowerCase().includes(this.companySubDistrictSearchQuery.toLowerCase())
+      )
+    },
+
+    filteredCompanyPostcodes() {
+      if (!this.companyPostalCodeSearchQuery) return this.companyPostcodes
+      return this.companyPostcodes.filter(postcode =>
+        postcode.postcode.includes(this.companyPostalCodeSearchQuery)
+      )
     }
   },
   mounted() {
     this.loadProvinces()
+    this.loadCompanyProvinces()
   },
   methods: {
     isTagSelected(tagId) {
@@ -2183,6 +2525,20 @@ export default {
       ]
       this.nextContactId = 2
       this.showRelationshipDropdowns = {}
+      
+      // Reset Company Address
+      this.selectedCompanyProvince = null
+      this.selectedCompanyDistrict = null
+      this.selectedCompanySubDistrict = null
+      this.selectedCompanyPostcode = null
+      this.companyDistricts = []
+      this.companySubDistricts = []
+      this.companyPostcodes = []
+      this.companyProvinceSearchQuery = ''
+      this.companyDistrictSearchQuery = ''
+      this.companySubDistrictSearchQuery = ''
+      this.companyPostalCodeSearchQuery = ''
+      
       this.originalSnapshot = JSON.stringify(this.form)
     },
 
@@ -2397,6 +2753,116 @@ export default {
     clearPostalCode() {
       this.form.postal_code = ''
       this.showPostalCodeDropdown = true
+    },
+
+    // Company Address methods
+    async loadCompanyProvinces() {
+      try {
+        const result = await addressService.getProvinces()
+        if (result.success) {
+          this.companyProvinces = result.data
+        }
+      } catch (error) {
+        console.error('Error loading company provinces:', error)
+      }
+    },
+
+    async loadCompanyDistricts(provinceName) {
+      try {
+        const result = await addressService.getDistricts(provinceName)
+        if (result.success) {
+          this.companyDistricts = result.data
+        }
+      } catch (error) {
+        console.error('Error loading company districts:', error)
+      }
+    },
+
+    async loadCompanySubDistricts(districtName) {
+      try {
+        const result = await addressService.getSubDistricts(districtName)
+        if (result.success) {
+          this.companySubDistricts = result.data
+        }
+      } catch (error) {
+        console.error('Error loading company sub-districts:', error)
+      }
+    },
+
+    async loadCompanyPostcodes(subDistrictName) {
+      try {
+        const result = await addressService.getPostcodes(subDistrictName)
+        if (result.success) {
+          this.companyPostcodes = result.data
+        }
+      } catch (error) {
+        console.error('Error loading company postcodes:', error)
+      }
+    },
+
+    // Company Province methods
+    onCompanyProvinceChange(province) {
+      if (province) {
+        this.form.company_province = province.name_th
+        this.showCompanyProvinceDropdown = false
+
+        // Clear dependent fields
+        this.form.company_district = ''
+        this.form.company_subdistrict = ''
+        this.form.company_postal_code = ''
+        this.selectedCompanyDistrict = null
+        this.selectedCompanySubDistrict = null
+        this.selectedCompanyPostcode = null
+        this.companyDistricts = []
+        this.companySubDistricts = []
+        this.companyPostcodes = []
+
+        // Load districts for selected province
+        this.loadCompanyDistricts(province.name_th)
+      }
+    },
+
+    // Company District methods
+    onCompanyDistrictChange(district) {
+      if (district) {
+        this.form.company_district = district.name_th
+        this.showCompanyDistrictDropdown = false
+
+        // Clear dependent fields
+        this.form.company_subdistrict = ''
+        this.form.company_postal_code = ''
+        this.selectedCompanySubDistrict = null
+        this.selectedCompanyPostcode = null
+        this.companySubDistricts = []
+        this.companyPostcodes = []
+
+        // Load sub-districts for selected district
+        this.loadCompanySubDistricts(district.name_th)
+      }
+    },
+
+    // Company Sub-district methods
+    onCompanySubDistrictChange(subDistrict) {
+      if (subDistrict) {
+        this.form.company_subdistrict = subDistrict.name_th
+        this.showCompanySubDistrictDropdown = false
+
+        // Clear dependent fields
+        this.form.company_postal_code = ''
+        this.selectedCompanyPostcode = null
+        this.companyPostcodes = []
+
+        // Load postcodes for selected sub-district
+        this.loadCompanyPostcodes(subDistrict.name_th)
+      }
+    },
+
+    // Company Postal code methods
+    onCompanyPostalCodeChange(postcode) {
+      if (postcode) {
+        this.form.company_postal_code = postcode.postcode
+        this.showCompanyPostalCodeDropdown = false
+      }
     },
 
     // Contact Person Methods
