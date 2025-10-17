@@ -55,7 +55,8 @@
                       v-model.trim="form.code"
                       type="text"
                       :readonly="true"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed hover:border-emerald-300 focus:outline-none"
+                      disabled
+                      class="mt-1 w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                     <p v-if="errors.code" class="text-xs text-red-600 mt-1">{{ errors.code }}</p>
                   </div>
@@ -64,7 +65,7 @@
                     <input
                       v-model.trim="form.name"
                       type="text"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                     <p v-if="errors.name" class="text-xs text-red-600 mt-1">{{ errors.name }}</p>
                   </div>
@@ -73,7 +74,7 @@
                     <textarea
                       v-model.trim="form.address"
                       rows="3"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     ></textarea>
                   </div>
                   <div>
@@ -81,7 +82,7 @@
                     <input
                       v-model.trim="form.phone"
                       type="text"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                   </div>
                   <div class="flex items-center">
@@ -89,19 +90,16 @@
                       type="button"
                       @click="form.isActive = !form.isActive"
                       :aria-pressed="form.isActive"
-                      class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none"
-                      :class="form.isActive ? 'bg-emerald-600' : 'bg-gray-300'"
+                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
+                      :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
                     >
                       <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                       <span
-                        :class="form.isActive ? 'translate-x-5' : 'translate-x-1'"
+                        :class="form.isActive ? 'translate-x-5' : 'translate-x-0'"
                         class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
                       ></span>
                     </button>
-                    <span
-                      class="ml-3 text-sm"
-                      :class="form.isActive ? 'text-emerald-700' : 'text-gray-600'"
-                    >
+                    <span class="ml-3 text-sm text-gray-700">
                       {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
                     </span>
                   </div>
@@ -150,12 +148,12 @@ export default {
     TransitionRoot,
     TransitionChild,
     ConfirmClosePopover,
-    X
+    X,
   },
   props: {
     modelValue: { type: Boolean, required: true },
     initialData: { type: Object, default: null },
-    loading: { type: Boolean, default: false }
+    loading: { type: Boolean, default: false },
   },
   emits: ['update:modelValue', 'save'],
   data() {
@@ -163,13 +161,13 @@ export default {
       form: { id: null, code: '', name: '', address: '', phone: '', isActive: true },
       errors: {},
       originalSnapshot: null,
-      showConfirmClose: false
+      showConfirmClose: false,
     }
   },
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    }
+    },
   },
   watch: {
     initialData: {
@@ -182,15 +180,15 @@ export default {
             name: v.name || '',
             address: v.address || '',
             phone: v.phone || '',
-            isActive: v.isActive ?? true
+            isActive: v.isActive ?? true,
           }
         } else {
           this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
-      }
-    }
+      },
+    },
   },
   methods: {
     async onClose() {
@@ -207,7 +205,7 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
-          isActive: this.initialData.isActive ?? true
+          isActive: this.initialData.isActive ?? true,
         }
       } else {
         this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
@@ -227,7 +225,7 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
-          isActive: this.initialData.isActive ?? true
+          isActive: this.initialData.isActive ?? true,
         }
       } else {
         this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
@@ -246,8 +244,8 @@ export default {
     onSave() {
       if (!this.validate()) return
       this.$emit('save', { ...this.form })
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -35,7 +35,7 @@
             <!-- Right side items -->
             <div class="flex items-center space-x-2 sm:space-x-4">
               <!-- Global Search -->
-              <div class="relative hidden sm:block">
+              <div v-if="$route.path !== '/main/lobby'" class="relative hidden sm:block">
                 <div class="relative">
                   <input
                     ref="searchInput"
@@ -87,6 +87,7 @@
 
               <!-- Search Button for Mobile -->
               <button
+                v-if="$route.path !== '/main/lobby'"
                 @click="toggleMobileSearch"
                 class="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
                 v-tooltip="'ค้นหา'"
@@ -536,7 +537,10 @@ export default {
     this._onKeydown = e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault()
-        this.$refs.searchInput.focus()
+        // เปิด search เฉพาะเมื่อไม่อยู่ในหน้า lobby
+        if (this.$route.path !== '/main/lobby') {
+          this.$refs.searchInput?.focus()
+        }
       }
     }
     window.addEventListener('keydown', this._onKeydown)

@@ -116,7 +116,11 @@
                             v-model="form.hn"
                             type="text"
                             readonly
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed focus:outline-none"
+                            disabled
+                            class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg shadow-sm 
+        text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             placeholder="ระบบจะสร้างให้อัตโนมัติ"
                           />
                         </div>
@@ -162,7 +166,7 @@
                               type="button"
                               @click="form.isActive = !form.isActive"
                               :class="[
-                                form.isActive ? 'bg-emerald-600' : 'bg-gray-200',
+                                form.isActive ? 'bg-lime-500' : 'bg-gray-200',
                                 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'
                               ]"
                             >
@@ -1360,48 +1364,116 @@
                 </div>
 
                 <!-- Contact Information Tab -->
-                <div v-if="activeTab === 'contact'" class="space-y-6 py-8">
-                  <div class="space-y-4">
-                    <div class="grid grid-cols-3 gap-4">
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1"
-                          >ชื่อ-นามสกุล</label
-                        >
+                <div v-if="activeTab === 'contact'" class="space-y-6">
+                  <div class="space-y-2">
+                    <!-- Column Headers -->
+                    <div class="grid grid-cols-12 gap-4">
+                      <div class="col-span-4 text-sm font-medium text-gray-700">ชื่อ-นามสกุล</div>
+                      <div class="col-span-3 text-sm font-medium text-gray-700">เบอร์โทร</div>
+                      <div class="col-span-3 text-sm font-medium text-gray-700">ความสัมพันธ์</div>
+                    </div>
+
+                    <!-- Contact Input Groups -->
+                    <div v-for="(contact, index) in contactPersons" :key="contact.id" class="grid grid-cols-12 gap-4 items-center">
+                      <!-- ชื่อ-นามสกุล -->
+                      <div class="col-span-4">
                         <input
-                          v-model="contactPerson.name"
+                          v-model="contact.name"
                           type="text"
                           class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ชื่อ-นามสกุล"
                         />
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทร</label>
+
+                      <!-- เบอร์โทร -->
+                      <div class="col-span-3">
                         <input
-                          v-model="contactPerson.phone"
+                          v-model="contact.phone"
                           type="tel"
                           class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="เบอร์โทร"
                         />
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1"
-                          >ความสัมพันธ์</label
+
+                      <!-- ความสัมพันธ์ -->
+                      <div class="col-span-3">
+                        <div class="relative">
+                          <input
+                            v-model="contact.relationship"
+                            type="text"
+                            :class="[
+                              'w-full px-3 py-2 pr-20 border border-gray-200 rounded-lg shadow-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400',
+                              contact.relationship && contact.relationship !== ''
+                                ? 'bg-gray-100 text-gray-700'
+                                : 'bg-white text-gray-700 placeholder-gray-400'
+                            ]"
+                            placeholder="ความสัมพันธ์"
+                            @focus="showRelationshipDropdown(contact.id)"
+                            @blur="hideRelationshipDropdown(contact.id)"
+                            @input="handleRelationshipInput(contact.id)"
+                          />
+                          <button
+                            v-if="contact.relationship && contact.relationship !== ''"
+                            type="button"
+                            @click="clearRelationship(contact.id)"
+                            class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                          >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            @click="toggleRelationshipDropdown(contact.id)"
+                            class="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600"
+                          >
+                            <ChevronDown class="h-5 w-5" />
+                          </button>
+
+                          <!-- Dropdown Options -->
+                          <div
+                            v-if="showRelationshipDropdowns[contact.id]"
+                            class="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                          >
+                            <div
+                              v-for="relationship in relationshipOptions"
+                              :key="relationship"
+                              @click="selectRelationship(contact.id, relationship)"
+                              class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-emerald-100 hover:text-emerald-900"
+                            >
+                              <span class="block truncate">{{ relationship }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- ปุ่มดำเนินการ -->
+                      <div class="col-span-2 flex justify-center">
+                        <!-- ปุ่มเพิ่ม (แสดงเฉพาะแถวสุดท้าย) -->
+                        <button
+                          v-if="index === contactPersons.length - 1"
+                          type="button"
+                          @click="addContactPerson"
+                          class="px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors duration-200 flex items-center justify-center"
+                          title="เพิ่มผู้ติดต่อ"
                         >
-                        <input
-                          v-model="contactPerson.relationship"
-                          type="text"
-                          class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                          placeholder="ความสัมพันธ์"
-                        />
+                          <Plus class="h-5 w-5" />
+                        </button>
+
+                        <!-- ปุ่มลบ (แสดงเฉพาะเมื่อมีมากกว่า 1 คน) -->
+                        <button
+                          v-if="contactPersons.length > 1"
+                          type="button"
+                          @click="removeContactPerson(contact.id)"
+                          class="px-4 py-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                          title="ลบผู้ติดต่อ"
+                        >
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <Plus class="h-4 w-4 inline mr-1" />
-                      เพิ่มผู้ติดต่อ
-                    </button>
                   </div>
                 </div>
 
@@ -1586,11 +1658,15 @@ export default {
         name: '',
         relationship: ''
       },
-      contactPerson: {
-        name: '',
-        phone: '',
-        relationship: ''
-      },
+      contactPersons: [
+        {
+          id: 1,
+          name: '',
+          phone: '',
+          relationship: ''
+        }
+      ],
+      nextContactId: 2,
       form: {
         hn: '',
         prefix: '',
@@ -1653,6 +1729,7 @@ export default {
       showEducationLevelDropdown: false,
       showMaritalStatusDropdown: false,
       showBloodGroupDropdown: false,
+      showRelationshipDropdowns: {},
       tabs: [
         { id: 'personal', name: 'ข้อมูลส่วนตัว' },
         { id: 'health', name: 'ข้อมูลสุขภาพ' },
@@ -1740,6 +1817,29 @@ export default {
       maritalStatusOptions: ['ไม่ระบุ', 'โสด', 'สมรส', 'หย่า', 'หม้าย'],
       bloodGroupOptions: ['ไม่ระบุ', 'A', 'B', 'AB', 'O'],
       treatmentTypeOptions: ['OPD ผู้ป่วยนอก', 'IPD ผู้ป่วยใน'],
+      relationshipOptions: [
+        'ไม่ระบุ',
+        'พ่อ',
+        'แม่',
+        'ลูกชาย',
+        'ลูกสาว',
+        'พี่ชาย',
+        'พี่สาว',
+        'น้องชาย',
+        'น้องสาว',
+        'ปู่',
+        'ย่า',
+        'ตา',
+        'ยาย',
+        'ลุง',
+        'ป้า',
+        'น้า',
+        'อา',
+        'ญาติ',
+        'เพื่อน',
+        'เพื่อนร่วมงาน',
+        'เพื่อนบ้าน',
+      ],
 
       // Address dropdown states
       showProvinceDropdown: false,
@@ -1766,7 +1866,6 @@ export default {
       postalCodeSearchQuery: '',
 
       // Dropdown states for animation
-      showProvinceDropdown: false,
       showTreatmentTypeDropdown: false
     }
   },
@@ -2069,6 +2168,16 @@ export default {
       }
       this.selectedTags = []
       this.activeTab = 'personal'
+      this.contactPersons = [
+        {
+          id: 1,
+          name: '',
+          phone: '',
+          relationship: ''
+        }
+      ]
+      this.nextContactId = 2
+      this.showRelationshipDropdowns = {}
       this.originalSnapshot = JSON.stringify(this.form)
     },
 
@@ -2283,6 +2392,72 @@ export default {
     clearPostalCode() {
       this.form.postal_code = ''
       this.showPostalCodeDropdown = true
+    },
+
+    // Contact Person Methods
+    addContactPerson() {
+      this.contactPersons.push({
+        id: this.nextContactId,
+        name: '',
+        phone: '',
+        relationship: ''
+      })
+      this.nextContactId++
+    },
+
+    removeContactPerson(contactId) {
+      const index = this.contactPersons.findIndex(contact => contact.id === contactId)
+      if (index > -1) {
+        this.contactPersons.splice(index, 1)
+        // ลบ dropdown state ของ contact ที่ถูกลบ
+        delete this.showRelationshipDropdowns[contactId]
+      }
+    },
+
+    // Relationship Dropdown Methods
+    showRelationshipDropdown(contactId) {
+      this.showRelationshipDropdowns[contactId] = true
+    },
+
+    hideRelationshipDropdown(contactId) {
+      setTimeout(() => {
+        this.showRelationshipDropdowns[contactId] = false
+      }, 200)
+    },
+
+    toggleRelationshipDropdown(contactId) {
+      this.showRelationshipDropdowns[contactId] = !this.showRelationshipDropdowns[contactId]
+    },
+
+    selectRelationship(contactId, relationship) {
+      const contact = this.contactPersons.find(c => c.id === contactId)
+      if (contact) {
+        contact.relationship = relationship
+      }
+      this.showRelationshipDropdowns[contactId] = false
+    },
+
+    handleRelationshipInput(contactId) {
+      const contact = this.contactPersons.find(c => c.id === contactId)
+      if (contact) {
+        const isMatching = this.relationshipOptions.some(
+          option => option.toLowerCase() === contact.relationship.toLowerCase()
+        )
+
+        if (!isMatching && contact.relationship.length > 0) {
+          this.showRelationshipDropdowns[contactId] = false
+        } else if (contact.relationship.length === 0) {
+          this.showRelationshipDropdowns[contactId] = true
+        }
+      }
+    },
+
+    clearRelationship(contactId) {
+      const contact = this.contactPersons.find(c => c.id === contactId)
+      if (contact) {
+        contact.relationship = ''
+      }
+      this.showRelationshipDropdowns[contactId] = true
     }
   },
   watch: {

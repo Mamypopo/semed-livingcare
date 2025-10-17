@@ -7,14 +7,21 @@
         <p class="text-md text-gray-500">จัดการข้อมูลลูกค้าทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
+        <div class="relative">
+          <SearchIcon
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                  />
         <input
           v-model.trim="query"
           @input="onFilterInput"
           type="text"
           placeholder="ค้นหา HN, ชื่อ, เบอร์โทร, อีเมล..."
-          class="px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-64 hover:border-emerald-300 focus:outline-none"
+          class="w-64 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
         />
-
+      </div>
         <!-- Status dropdown -->
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
@@ -346,7 +353,8 @@ import {
   ChevronRight,
   Pencil,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  SearchIcon
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import Swal from 'sweetalert2'
@@ -366,7 +374,8 @@ export default {
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    PatientModal
+    PatientModal,
+    SearchIcon
   },
   data() {
     return {

@@ -58,7 +58,7 @@
                     <input
                       v-model.trim="form.name"
                       type="text"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                       placeholder="เช่น Walk-in, Corporate, VIP"
                     />
                     <p v-if="errors.name" class="text-xs text-red-600 mt-1">{{ errors.name }}</p>
@@ -70,7 +70,7 @@
                     <Listbox v-model="form.discount_type" as="div" class="relative">
                       <div>
                         <ListboxButton
-                          class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                          class="mt-1 w-full px-3 py-2 text-left border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         >
                           <span class="block truncate">{{
                             getDiscountTypeLabel(form.discount_type)
@@ -102,13 +102,13 @@
                             <li
                               :class="[
                                 active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
-                                'cursor-pointer select-none relative py-2 pl-3 pr-9'
+                                'cursor-pointer select-none relative py-2 pl-3 pr-9',
                               ]"
                             >
                               <span
                                 :class="[
                                   selected ? 'font-semibold' : 'font-normal',
-                                  'block truncate'
+                                  'block truncate',
                                 ]"
                               >
                                 {{ discountType.label }}
@@ -117,7 +117,7 @@
                                 v-if="selected"
                                 :class="[
                                   active ? 'text-emerald-600' : 'text-emerald-600',
-                                  'absolute inset-y-0 right-0 flex items-center pr-4'
+                                  'absolute inset-y-0 right-0 flex items-center pr-4',
                                 ]"
                               >
                                 <CheckIcon class="w-4 h-4" />
@@ -154,7 +154,7 @@
                         type="number"
                         min="0"
                         step="0.01"
-                        class="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         :placeholder="form.discount_type === 'percent' ? '10' : '100'"
                       />
                       <div
@@ -177,7 +177,7 @@
                   <textarea
                     v-model.trim="form.note"
                     rows="3"
-                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     placeholder="หมายเหตุเพิ่มเติม..."
                   ></textarea>
                   <p v-if="errors.note" class="text-xs text-red-600 mt-1">{{ errors.note }}</p>
@@ -190,18 +190,18 @@
                       type="button"
                       @click="form.isActive = !form.isActive"
                       :aria-pressed="form.isActive"
-                      class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none"
-                      :class="form.isActive ? 'bg-emerald-600' : 'bg-gray-300'"
+                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
+                      :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
                     >
                       <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                       <span
-                        :class="form.isActive ? 'translate-x-5' : 'translate-x-1'"
+                        :class="form.isActive ? 'translate-x-5' : 'translate-x-0'"
                         class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
                       ></span>
                     </button>
                     <span
-                      class="ml-3 text-sm"
-                      :class="form.isActive ? 'text-emerald-700' : 'text-gray-600'"
+                      class="ml-3 text-sm text-gray-700"
+                    
                     >
                       {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
                     </span>
@@ -246,7 +246,7 @@ import {
   Listbox,
   ListboxButton,
   ListboxOptions,
-  ListboxOption
+  ListboxOption,
 } from '@headlessui/vue'
 import { X, ChevronDown, CheckIcon } from 'lucide-vue-next'
 import ColorPicker from '@/components/ColorPicker.vue'
@@ -268,12 +268,12 @@ export default {
     ChevronDown,
     CheckIcon,
     ColorPicker,
-    ConfirmClosePopover
+    ConfirmClosePopover,
   },
   props: {
     modelValue: { type: Boolean, required: true },
     initialData: { type: Object, default: null },
-    loading: { type: Boolean, default: false }
+    loading: { type: Boolean, default: false },
   },
   emits: ['update:modelValue', 'save'],
   data() {
@@ -285,7 +285,7 @@ export default {
         color: '#22C55E',
         discount_type: '',
         discount_amount: null,
-        isActive: true
+        isActive: true,
       },
       errors: {},
       originalSnapshot: null,
@@ -293,14 +293,14 @@ export default {
       discountTypeOptions: [
         { label: 'ไม่ระบุ', value: '' },
         { label: 'เปอร์เซ็นต์ (%)', value: 'percent' },
-        { label: 'จำนวนเงิน (บาท)', value: 'amount' }
-      ]
+        { label: 'จำนวนเงิน (บาท)', value: 'amount' },
+      ],
     }
   },
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    }
+    },
   },
   watch: {
     initialData: {
@@ -314,15 +314,15 @@ export default {
             color: v.color || '#22C55E',
             discount_type: v.discount_type || '',
             discount_amount: v.discount_amount || null,
-            isActive: v.isActive ?? true
+            isActive: v.isActive ?? true,
           }
         } else {
           this.resetForm()
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
-      }
-    }
+      },
+    },
   },
   methods: {
     resetForm() {
@@ -334,7 +334,7 @@ export default {
           color: this.initialData.color || '#22C55E',
           discount_type: this.initialData.discount_type || '',
           discount_amount: this.initialData.discount_amount || null,
-          isActive: this.initialData.isActive ?? true
+          isActive: this.initialData.isActive ?? true,
         }
       } else {
         this.form = {
@@ -344,7 +344,7 @@ export default {
           color: '#22C55E',
           discount_type: '',
           discount_amount: null,
-          isActive: true
+          isActive: true,
         }
       }
       this.originalSnapshot = JSON.stringify(this.form)
@@ -406,9 +406,9 @@ export default {
     },
 
     getDiscountTypeLabel(value) {
-      const option = this.discountTypeOptions.find(opt => opt.value === value)
+      const option = this.discountTypeOptions.find((opt) => opt.value === value)
       return option ? option.label : 'ไม่ระบุ'
-    }
-  }
+    },
+  },
 }
 </script>

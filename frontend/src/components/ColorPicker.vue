@@ -7,7 +7,7 @@
       <input
         v-model="colorValue"
         type="color"
-        class="h-10 w-16 border border-gray-200 rounded-md cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300"
+        class="h-10 w-16 border border-gray-200 rounded-md cursor-pointer focus:ring-1 focus:ring-emerald-300/80 focus:border-emerald-400 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
         @input="onColorChange"
       />
 
@@ -16,7 +16,10 @@
         v-model="colorValue"
         type="text"
         :placeholder="placeholder"
-        class="flex-1 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none font-mono text-sm"
+        class="flex-1 px-3 py-2 border border-gray-200 rounded-lg shadow-sm 
+       bg-white text-gray-700 placeholder-gray-400 
+       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
+       focus:outline-none transition-colors duration-200 hover:border-emerald-400 font-mono text-sm"
         @input="onTextChange"
       />
 
@@ -24,7 +27,7 @@
       <button
         type="button"
         @click="generateRandomColor"
-        class="px-3 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+        class="px-3 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50  focus:outline-none focus:ring-1 focus:ring-emerald-300/80 transition-colors duration-200 hover:border-emerald-400"
         v-tooltip:top="'สุ่มสี'"
       >
         <Shuffle class="w-4 h-4" />

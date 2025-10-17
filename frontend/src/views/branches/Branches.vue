@@ -6,13 +6,18 @@
         <p class="text-md text-gray-500">จัดการข้อมูลสาขาทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
-        <input
-          v-model.trim="query"
-          @input="onFilterInput"
-          type="text"
-          placeholder="ค้นหา รหัส/ชื่อ/ที่อยู่..."
-          class="px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-56 hover:border-emerald-300 focus:outline-none"
-        />
+        <div class="relative">
+          <SearchIcon
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+          />
+          <input
+            v-model.trim="query"
+            @input="onFilterInput"
+            type="text"
+            placeholder="ค้นหา รหัส/ชื่อ/ที่อยู่..."
+            class="w-56 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+          />
+        </div>
 
         <!-- Status dropdown (Headless UI Listbox) -->
         <Listbox v-model="statusOption" as="div" class="relative">
@@ -283,7 +288,8 @@ import {
   Pencil,
   Trash2,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  SearchIcon
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import BranchModal from '@/views/branches/components/modals/BranchModal.vue'
@@ -305,7 +311,8 @@ export default {
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    BranchModal
+    BranchModal,
+    SearchIcon
   },
   setup() {
     const authStore = useAuthStore()

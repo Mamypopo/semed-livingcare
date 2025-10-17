@@ -55,7 +55,7 @@
                     <input
                       v-model.trim="form.name"
                       type="text"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                     <p v-if="errors.name" class="text-xs text-red-600 mt-1">{{ errors.name }}</p>
                   </div>
@@ -66,7 +66,7 @@
                     <input
                       v-model.trim="form.email"
                       type="email"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                     <p v-if="errors.email" class="text-xs text-red-600 mt-1">{{ errors.email }}</p>
                   </div>
@@ -77,7 +77,7 @@
                     <input
                       v-model.trim="form.password"
                       type="password"
-                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                     <p v-if="errors.password" class="text-xs text-red-600 mt-1">
                       {{ errors.password }}
@@ -89,7 +89,7 @@
                     <button
                       type="button"
                       @click="openChangePasswordModal"
-                      class="inline-flex items-center px-3 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      class="inline-flex items-center px-3 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-emerald-300/80 transition-colors duration-200 hover:border-emerald-400"
                     >
                       <Key class="w-4 h-4 mr-2" />
                       เปลี่ยนรหัสผ่าน
@@ -102,7 +102,7 @@
                     <Listbox v-model="form.role" as="div" class="relative">
                       <div>
                         <ListboxButton
-                          class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                          class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-lg shadow-sm  text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         >
                           <span class="block truncate">{{ getRoleLabel(form.role) }}</span>
                           <span
@@ -166,7 +166,7 @@
                     <Listbox v-model="form.branchId" as="div" class="relative">
                       <div>
                         <ListboxButton
-                          class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                        class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-lg shadow-sm  text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         >
                           <div class="flex items-center gap-2">
                             <span class="block truncate">{{ getBranchName(form.branchId) }}</span>
@@ -202,7 +202,7 @@
                               @input="onBranchSearchInput"
                               type="text"
                               placeholder="ค้นหาสาขา..."
-                              class="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none hover:border-emerald-300"
+                              class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               @click.stop
                             />
                           </div>
@@ -292,18 +292,17 @@
                         type="button"
                         @click="form.isActive = !form.isActive"
                         :aria-pressed="form.isActive"
-                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none"
-                        :class="form.isActive ? 'bg-emerald-600' : 'bg-gray-300'"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
+                        :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
                       >
                         <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                         <span
-                          :class="form.isActive ? 'translate-x-5' : 'translate-x-1'"
+                          :class="form.isActive ? 'translate-x-5' : 'translate-x-0'"
                           class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
                         ></span>
                       </button>
                       <span
-                        class="ml-3 text-sm"
-                        :class="form.isActive ? 'text-emerald-700' : 'text-gray-600'"
+                        class="ml-3 text-sm text-gray-700"
                       >
                         {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
                       </span>
