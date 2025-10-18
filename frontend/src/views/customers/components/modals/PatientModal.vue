@@ -2515,7 +2515,7 @@ export default {
       this.lastErrorMessage = null // Reset error message
     },
     
-    handleCardData(cardData) {
+    async handleCardData(cardData) {
       if (!cardData) {
         return
       }
@@ -2601,7 +2601,7 @@ export default {
         
         // แยกข้อมูลที่อยู่
         if (cardData.address) {
-          this.parseAddress(cardData.address)
+          await this.parseAddress(cardData.address)
         }
         
         // หยุดการอ่านบัตรหลังจากอ่านสำเร็จ (ไม่ปิด modal อัตโนมัติ)
@@ -2633,9 +2633,9 @@ export default {
         confirmButtonColor: '#10b981',
         cancelButtonColor: '#ef4444',
         width: '500px'
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.updateFormWithCardData(cardData)
+          await this.updateFormWithCardData(cardData)
           Swal.fire({
             toast: true,
             position: 'top-end',
@@ -2768,7 +2768,7 @@ export default {
       }
     },
     
-    updateFormWithCardData(cardData) {
+    async updateFormWithCardData(cardData) {
       // นำข้อมูลบัตรไปใส่ในฟอร์ม
       if (cardData.id_number) {
         // แยกเลขบัตรประชาชนเป็นตัวๆ
@@ -2837,7 +2837,7 @@ export default {
         
         // แยกข้อมูลที่อยู่
         if (cardData.address) {
-          this.parseAddress(cardData.address)
+          await this.parseAddress(cardData.address)
         }
         
         // หยุดการอ่านบัตรหลังจากอ่านสำเร็จ
@@ -2848,13 +2848,20 @@ export default {
       }
     },
     
-    parseAddress(address) {
+    async parseAddress(address) {
       // ตั้งค่าเริ่มต้น
       this.form.address = ''
       this.form.sub_district = ''
       this.form.district = ''
       this.form.province = ''
       this.form.postal_code = ''
+      this.selectedProvince = null
+      this.selectedDistrict = null
+      this.selectedSubDistrict = null
+      this.selectedPostcode = null
+      this.districts = []
+      this.subDistricts = []
+      this.postcodes = []
       
       if (!address) return
       
@@ -2882,6 +2889,8 @@ export default {
         const provinceObj = this.provinces.find(p => p.name_th === province)
         if (provinceObj) {
           this.selectedProvince = provinceObj
+          // โหลดอำเภอสำหรับจังหวัดนี้
+          await this.loadDistricts(province)
         }
         parts.pop()
         
@@ -2894,10 +2903,12 @@ export default {
           this.form.district = district
           
           // หา selectedDistrict object จาก districts array
-          if (this.selectedProvince) {
+          if (this.selectedProvince && this.districts.length > 0) {
             const districtObj = this.districts.find(d => d.name_th === district)
             if (districtObj) {
               this.selectedDistrict = districtObj
+              // โหลดตำบลสำหรับอำเภอนี้
+              await this.loadSubDistricts(district)
             }
           }
           parts.pop()
@@ -2912,10 +2923,20 @@ export default {
           this.form.sub_district = subDistrict
           
           // หา selectedSubDistrict object จาก subDistricts array
-          if (this.selectedDistrict) {
+          if (this.selectedDistrict && this.subDistricts.length > 0) {
             const subDistrictObj = this.subDistricts.find(sd => sd.name_th === subDistrict)
             if (subDistrictObj) {
               this.selectedSubDistrict = subDistrictObj
+              // โหลดรหัสไปรษณีย์สำหรับตำบลนี้
+              await this.loadPostcodes(subDistrict)
+              
+              // หา selectedPostcode object จาก postcodes array
+              if (this.postcodes.length > 0 && this.form.postal_code) {
+                const postcodeObj = this.postcodes.find(p => p.postcode === this.form.postal_code)
+                if (postcodeObj) {
+                  this.selectedPostcode = postcodeObj
+                }
+              }
             }
           }
           parts.pop()

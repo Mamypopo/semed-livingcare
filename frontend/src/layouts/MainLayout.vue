@@ -28,7 +28,7 @@
             <!-- Page Title -->
             <div class="flex-1 lg:flex-none">
               <h1 class="text-xl font-semibold text-gray-900">
-                {{ $route.path === '/main/lobby' ? 'SEMed Livingcare' : pageTitle }}
+                {{ $route.path === '/main/lobby' ? 'SEMed Livingcare' : (authStore.currentBranch?.name || pageTitle) }}
               </h1>
             </div>
 
