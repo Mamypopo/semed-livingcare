@@ -39,10 +39,11 @@
                     type="button"
                     @click="handleCardRead"
                     :disabled="loading"
-                    class="px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {{ isCardReaderActive ? 'หยุดอ่านบัตร' : 'อ่านข้อมูลบัตร' }}
                   </button>
+                  
                   <button
                     type="submit"
                     form="patient-form"
@@ -54,7 +55,7 @@
                   <button
                     type="button"
                     @click="requestClose"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     ยกเลิก
                   </button>
@@ -760,6 +761,7 @@
                             <input
                               v-model="form.phone_1"
                               type="tel"
+                              maxlength="10"
                               class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุเบอร์โทรศัพท์"
                             />
@@ -771,6 +773,7 @@
                             <input
                               v-model="form.phone_2"
                               type="tel"
+                              maxlength="10"
                               class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="ระบุเบอร์โทรศัพท์"
                             />
@@ -1332,7 +1335,7 @@
                     </div>
 
                     <!-- Contact Input Groups -->
-                    <div v-for="(contact, index) in contactPersons" :key="contact.id" class="grid grid-cols-12 gap-4 items-center">
+                    <div v-for="contact in contactPersons" :key="contact.id" class="grid grid-cols-12 gap-4 items-center">
                       <!-- ชื่อ-นามสกุล -->
                       <div class="col-span-4">
                         <input
@@ -1406,11 +1409,23 @@
 
                       <!-- ปุ่มดำเนินการ -->
                       <div class="col-span-2 flex justify-center">
-                        <!-- ปุ่มเพิ่ม (แสดงเฉพาะแถวสุดท้ายและกรอกข้อมูลครบแล้ว) -->
+                        <!-- ปุ่มลบ (แสดงเฉพาะแถวที่ถูกเพิ่มแล้ว) -->
                         <button
-                          v-if="index === contactPersons.length - 1"
+                          v-if="contact.isAdded"
                           type="button"
-                          @click="(!contact.name || !contact.phone || !contact.relationship) ? null : addContactPerson()"
+                          @click="removeContactPerson(contact.id)"
+                          class="px-4 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-400 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                          v-tooltip.bottom="'ลบผู้ติดต่อ'"
+                        >
+                          <Trash2 class="h-5 w-5" />
+                        </button>
+
+                        <!-- ปุ่มเพิ่ม (แสดงเฉพาะแถวที่ยังไม่ถูกเพิ่ม) -->
+                        <button
+                          v-if="!contact.isAdded"
+                          type="button"
+                          @click="addContactPerson()"
+                          :disabled="!contact.name || !contact.phone || !contact.relationship"
                           :class="[
                             'px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-colors duration-200 flex items-center justify-center',
                             (!contact.name || !contact.phone || !contact.relationship)
@@ -1418,19 +1433,8 @@
                               : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
                           ]"
                           v-tooltip.bottom="(!contact.name || !contact.phone || !contact.relationship) ? 'กรุณากรอกข้อมูลให้ครบถ้วน' : 'เพิ่มผู้ติดต่อ'"
-                          >
-                          <Plus class="h-5 w-5" />
-                        </button>
-
-                        <!-- ปุ่มลบ (แสดงเฉพาะแถวที่มีข้อมูลแล้วและไม่ใช่แถวสุดท้าย) -->
-                        <button
-                          v-if="index !== contactPersons.length - 1 && (contact.name || contact.phone || contact.relationship)"
-                          type="button"
-                          @click="removeContactPerson(contact.id)"
-                          class="px-4 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-400 rounded-lg transition-colors duration-200 flex items-center justify-center"
-                          v-tooltip.bottom="'ลบผู้ติดต่อ'"
                         >
-                          <Trash2 class="h-5 w-5" />
+                          <Plus class="h-5 w-5" />
                         </button>
                       </div>
                     </div>
@@ -2143,7 +2147,8 @@ export default {
           id: 1,
           name: '',
           phone: '',
-          relationship: ''
+          relationship: '',
+          isAdded: false
         }
       ],
       nextContactId: 2,
@@ -3453,7 +3458,8 @@ export default {
           id: 1,
           name: '',
           phone: '',
-          relationship: ''
+          relationship: '',
+          isAdded: false
         }
       ]
       this.nextContactId = 2
@@ -3804,11 +3810,19 @@ export default {
 
     // Contact Person Methods
     addContactPerson() {
+      // ตั้งค่า isAdded: true สำหรับแถวปัจจุบัน
+      const currentIndex = this.contactPersons.length - 1
+      if (currentIndex >= 0) {
+        this.contactPersons[currentIndex].isAdded = true
+      }
+      
+      // เพิ่มแถวใหม่
       this.contactPersons.push({
         id: this.nextContactId,
         name: '',
         phone: '',
-        relationship: ''
+        relationship: '',
+        isAdded: false
       })
       this.nextContactId++
     },
@@ -4198,15 +4212,25 @@ export default {
                 id: index + 1,
                 name: contact.name || '',
                 phone: contact.phone || '',
-                relationship: contact.relationship || ''
+                relationship: contact.relationship || '',
+                isAdded: true
               }))
+              // เพิ่มแถวว่างสำหรับเพิ่มผู้ติดต่อใหม่
+              this.contactPersons.push({
+                id: this.initialData.contactPersons.length + 1,
+                name: '',
+                phone: '',
+                relationship: '',
+                isAdded: false
+              })
               this.nextContactId = this.contactPersons.length + 1
             } else {
               this.contactPersons = [{
                 id: 1,
                 name: '',
                 phone: '',
-                relationship: ''
+                relationship: '',
+                isAdded: false
               }]
               this.nextContactId = 2
             }
