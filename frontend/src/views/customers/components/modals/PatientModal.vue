@@ -61,23 +61,6 @@
                 </div>
               </div>
 
-              <!-- Card Reader Status -->
-              <div v-if="isCardReaderActive || cardReaderError" class="px-6 py-3 bg-gray-50 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <div :class="cardReaderStatus.color" class="text-sm font-medium">
-                      {{ cardReaderStatus.text }}
-                    </div>
-                    <div v-if="isCardReaderActive" class="flex items-center space-x-1">
-                      <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                      <span class="text-xs text-gray-500">กำลังอ่านบัตร...</span>
-                    </div>
-                  </div>
-                  <div v-if="cardReaderError" class="text-sm text-red-600">
-                    {{ cardReaderError.message }}
-                  </div>
-                </div>
-              </div>
 
               <!-- Tab Navigation -->
               <div class="border-b border-gray-200">
@@ -2165,15 +2148,11 @@ export default {
       nextContactId: 2,
       nationalIdDigits: Array(13).fill(''),
       nationalIdError: '',
-      // Card Reader Status
-      cardReaderStatus: {
-        text: 'ไม่ได้เชื่อมต่อ',
-        color: 'text-gray-500'
-      },
-      cardReaderError: null,
       isCardReaderActive: false,
       profileImageFile: null,
       profileImagePreview: null,
+      lastToastStatus: null, // ป้องกันการแสดง toast ซ้ำ
+      lastErrorMessage: null, // ป้องกันการแสดง error message ซ้ำ
       form: {
         hn: '',
         prefix: '',
@@ -2523,11 +2502,8 @@ export default {
     
     resetCardReaderState() {
       // Reset สถานะการอ่านบัตร
-      this.cardReaderStatus = {
-        text: 'กำลังเริ่มต้นการอ่านบัตร...',
-        color: 'text-yellow-500'
-      }
-      this.cardReaderError = null
+      this.lastToastStatus = null // Reset flag เพื่อให้แสดง toast ใหม่ได้
+      this.lastErrorMessage = null // Reset error message
     },
     
     handleCardData(cardData) {
@@ -2557,7 +2533,7 @@ export default {
           this.form.last_name = cardData.en_last_name
         }
         
-        // เพิ่มข้อมูลภาษาอังกฤษ
+        // ข้อมูลภาษาอังกฤษ
         if (cardData.en_first_name) {
           this.form.first_name_en = cardData.en_first_name
         }
@@ -2729,11 +2705,67 @@ export default {
     },
     
     updateCardReaderStatus(status) {
-      this.cardReaderStatus = status
+      // แสดง toast เฉพาะเมื่ออ่านสำเร็จเท่านั้น และไม่ซ้ำกับครั้งก่อน
+      if ((status.text.includes('READ_SUCCESS') || status.text.includes('อ่านข้อมูลสำเร็จ')) && 
+          this.lastToastStatus !== 'SUCCESS') {
+        this.lastToastStatus = 'SUCCESS'
+        this.lastErrorMessage = null // Reset error message
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          icon: 'success',
+          title: 'อ่านบัตรสำเร็จ',
+          text: 'ข้อมูลถูกโหลดเข้าฟอร์มแล้ว'
+        })
+      } else if ((status.text.includes('ไม่สามารถเชื่อมต่อ') || status.text.includes('ERROR') || 
+                  status.text.includes('NO_READER') || status.text.includes('IDLE')) && 
+                 this.lastErrorMessage !== status.text) {
+        this.lastToastStatus = 'ERROR'
+        this.lastErrorMessage = status.text
+        
+        // หยุดการอ่านบัตรเมื่อเกิด error หรือไม่พบเครื่องอ่าน
+        if (this.isCardReaderActive) {
+          stopPolling({ onStatusChange: this.updateCardReaderStatus })
+          this.isCardReaderActive = false
+        }
+        
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true,
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: status.text
+        })
+      }
     },
     
     handleCardReaderError(error) {
-      this.cardReaderError = error
+      if (error && this.lastErrorMessage !== error.message) {
+        this.lastErrorMessage = error.message
+        
+        // หยุดการอ่านบัตรเมื่อเกิด error
+        if (this.isCardReaderActive) {
+          stopPolling({ onStatusChange: this.updateCardReaderStatus })
+          this.isCardReaderActive = false
+        }
+        
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 5000,
+          timerProgressBar: true,
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: error.message || 'ไม่สามารถอ่านบัตรได้'
+        })
+      }
     },
     
     handleNationalIdInput(index, event) {

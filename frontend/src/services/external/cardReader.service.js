@@ -91,6 +91,8 @@ function handleStatusUpdate(statusData, { onData, onStatusChange, onError }) {
     case 'NO_READER':
       hasCardBeenReadSinceInserted = false // Reset on card removal or reader disconnect
       statusTag = status_code === 'NO_READER' ? 'error' : 'info'
+      // ส่งสถานะไปยัง UI เพื่อให้หยุดการอ่านบัตร
+      onStatusChange({ text: `[${status_code}] ${message}`, color: `text-${statusTag}-500` })
       break
 
     case 'READING':
@@ -115,6 +117,11 @@ function handleStatusUpdate(statusData, { onData, onStatusChange, onError }) {
   }
 
   onStatusChange({ text: `[${status_code}] ${message}`, color: `text-${statusTag}-500` })
+  
+  // ส่งสถานะเพิ่มเติมสำหรับการตรวจสอบการเชื่อมต่อ
+  if (status_code === 'NO_READER' || status_code === 'IDLE') {
+    onStatusChange({ text: `[${status_code}] ${message}`, color: `text-${statusTag}-500` })
+  }
 }
 
 async function triggerReadCard(onError) {
