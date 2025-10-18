@@ -704,27 +704,34 @@
                         </div>
 
                         <!-- Row 3: 2 columns -->
-                        <div class="grid grid-cols-5 gap-2">
-                          <div class="col-span-3">
+                        <div class="grid grid-cols-12 gap-4">
+                          <div class="col-span-8">
                             <label class="block text-sm font-medium text-gray-700 mb-1"
                               >เลขบัตรประชาชน</label
                             >
-                            <div class="flex gap-1 justify-center">
-                              <input
-                                v-for="(digit, index) in nationalIdDigits"
-                                :key="index"
-                                :ref="`nationalIdInputs`"
-                                v-model="nationalIdDigits[index]"
-                                type="text"
-                                maxlength="1"
-                                class="w-8 h-8 mt-1 text-center border border-gray-300 rounded shadow-sm text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm font-mono"
-                                @input="handleNationalIdInput(index, $event)"
-                                @keydown="handleNationalIdKeydown(index, $event)"
-                                @paste="handleNationalIdPaste"
-                              />
+                            <div class="flex gap-1 justify-center items-center">
+                              <template v-for="(digit, index) in nationalIdDigits" :key="index">
+                                <input
+                                  :ref="`nationalIdInputs`"
+                                  v-model="nationalIdDigits[index]"
+                                  type="text"
+                                  maxlength="1"
+                                  class="w-8 h-8 mt-1 text-center border border-gray-300 rounded shadow-sm text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm font-mono"
+                                  @input="handleNationalIdInput(index, $event)"
+                                  @keydown="handleNationalIdKeydown(index, $event)"
+                                  @paste="handleNationalIdPaste"
+                                />
+                                <!-- เพิ่มขีดขั้น (-) ระหว่างช่อง -->
+                                <span 
+                                  v-if="index === 0 || index === 4 || index === 9 || index === 11" 
+                                  class="text-gray-400 text-lg font-bold mx-1"
+                                >
+                                  -
+                                </span>
+                              </template>
                             </div>
                           </div>
-                          <div class="col-span-2">
+                          <div class="col-span-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1"
                               >หนังสือเดินทาง</label
                             >
