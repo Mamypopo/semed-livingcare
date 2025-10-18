@@ -2130,6 +2130,7 @@ export default {
     }
   },
   emits: ['update:modelValue', 'save'],
+  inheritAttrs: false,
   data() {
     return {
       activeTab: 'personal',
@@ -2403,6 +2404,9 @@ export default {
     isEdit() {
       return !!this.initialData
     },
+    isEditMode() {
+      return this.$attrs.isEditMode || (this.initialData && this.initialData.id)
+    },
 
     filteredProvinces() {
       if (!this.provinceSearchQuery) return this.provinces
@@ -2511,7 +2515,13 @@ export default {
         return
       }
       
-      // นำข้อมูลบัตรไปใส่ในฟอร์ม
+      // ตรวจสอบว่าเป็นโหมดแก้ไขหรือไม่
+      if (this.isEditMode) {
+        this.showUpdateConfirmation(cardData)
+        return
+      }
+      
+      // นำข้อมูลบัตรไปใส่ในฟอร์ม (โหมดเพิ่มใหม่)
       if (cardData.id_number) {
         // แยกเลขบัตรประชาชนเป็นตัวๆ
         const idNumber = cardData.id_number.toString()
@@ -2590,6 +2600,242 @@ export default {
         }
         
         // หยุดการอ่านบัตรหลังจากอ่านสำเร็จ (ไม่ปิด modal อัตโนมัติ)
+        setTimeout(() => {
+          stopPolling({ onStatusChange: this.updateCardReaderStatus })
+          this.isCardReaderActive = false
+        }, 2000)
+      }
+    },
+    
+    showUpdateConfirmation(cardData) {
+      // สร้างข้อความแสดงข้อมูลที่จะทับ
+      const changes = this.getChangesSummary(cardData)
+      
+      Swal.fire({
+        title: 'ยืนยันการอัปเดตข้อมูล',
+        html: `
+          <div class="text-left">
+            <p class="mb-3">ข้อมูลต่อไปนี้จะถูกแทนที่:</p>
+            <div class="bg-gray-100 p-3 rounded text-sm max-h-60 overflow-y-auto">
+              ${changes}
+            </div>
+            <p class="mt-3 text-sm text-gray-600">ต้องการดำเนินการต่อหรือไม่?</p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'อัปเดตข้อมูล',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#ef4444',
+        width: '500px'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.updateFormWithCardData(cardData)
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            icon: 'success',
+            title: 'อัปเดตข้อมูลสำเร็จ!',
+            text: 'ข้อมูลจากบัตรถูกอัปเดตในฟอร์มแล้ว'
+          })
+        } else {
+          // หยุดการอ่านบัตรเมื่อยกเลิก
+          if (this.isCardReaderActive) {
+            stopPolling({ onStatusChange: this.updateCardReaderStatus })
+            this.isCardReaderActive = false
+          }
+        }
+      })
+    },
+    
+    getChangesSummary(cardData) {
+      const changes = []
+      
+      // ตรวจสอบข้อมูลที่จะเปลี่ยน
+      if (cardData.th_first_name && cardData.th_first_name !== this.form.first_name) {
+        changes.push(`<strong>ชื่อ:</strong> "${this.form.first_name || 'ว่าง'}" → "${cardData.th_first_name}"`)
+      }
+      
+      if (cardData.th_last_name && cardData.th_last_name !== this.form.last_name) {
+        changes.push(`<strong>นามสกุล:</strong> "${this.form.last_name || 'ว่าง'}" → "${cardData.th_last_name}"`)
+      }
+      
+      if (cardData.date_of_birth_ce) {
+        const newBirthDate = this.formatBirthDate(cardData.date_of_birth_ce)
+        if (newBirthDate !== this.form.birth_date) {
+          changes.push(`<strong>วันเกิด:</strong> "${this.form.birth_date || 'ว่าง'}" → "${newBirthDate}"`)
+        }
+      }
+      
+      if (cardData.gender && cardData.gender !== this.form.gender) {
+        changes.push(`<strong>เพศ:</strong> "${this.form.gender || 'ว่าง'}" → "${cardData.gender}"`)
+      }
+      
+      if (cardData.th_prefix && cardData.th_prefix !== this.form.prefix) {
+        changes.push(`<strong>คำนำหน้า:</strong> "${this.form.prefix || 'ว่าง'}" → "${cardData.th_prefix}"`)
+      }
+      
+      if (cardData.address) {
+        const parsedAddress = this.parseAddressForSummary(cardData.address)
+        if (parsedAddress.address !== this.form.address) {
+          changes.push(`<strong>ที่อยู่:</strong> "${this.form.address || 'ว่าง'}" → "${parsedAddress.address}"`)
+        }
+        if (parsedAddress.province !== this.form.province) {
+          changes.push(`<strong>จังหวัด:</strong> "${this.form.province || 'ว่าง'}" → "${parsedAddress.province}"`)
+        }
+        if (parsedAddress.district !== this.form.district) {
+          changes.push(`<strong>อำเภอ:</strong> "${this.form.district || 'ว่าง'}" → "${parsedAddress.district}"`)
+        }
+        if (parsedAddress.sub_district !== this.form.sub_district) {
+          changes.push(`<strong>ตำบล:</strong> "${this.form.sub_district || 'ว่าง'}" → "${parsedAddress.sub_district}"`)
+        }
+      }
+      
+      // เพิ่มข้อมูลใหม่ที่ไม่มีในฟอร์มเดิม
+      if (cardData.en_first_name && !this.form.first_name_en) {
+        changes.push(`<strong>ชื่อ (EN):</strong> เพิ่ม "${cardData.en_first_name}"`)
+      }
+      
+      if (cardData.en_last_name && !this.form.last_name_en) {
+        changes.push(`<strong>นามสกุล (EN):</strong> เพิ่ม "${cardData.en_last_name}"`)
+      }
+      
+      return changes.length > 0 ? changes.join('<br>') : 'ไม่มีการเปลี่ยนแปลง'
+    },
+    
+    formatBirthDate(dateString) {
+      // แปลงรูปแบบวันที่ DD/MM/YYYY เป็น YYYY-MM-DD
+      const dateParts = dateString.split('/')
+      if (dateParts.length === 3) {
+        const day = dateParts[0].padStart(2, '0')
+        const month = dateParts[1].padStart(2, '0')
+        const year = dateParts[2]
+        return `${year}-${month}-${day}`
+      }
+      return dateString
+    },
+    
+    parseAddressForSummary(address) {
+      if (!address) return { address: '', province: '', district: '', sub_district: '' }
+      
+      let remainingAddress = address.trim()
+      const parts = remainingAddress.split(/\s+/)
+      
+      let province = ''
+      let district = ''
+      let sub_district = ''
+      
+      if (parts.length >= 3) {
+        // จังหวัด (คำสุดท้าย)
+        province = parts[parts.length - 1]
+        if (province.startsWith('จังหวัด')) {
+          province = province.replace('จังหวัด', '').trim()
+        }
+        parts.pop()
+        
+        // อำเภอ (คำที่ 2 จากท้าย)
+        if (parts.length > 0) {
+          district = parts[parts.length - 1]
+          if (district.startsWith('อำเภอ')) {
+            district = district.replace('อำเภอ', '').trim()
+          }
+          parts.pop()
+        }
+        
+        // ตำบล (คำที่ 3 จากท้าย)
+        if (parts.length > 0) {
+          sub_district = parts[parts.length - 1]
+          if (sub_district.startsWith('ตำบล')) {
+            sub_district = sub_district.replace('ตำบล', '').trim()
+          }
+          parts.pop()
+        }
+      }
+      
+      return {
+        address: parts.join(' '),
+        province,
+        district,
+        sub_district
+      }
+    },
+    
+    updateFormWithCardData(cardData) {
+      // นำข้อมูลบัตรไปใส่ในฟอร์ม
+      if (cardData.id_number) {
+        // แยกเลขบัตรประชาชนเป็นตัวๆ
+        const idNumber = cardData.id_number.toString()
+        for (let i = 0; i < 13 && i < idNumber.length; i++) {
+          this.nationalIdDigits[i] = idNumber[i]
+        }
+        this.form.national_id = cardData.id_number
+        
+        // อัปเดตข้อมูลชื่อ
+        if (cardData.th_first_name) {
+          this.form.first_name = cardData.th_first_name
+        } else if (cardData.en_first_name) {
+          this.form.first_name = cardData.en_first_name
+        }
+        
+        if (cardData.th_last_name) {
+          this.form.last_name = cardData.th_last_name
+        } else if (cardData.en_last_name) {
+          this.form.last_name = cardData.en_last_name
+        }
+        
+        // ข้อมูลภาษาอังกฤษ
+        if (cardData.en_first_name) {
+          this.form.first_name_en = cardData.en_first_name
+        }
+        if (cardData.en_last_name) {
+          this.form.last_name_en = cardData.en_last_name
+        }
+        
+        // ลองแยกจากชื่อเต็ม
+        if (cardData.th_full_name && !this.form.first_name) {
+          const nameParts = cardData.th_full_name.trim().split(/\s+/)
+          if (nameParts.length >= 2) {
+            this.form.first_name = nameParts[0]
+            this.form.last_name = nameParts.slice(1).join(' ')
+          }
+        }
+        
+        // อัปเดตข้อมูลวันเกิด
+        if (cardData.date_of_birth_ce) {
+          this.form.birth_date = this.formatBirthDate(cardData.date_of_birth_ce)
+        } else if (cardData.date_of_birth_be) {
+          // แปลงจากพุทธศักราชเป็นคริสต์ศักราช
+          const dateParts = cardData.date_of_birth_be.split('/')
+          if (dateParts.length === 3) {
+            const day = dateParts[0].padStart(2, '0')
+            const month = dateParts[1].padStart(2, '0')
+            const yearBE = parseInt(dateParts[2])
+            const yearCE = yearBE - 543
+            this.form.birth_date = `${yearCE}-${month}-${day}`
+          }
+        }
+        
+        // อัปเดตข้อมูลเพศ
+        if (cardData.gender) {
+          this.form.gender = cardData.gender
+        }
+        
+        // อัปเดตข้อมูลคำนำหน้า
+        if (cardData.th_prefix) {
+          this.form.prefix = cardData.th_prefix
+        } else if (cardData.en_prefix) {
+          this.form.prefix = cardData.en_prefix
+        }
+        
+        // แยกข้อมูลที่อยู่
+        if (cardData.address) {
+          this.parseAddress(cardData.address)
+        }
+        
+        // หยุดการอ่านบัตรหลังจากอ่านสำเร็จ
         setTimeout(() => {
           stopPolling({ onStatusChange: this.updateCardReaderStatus })
           this.isCardReaderActive = false

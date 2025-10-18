@@ -338,6 +338,7 @@
       v-model="modalOpen"
       :initialData="editingPatient"
       :loading="modalLoading"
+      :isEditMode="!!editingPatient"
       @save="handleSave"
     />
   </div>
