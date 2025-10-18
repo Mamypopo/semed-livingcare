@@ -37,9 +37,11 @@
                 <div class="flex items-center space-x-3">
                   <button
                     type="button"
-                    class="px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    @click="handleCardRead"
+                    :disabled="loading"
+                    class="px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    อ่านข้อมูลบัตรยังไม่ได้ทำ
+                    {{ isCardReaderActive ? 'หยุดอ่านบัตร' : 'อ่านข้อมูลบัตร' }}
                   </button>
                   <button
                     type="submit"
@@ -56,6 +58,24 @@
                   >
                     ยกเลิก
                   </button>
+                </div>
+              </div>
+
+              <!-- Card Reader Status -->
+              <div v-if="isCardReaderActive || cardReaderError" class="px-6 py-3 bg-gray-50 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <div :class="cardReaderStatus.color" class="text-sm font-medium">
+                      {{ cardReaderStatus.text }}
+                    </div>
+                    <div v-if="isCardReaderActive" class="flex items-center space-x-1">
+                      <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                      <span class="text-xs text-gray-500">กำลังอ่านบัตร...</span>
+                    </div>
+                  </div>
+                  <div v-if="cardReaderError" class="text-sm text-red-600">
+                    {{ cardReaderError.message }}
+                  </div>
                 </div>
               </div>
 
@@ -258,19 +278,7 @@
                                 @click="clearPrefix"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -322,19 +330,7 @@
                                 @click="clearGender"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -386,19 +382,7 @@
                                 @click="clearNationality"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -450,19 +434,7 @@
                                 @click="clearReligion"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -518,19 +490,7 @@
                                 @click="clearEducationLevel"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -582,19 +542,7 @@
                                 @click="clearMaritalStatus"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -646,19 +594,7 @@
                                 @click="clearBloodGroup"
                                 class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                               >
-                                <svg
-                                  class="h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  ></path>
-                                </svg>
+                                <X class="h-4 w-4" />
                               </button>
                               <button
                                 type="button"
@@ -716,7 +652,10 @@
                                   v-model="nationalIdDigits[index]"
                                   type="text"
                                   maxlength="1"
-                                  class="w-8 h-8 mt-1 text-center border border-gray-300 rounded shadow-sm text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm font-mono"
+                                  :class="[
+                                    'w-8 h-8 mt-1 text-center border rounded shadow-sm text-gray-700 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm font-mono',
+                                    nationalIdError ? 'border-red-400 focus:border-red-400' : 'border-gray-300 focus:border-emerald-400'
+                                  ]"
                                   @input="handleNationalIdInput(index, $event)"
                                   @keydown="handleNationalIdKeydown(index, $event)"
                                   @paste="handleNationalIdPaste"
@@ -730,6 +669,11 @@
                                 </span>
                               </template>
                             </div>
+                            <!-- Error Message -->
+                            <div v-if="nationalIdError" class="mt-1 text-sm text-red-600 flex items-center gap-1">
+                              <AlertCircle class="w-4 h-4 flex-shrink-0" />
+                              {{ nationalIdError }}
+                            </div>
                           </div>
                           <div class="col-span-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -738,7 +682,7 @@
                             <input
                               v-model="form.passport_no"
                               type="text"
-                              class="w-full px-2 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 text-sm"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400 "
                               placeholder="ระบุหนังสือเดินทาง"
                             />
                           </div>
@@ -1450,9 +1394,7 @@
                             @click="clearRelationship(contact.id)"
                             class="absolute inset-y-0 right-8 flex items-center pr-2 text-gray-400 hover:text-gray-600"
                           >
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                            <X class="h-4 w-4" />
                           </button>
                           <button
                             type="button"
@@ -2147,7 +2089,7 @@ import {
   TransitionChild
 } from '@headlessui/vue'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { ChevronDown, Check, Plus, Trash2, Upload, FileText, X, Image as ImageIcon, File, Eye, Search as SearchIcon} from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, Trash2, Upload, FileText, X, Image as ImageIcon, File, Eye, Search as SearchIcon, AlertCircle} from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 import TagDropdown from '@/components/dropdown/TagDropdown.vue'
 import BranchDropdown from '@/components/dropdown/BranchDropdown.vue'
@@ -2157,6 +2099,7 @@ import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { addressService } from '@/services/external/address.service'
+import { startPolling, stopPolling, resetStatus } from '@/services/external/cardReader.service.js'
 import fileService from '@/services/file.js'
 
 export default {
@@ -2179,6 +2122,7 @@ export default {
     ImageIcon,
     File,
     X,
+    AlertCircle,
     TagDropdown,
     VueDatePicker,
     BranchDropdown,
@@ -2220,6 +2164,14 @@ export default {
       ],
       nextContactId: 2,
       nationalIdDigits: Array(13).fill(''),
+      nationalIdError: '',
+      // Card Reader Status
+      cardReaderStatus: {
+        text: 'ไม่ได้เชื่อมต่อ',
+        color: 'text-gray-500'
+      },
+      cardReaderError: null,
+      isCardReaderActive: false,
       profileImageFile: null,
       profileImagePreview: null,
       form: {
@@ -2534,10 +2486,256 @@ export default {
     this.loadProvinces()
     this.loadCompanyProvinces()
   },
+  beforeUnmount() {
+    // หยุดการอ่านบัตรเมื่อ component ถูก destroy
+    if (this.isCardReaderActive) {
+      stopPolling({ onStatusChange: this.updateCardReaderStatus })
+      this.isCardReaderActive = false
+    }
+  },
   methods: {
     isTagSelected(tagId) {
       return this.selectedTags.some(t => t.id === tagId)
     },
+    
+    // Card Reader Functions
+    handleCardRead() {
+      if (this.isCardReaderActive) {
+        // หยุดการอ่านบัตร
+        stopPolling({ onStatusChange: this.updateCardReaderStatus })
+        this.isCardReaderActive = false
+        resetStatus({ onStatusChange: this.updateCardReaderStatus })
+      } else {
+        // เริ่มการอ่านบัตร
+        this.isCardReaderActive = true
+        this.cardReaderError = null
+        
+        // Reset สถานะการอ่านบัตรเพื่อให้อ่านใหม่
+        this.resetCardReaderState()
+        
+        startPolling({
+          onData: this.handleCardData,
+          onStatusChange: this.updateCardReaderStatus,
+          onError: this.handleCardReaderError
+        })
+      }
+    },
+    
+    resetCardReaderState() {
+      // Reset สถานะการอ่านบัตร
+      this.cardReaderStatus = {
+        text: 'กำลังเริ่มต้นการอ่านบัตร...',
+        color: 'text-yellow-500'
+      }
+      this.cardReaderError = null
+    },
+    
+    handleCardData(cardData) {
+      if (!cardData) {
+        return
+      }
+      
+      // นำข้อมูลบัตรไปใส่ในฟอร์ม
+      if (cardData.id_number) {
+        // แยกเลขบัตรประชาชนเป็นตัวๆ
+        const idNumber = cardData.id_number.toString()
+        for (let i = 0; i < 13 && i < idNumber.length; i++) {
+          this.nationalIdDigits[i] = idNumber[i]
+        }
+        this.form.national_id = cardData.id_number
+        
+        // อัปเดตข้อมูลชื่อ
+        if (cardData.th_first_name) {
+          this.form.first_name = cardData.th_first_name
+        } else if (cardData.en_first_name) {
+          this.form.first_name = cardData.en_first_name
+        }
+        
+        if (cardData.th_last_name) {
+          this.form.last_name = cardData.th_last_name
+        } else if (cardData.en_last_name) {
+          this.form.last_name = cardData.en_last_name
+        }
+        
+        // เพิ่มข้อมูลภาษาอังกฤษ
+        if (cardData.en_first_name) {
+          this.form.first_name_en = cardData.en_first_name
+        }
+        if (cardData.en_last_name) {
+          this.form.last_name_en = cardData.en_last_name
+        }
+        
+        // ลองแยกจากชื่อเต็ม
+        if (cardData.th_full_name && !this.form.first_name) {
+          const nameParts = cardData.th_full_name.trim().split(/\s+/)
+          if (nameParts.length >= 2) {
+            this.form.first_name = nameParts[0]
+            this.form.last_name = nameParts.slice(1).join(' ')
+          }
+        }
+        
+        // อัปเดตข้อมูลวันเกิด
+        if (cardData.date_of_birth_ce) {
+          // แปลงรูปแบบวันที่ DD/MM/YYYY เป็น YYYY-MM-DD
+          const dateParts = cardData.date_of_birth_ce.split('/')
+          if (dateParts.length === 3) {
+            const day = dateParts[0].padStart(2, '0')
+            const month = dateParts[1].padStart(2, '0')
+            const year = dateParts[2]
+            this.form.birth_date = `${year}-${month}-${day}`
+          }
+        } else if (cardData.date_of_birth_be) {
+          // แปลงจากพุทธศักราชเป็นคริสต์ศักราช
+          const dateParts = cardData.date_of_birth_be.split('/')
+          if (dateParts.length === 3) {
+            const day = dateParts[0].padStart(2, '0')
+            const month = dateParts[1].padStart(2, '0')
+            const yearBE = parseInt(dateParts[2])
+            const yearCE = yearBE - 543
+            this.form.birth_date = `${yearCE}-${month}-${day}`
+          }
+        }
+        
+        // อัปเดตข้อมูลเพศ
+        if (cardData.gender) {
+          this.form.gender = cardData.gender
+        }
+        
+        // อัปเดตข้อมูลคำนำหน้า
+        if (cardData.th_prefix) {
+          this.form.prefix = cardData.th_prefix
+        } else if (cardData.en_prefix) {
+          this.form.prefix = cardData.en_prefix
+        }
+        
+        // แยกข้อมูลที่อยู่
+        if (cardData.address) {
+          this.parseAddress(cardData.address)
+        }
+        
+        // หยุดการอ่านบัตรหลังจากอ่านสำเร็จ (ไม่ปิด modal อัตโนมัติ)
+        setTimeout(() => {
+          stopPolling({ onStatusChange: this.updateCardReaderStatus })
+          this.isCardReaderActive = false
+        }, 2000)
+      }
+    },
+    
+    parseAddress(address) {
+      // ตั้งค่าเริ่มต้น
+      this.form.address = ''
+      this.form.sub_district = ''
+      this.form.district = ''
+      this.form.province = ''
+      this.form.postal_code = ''
+      
+      if (!address) return
+      
+      let remainingAddress = address.trim()
+      
+      // หารหัสไปรษณีย์ (5 หลัก) ก่อน
+      const postalCodeMatch = remainingAddress.match(/\b\d{5}\b/)
+      if (postalCodeMatch) {
+        this.form.postal_code = postalCodeMatch[0]
+        remainingAddress = remainingAddress.replace(postalCodeMatch[0], '').trim()
+      }
+      
+      // แยกข้อมูลจากท้ายไปหน้า
+      const parts = remainingAddress.split(/\s+/)
+      
+      if (parts.length >= 3) {
+        // จังหวัด (คำสุดท้าย - ลบคำว่า "จังหวัด" ออก)
+        let province = parts[parts.length - 1]
+        if (province.startsWith('จังหวัด')) {
+          province = province.replace('จังหวัด', '').trim()
+        }
+        this.form.province = province
+        
+        // หา selectedProvince object จาก provinces array
+        const provinceObj = this.provinces.find(p => p.name_th === province)
+        if (provinceObj) {
+          this.selectedProvince = provinceObj
+        }
+        parts.pop()
+        
+        // อำเภอ (คำที่ 2 จากท้าย - ลบคำว่า "อำเภอ" ออก)
+        if (parts.length > 0) {
+          let district = parts[parts.length - 1]
+          if (district.startsWith('อำเภอ')) {
+            district = district.replace('อำเภอ', '').trim()
+          }
+          this.form.district = district
+          
+          // หา selectedDistrict object จาก districts array
+          if (this.selectedProvince) {
+            const districtObj = this.districts.find(d => d.name_th === district)
+            if (districtObj) {
+              this.selectedDistrict = districtObj
+            }
+          }
+          parts.pop()
+        }
+        
+        // ตำบล (คำที่ 3 จากท้าย - ลบคำว่า "ตำบล" ออก)
+        if (parts.length > 0) {
+          let subDistrict = parts[parts.length - 1]
+          if (subDistrict.startsWith('ตำบล')) {
+            subDistrict = subDistrict.replace('ตำบล', '').trim()
+          }
+          this.form.sub_district = subDistrict
+          
+          // หา selectedSubDistrict object จาก subDistricts array
+          if (this.selectedDistrict) {
+            const subDistrictObj = this.subDistricts.find(sd => sd.name_th === subDistrict)
+            if (subDistrictObj) {
+              this.selectedSubDistrict = subDistrictObj
+            }
+          }
+          parts.pop()
+        }
+        
+        // ที่เหลือเป็นที่อยู่ (บ้านเลขที่ ซอย ถนน)
+        this.form.address = parts.join(' ')
+      } else {
+        // หากไม่สามารถแยกได้ ให้ใส่ทั้งหมดในที่อยู่
+        this.form.address = remainingAddress
+      }
+      
+      // ตรวจสอบและปรับปรุงข้อมูล
+      this.validateAndFixAddress()
+    },
+    
+    validateAndFixAddress() {
+      // ตรวจสอบจังหวัด
+      if (this.form.province && this.form.province.length < 2) {
+        // หากจังหวัดสั้นเกินไป อาจเป็นส่วนหนึ่งของอำเภอ
+        this.form.district = this.form.district + ' ' + this.form.province
+        this.form.province = ''
+      }
+      
+      // ตรวจสอบอำเภอ
+      if (this.form.district && this.form.district.length < 2) {
+        // หากอำเภอสั้นเกินไป อาจเป็นส่วนหนึ่งของตำบล
+        this.form.sub_district = this.form.sub_district + ' ' + this.form.district
+        this.form.district = ''
+      }
+      
+      // ตรวจสอบตำบล
+      if (this.form.sub_district && this.form.sub_district.length < 2) {
+        // หากตำบลสั้นเกินไป อาจเป็นส่วนหนึ่งของที่อยู่
+        this.form.address = this.form.sub_district + ' ' + this.form.address
+        this.form.sub_district = ''
+      }
+    },
+    
+    updateCardReaderStatus(status) {
+      this.cardReaderStatus = status
+    },
+    
+    handleCardReaderError(error) {
+      this.cardReaderError = error
+    },
+    
     handleNationalIdInput(index, event) {
       // รับเฉพาะตัวเลข
       let value = event.target.value.replace(/\D/g, '')
@@ -2545,6 +2743,13 @@ export default {
       
       // อัปเดต form.national_id
       this.form.national_id = this.nationalIdDigits.join('')
+      
+      // ตรวจสอบความถูกต้องเมื่อกรอกครบ 13 หลัก
+      if (this.form.national_id.length === 13) {
+        this.validateNationalId()
+      } else {
+        this.nationalIdError = ''
+      }
       
       // ไปช่องถัดไปถ้าใส่ครบ
       if (value && index < 12) {
@@ -2571,9 +2776,45 @@ export default {
       
       this.form.national_id = this.nationalIdDigits.join('')
       
+      // ตรวจสอบความถูกต้องเมื่อ paste ครบ 13 หลัก
+      if (this.form.national_id.length === 13) {
+        this.validateNationalId()
+      } else {
+        this.nationalIdError = ''
+      }
+      
       // Focus ช่องถัดจากข้อมูลที่ paste
       const nextIndex = Math.min(pastedData.length, 12)
       this.$refs.nationalIdInputs[nextIndex]?.focus()
+    },
+    validateNationalId() {
+      const nationalId = this.form.national_id
+      
+      // ตรวจสอบความยาว
+      if (nationalId.length !== 13) {
+        this.nationalIdError = 'เลขบัตรประชาชนต้องมี 13 หลัก'
+        return false
+      }
+      
+      // ตรวจสอบความถูกต้องด้วย checksum
+      if (!this.isValidThaiID(nationalId)) {
+        this.nationalIdError = 'เลขบัตรประชาชนไม่ถูกต้อง'
+        return false
+      }
+      
+      this.nationalIdError = ''
+      return true
+    },
+    isValidThaiID(id) {
+      if (!/^\d{13}$/.test(id)) return false; // ต้องเป็นตัวเลข 13 หลัก
+
+      let sum = 0;
+      for (let i = 0; i < 12; i++) {
+        sum += Number(id.charAt(i)) * (13 - i);
+      }
+
+      const checkDigit = (11 - (sum % 11)) % 10;
+      return checkDigit === Number(id.charAt(12));
     },
     triggerProfileImageUpload() {
       this.$refs.profileImageInput.click()
@@ -2618,6 +2859,19 @@ export default {
     },
     async handleSubmit() {
       try {
+        // ตรวจสอบเลขบัตรประชาชนก่อน (ถ้ามีการกรอก)
+        if (this.form.national_id && this.form.national_id.length === 13) {
+          if (!this.validateNationalId()) {
+            Swal.fire({
+              title: 'เลขบัตรประชาชนไม่ถูกต้อง',
+              text: this.nationalIdError,
+              icon: 'error',
+              confirmButtonColor: '#ef4444'
+            })
+            return
+          }
+        }
+        
         // ตรวจสอบข้อมูลที่จำเป็นก่อนส่ง (ยอมรับค่า 'ไม่ระบุ')
         const requiredFields = [
           'prefix', 'first_name', 'last_name', 'patient_group_id', 'gender',
@@ -2669,9 +2923,19 @@ export default {
       this.$emit('update:modelValue', false)
     },
     requestClose() {
+      // หยุดการอ่านบัตรก่อนปิด modal
+      if (this.isCardReaderActive) {
+        stopPolling({ onStatusChange: this.updateCardReaderStatus })
+        this.isCardReaderActive = false
+      }
       this.onClose()
     },
     forceClose() {
+      // หยุดการอ่านบัตรก่อนปิด modal
+      if (this.isCardReaderActive) {
+        stopPolling({ onStatusChange: this.updateCardReaderStatus })
+        this.isCardReaderActive = false
+      }
       this.resetForm()
       this.showConfirmClose = false
       this.$emit('update:modelValue', false)
@@ -2919,6 +3183,7 @@ export default {
       this.profileImageFile = null
       this.profileImagePreview = null
       this.nationalIdDigits = Array(13).fill('')
+      this.nationalIdError = ''
       
       // Reset Company Address
       this.selectedCompanyProvince = null
