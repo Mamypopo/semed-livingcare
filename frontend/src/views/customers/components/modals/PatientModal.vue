@@ -1234,12 +1234,14 @@
                                 v-for="type in treatmentTypeOptions"
                                 :key="type"
                                 :value="type"
-                                v-slot="{ active, selected }"
+                                :disabled="type === 'IPD ผู้ป่วยใน'"
+                                v-slot="{ active, selected, disabled }"
                               >
                                 <li
                                   :class="[
-                                    active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
-                                    'relative cursor-default select-none py-2 pl-10 pr-4'
+                                    active && !disabled ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
+                                    disabled ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'cursor-default',
+                                    'relative select-none py-2 pl-10 pr-4'
                                   ]"
                                 >
                                   <span
@@ -1247,8 +1249,9 @@
                                       selected ? 'font-medium' : 'font-normal',
                                       'block truncate'
                                     ]"
-                                    >{{ type }}</span
-                                  >
+                                    >{{ type }}
+                                    <span v-if="disabled" class="text-xs ml-2 text-amber-500">(ยังไม่เปิดให้บริการ)</span>
+                                  </span>
                                   <span
                                     v-if="selected"
                                     class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"

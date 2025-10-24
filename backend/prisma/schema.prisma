@@ -13,17 +13,19 @@ enum RoleEnum {
   ADMIN
   STAFF
   GUEST
+  DOCTOR
 }
 
 model Branch {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique          // เช่น BR001, BR002
-  name      String                    // ชื่อสาขา
-  address   String?
-  phone     String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  code         String   @unique          // เช่น BR001, BR002
+  name         String                    // ชื่อสาขา
+  address      String?
+  phone        String?
+  isActive     Boolean  @default(true)
+  isMainBranch Boolean  @default(false)  // ระบุว่าสาขานี้เป็นสาขาหลักหรือไม่
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // ความสัมพันธ์
   users     User[]

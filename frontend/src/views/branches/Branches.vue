@@ -133,6 +133,7 @@
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ที่อยู่</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">โทร</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ประเภท</th>
               <th
                 @click="toggleSort('createdAt')"
                 class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
@@ -167,6 +168,9 @@
               <td class="px-4 py-3">
                 <div class="h-5 w-20 bg-gray-100 animate-pulse rounded-full"></div>
               </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-20 bg-gray-100 animate-pulse rounded"></div>
+              </td>
               <td class="px-4 py-3 text-right">
                 <div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div>
               </td>
@@ -188,6 +192,16 @@
                   class="px-2 py-1 rounded-full text-xs font-medium"
                 >
                   {{ b.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
+                </span>
+              </td>
+              <td class="px-4 py-2 text-sm">
+                <span
+                  :class="
+                    b.isMainBranch ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'
+                  "
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                >
+                  {{ b.isMainBranch ? 'สาขาหลัก' : 'สาขาย่อย' }}
                 </span>
               </td>
               <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
@@ -223,7 +237,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && branches.length === 0">
-              <td colspan="7" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="8" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
@@ -421,7 +435,7 @@ export default {
       // ดึงรหัสล่าสุดจาก service แล้วส่งเข้า modal เป็นค่าเริ่มต้น
       try {
         const code = await branchService.getLatestCode()
-        this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true }
+        this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true, isMainBranch: false }
       } catch (e) {
         this.editingBranch = {
           id: null,
@@ -429,7 +443,8 @@ export default {
           name: '',
           address: '',
           phone: '',
-          isActive: true
+          isActive: true,
+          isMainBranch: false
         }
       }
       this.modalOpen = true

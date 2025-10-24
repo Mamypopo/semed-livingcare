@@ -85,23 +85,44 @@
                       class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                   </div>
-                  <div class="flex items-center">
-                    <button
-                      type="button"
-                      @click="form.isActive = !form.isActive"
-                      :aria-pressed="form.isActive"
-                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
-                      :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
-                    >
-                      <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
-                      <span
-                        :class="form.isActive ? 'translate-x-5' : 'translate-x-0'"
-                        class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
-                      ></span>
-                    </button>
-                    <span class="ml-3 text-sm text-gray-700">
-                      {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
-                    </span>
+                  <div class="space-y-4">
+                    <div class="flex items-center">
+                      <button
+                        type="button"
+                        @click="form.isActive = !form.isActive"
+                        :aria-pressed="form.isActive"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
+                        :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
+                      >
+                        <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
+                        <span
+                          :class="form.isActive ? 'translate-x-5' : 'translate-x-0'"
+                          class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
+                        ></span>
+                      </button>
+                      <span class="ml-3 text-sm text-gray-700">
+                        {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
+                      </span>
+                    </div>
+                    
+                    <div class="flex items-center">
+                      <button
+                        type="button"
+                        @click="form.isMainBranch = !form.isMainBranch"
+                        :aria-pressed="form.isMainBranch"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        :class="form.isMainBranch ? 'bg-emerald-500' : 'bg-gray-300'"
+                      >
+                        <span class="sr-only">สลับสาขาหลัก</span>
+                        <span
+                          :class="form.isMainBranch ? 'translate-x-5' : 'translate-x-0'"
+                          class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
+                        ></span>
+                      </button>
+                      <span class="ml-3 text-sm text-gray-700">
+                        {{ form.isMainBranch ? 'สาขาหลัก' : 'สาขาย่อย' }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -158,7 +179,7 @@ export default {
   emits: ['update:modelValue', 'save'],
   data() {
     return {
-      form: { id: null, code: '', name: '', address: '', phone: '', isActive: true },
+      form: { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false },
       errors: {},
       originalSnapshot: null,
       showConfirmClose: false,
@@ -181,9 +202,10 @@ export default {
             address: v.address || '',
             phone: v.phone || '',
             isActive: v.isActive ?? true,
+            isMainBranch: v.isMainBranch ?? false,
           }
         } else {
-          this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
+          this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
@@ -206,9 +228,10 @@ export default {
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
           isActive: this.initialData.isActive ?? true,
+          isMainBranch: this.initialData.isMainBranch ?? false,
         }
       } else {
-        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
+        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
       }
       this.originalSnapshot = JSON.stringify(this.form)
       this.$emit('update:modelValue', false)
@@ -226,9 +249,10 @@ export default {
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
           isActive: this.initialData.isActive ?? true,
+          isMainBranch: this.initialData.isMainBranch ?? false,
         }
       } else {
-        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true }
+        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
       }
       this.originalSnapshot = JSON.stringify(this.form)
       this.showConfirmClose = false

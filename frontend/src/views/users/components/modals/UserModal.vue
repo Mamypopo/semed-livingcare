@@ -494,7 +494,8 @@ export default {
       roleOptions: [
         { label: 'ผู้เยี่ยมชม', value: 'GUEST' },
         { label: 'พนักงาน', value: 'STAFF' },
-        { label: 'ผู้ดูแลระบบ', value: 'ADMIN' }
+        { label: 'ผู้ดูแลระบบ', value: 'ADMIN' },
+        { label: 'แพทย์', value: 'DOCTOR' }
       ]
     }
   },

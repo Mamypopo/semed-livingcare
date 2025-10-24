@@ -492,7 +492,7 @@ export default {
           icon: 'success',
           title: 'เข้าสู่ระบบสำเร็จ!',
           text: 'ยินดีต้อนรับสู่ระบบ SEMed Livingcare',
-          timer: 2000,
+          timer: 1000,
           showConfirmButton: false,
           toast: true,
           position: 'top-end'

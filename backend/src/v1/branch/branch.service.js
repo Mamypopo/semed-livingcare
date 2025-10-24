@@ -171,7 +171,7 @@ export const getBranchById = async (id) => {
  * @returns {Object} Created branch
  */
 export const createBranch = async (branchData) => {
-  const { code, name, address, phone } = branchData;
+  const { code, name, address, phone, isMainBranch } = branchData;
 
   // Check if code already exists
   const existingBranch = await prisma.branch.findUnique({
@@ -182,12 +182,24 @@ export const createBranch = async (branchData) => {
     throw new Error("รหัสสาขานี้ถูกใช้งานแล้ว");
   }
 
+  // Check if trying to set as main branch when another main branch exists
+  if (isMainBranch) {
+    const existingMainBranch = await prisma.branch.findFirst({
+      where: { isMainBranch: true }
+    });
+
+    if (existingMainBranch) {
+      throw new Error("มีสาขาหลักอยู่แล้ว กรุณาเปลี่ยนสาขาหลักเดิมเป็นสาขาย่อยก่อน");
+    }
+  }
+
   const newBranch = await prisma.branch.create({
     data: {
       code,
       name,
       address: address || null,
       phone: phone || null,
+      isMainBranch: isMainBranch || false,
     },
     include: {
       _count: {
@@ -209,7 +221,7 @@ export const createBranch = async (branchData) => {
  * @returns {Object} Updated branch
  */
 export const updateBranch = async (id, updateData) => {
-  const { code, name, address, phone, isActive } = updateData;
+  const { code, name, address, phone, isActive, isMainBranch } = updateData;
 
   // Check if branch exists
   const existingBranch = await prisma.branch.findUnique({
@@ -231,6 +243,25 @@ export const updateBranch = async (id, updateData) => {
     }
   }
 
+  // Check if trying to set as main branch when another main branch exists
+  if (isMainBranch && existingBranch.id !== parseInt(id)) {
+    const existingMainBranch = await prisma.branch.findFirst({
+      where: { 
+        isMainBranch: true,
+        id: { not: parseInt(id) }
+      }
+    });
+
+    if (existingMainBranch) {
+      throw new Error("มีสาขาหลักอยู่แล้ว กรุณาเปลี่ยนสาขาหลักเดิมเป็นสาขาย่อยก่อน");
+    }
+  }
+
+  // Check if trying to deactivate main branch
+  if (isActive === false && existingBranch.isMainBranch) {
+    throw new Error("ไม่สามารถปิดใช้งานสาขาหลักได้ กรุณาเปลี่ยนสาขาหลักก่อน");
+  }
+
   const updatedBranch = await prisma.branch.update({
     where: { id: parseInt(id) },
     data: {
@@ -239,6 +270,7 @@ export const updateBranch = async (id, updateData) => {
       ...(address !== undefined && { address }),
       ...(phone !== undefined && { phone }),
       ...(isActive !== undefined && { isActive }),
+      ...(isMainBranch !== undefined && { isMainBranch }),
     },
     include: {
       _count: {
@@ -312,6 +344,12 @@ export const updateBranchActive = async (id, isActive) => {
   if (!existingBranch) {
     throw new Error("ไม่พบสาขาที่ระบุ");
   }
+
+  // Check if trying to deactivate main branch
+  if (!isActive && existingBranch.isMainBranch) {
+    throw new Error("ไม่สามารถปิดใช้งานสาขาหลักได้ กรุณาเปลี่ยนสาขาหลักก่อน");
+  }
+
   const updated = await prisma.branch.update({
     where: { id: parseInt(id) },
     data: { isActive },

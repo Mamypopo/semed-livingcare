@@ -672,15 +672,17 @@ export default {
       const labels = {
         ADMIN: 'ผู้ดูแลระบบ',
         STAFF: 'พนักงาน',
-        GUEST: 'ผู้เยี่ยมชม'
+        GUEST: 'ผู้เยี่ยมชม',
+        DOCTOR: 'แพทย์'
       }
       return labels[role] || role
     },
     getRoleBadgeClass(role) {
       const classes = {
-        ADMIN: 'bg-red-50 text-red-700',
+        ADMIN: 'bg-purple-50 text-purple-700',
         STAFF: 'bg-blue-50 text-blue-700',
-        GUEST: 'bg-gray-50 text-gray-700'
+        GUEST: 'bg-gray-50 text-gray-700',
+        DOCTOR: 'bg-emerald-50 text-emerald-700'
       }
       return classes[role] || 'bg-gray-50 text-gray-700'
     },
