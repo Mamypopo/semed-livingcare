@@ -105,6 +105,9 @@ model Patient {
   province           String?
   postal_code        String?
 
+  // รูปโปรไฟล์ (เก็บ URL ใน blob storage)
+  profile_image      String?                    // URL ของรูปโปรไฟล์ใน blob storage
+
   //  ข้อมูลบริษัท / ออกใบเสร็จ
   company_name       String?
   company_tax_id     String?

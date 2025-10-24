@@ -5,12 +5,33 @@ import compression from "compression";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import path from "path";
+import multer from "multer";
 import { ENV } from "./config/env.js";
 import routes from "./routes/index.js";
 
 dotenv.config();
 
 const app = express();
+
+// Multer configuration for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Only allow image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
+// Make upload middleware available globally
+app.locals.upload = upload;
 
 // CORS configuration
 app.use(cors({

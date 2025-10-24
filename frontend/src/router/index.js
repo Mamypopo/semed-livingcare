@@ -82,6 +82,13 @@ const router = createRouter({
           name: 'InsuranceTypes',
           component: () => import('@/views/customers/InsuranceTypes.vue'),
           meta: { requiresBranch: true, title: 'ประเภทประกัน' }
+        },
+        // Queue Management
+        {
+          path: 'queue/opd',
+          name: 'OPDQueue',
+          component: () => import('@/views/queue/OPDQueue.vue'),
+          meta: { requiresBranch: true, title: 'คิวตรวจ OPD' }
         }
       ]
     },

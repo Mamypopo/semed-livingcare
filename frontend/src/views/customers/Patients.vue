@@ -115,7 +115,7 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -147,7 +147,6 @@
                 </span>
               </th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">เพศ</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">เบอร์โทร</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สาขา</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">กลุ่มลูกค้า</th>
               <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
@@ -180,9 +179,7 @@
                 <td class="px-4 py-3">
                   <div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div>
                 </td>
-                <td class="px-4 py-3">
-                  <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
-                </td>
+              
                 <td class="px-4 py-3">
                   <div class="h-4 w-20 bg-gray-100 animate-pulse rounded"></div>
                 </td>
@@ -257,28 +254,63 @@
                   {{ formatDate(patient.createdAt) }}
                 </td>
                 <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
-                  <button
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-sky-200 text-sky-700 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    @click="openEdit(patient)"
-                    v-tooltip:top="'แก้ไข'"
-                  >
-                    <Pencil class="w-3.5 h-3.5" />
-                    แก้ไข
-                  </button>
-                  <button
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md ml-2 transition-colors"
-                    :class="
-                      patient.isActive
-                        ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
-                        : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'
-                    "
-                    @click="toggleActive(patient)"
-                    v-tooltip:top="patient.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
-                  >
-                    <ToggleRight v-if="patient.isActive" class="w-3.5 h-3.5" />
-                    <ToggleLeft v-else class="w-3.5 h-3.5" />
-                    {{ patient.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
-                  </button>
+                  <!-- Action Buttons Container -->
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- Edit Button -->
+                    <button
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-sky-200 text-sky-700 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      @click="openEdit(patient)"
+                      v-tooltip:top="'แก้ไข'"
+                    >
+                      <Pencil class="w-3.5 h-3.5" />
+                      แก้ไข
+                    </button>
+
+                    <!-- Action Dropdown -->
+                    <div class="relative inline-block text-left">
+                      <div>
+                        <button
+                          @click="toggleActionMenu(patient.id)"
+                          :data-patient-id="patient.id"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          v-tooltip:top="'จัดการ'"
+                        >
+                          จัดการ
+                          <ChevronDown class="w-3 h-3 ml-1" />
+                        </button>
+                      </div>
+
+                    <!-- Dropdown Menu using Teleport -->
+                    <Teleport to="body">
+                      <div
+                        v-if="activeActionMenu === patient.id"
+                        class="fixed z-50 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        :style="getDropdownPosition(patient.id)"
+                        @click-outside="closeActionMenu"
+                      >
+                        <div class="py-1">
+                          <button
+                            @click="openDetail(patient); closeActionMenu()"
+                            class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                          >
+                            <Eye class="w-4 h-4" />
+                            ดูข้อมูล
+                          </button>
+                          <div class="border-t border-gray-100"></div>
+                          <button
+                            @click="toggleActive(patient); closeActionMenu()"
+                            class="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-orange-50 hover:text-orange-700"
+                            :class="patient.isActive ? 'text-orange-600' : 'text-green-600'"
+                          >
+                            <ToggleRight v-if="patient.isActive" class="w-4 h-4" />
+                            <ToggleLeft v-else class="w-4 h-4" />
+                            {{ patient.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
+                          </button>
+                        </div>
+                      </div>
+                    </Teleport>
+                  </div>
+                </div>
                 </td>
               </tr>
             </template>
@@ -341,12 +373,23 @@
       :isEditMode="!!editingPatient"
       @save="handleSave"
     />
+
+    <!-- Patient Detail Modal -->
+    <PatientDetailModal
+      v-model="detailModalOpen"
+      :patientData="selectedPatient"
+      @queue-opd="handleQueueOPD"
+      @queue-ipd="handleQueueIPD"
+      @queue-service="handleQueueService"
+      @add-receipt="handleAddReceipt"
+    />
   </div>
 </template>
 
 <script>
 import patientService from '@/services/patient.js'
 import PatientModal from './components/modals/PatientModal.vue'
+import PatientDetailModal from './components/modals/PatientDetailModal.vue'
 import {
   Plus,
   ChevronDown,
@@ -356,13 +399,14 @@ import {
   Pencil,
   ToggleLeft,
   ToggleRight,
-  SearchIcon
+  SearchIcon,
+  Eye
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import Swal from 'sweetalert2'
 
 export default {
-  name: 'Patients',
+  name: 'PatientsPage',
   components: {
     Plus,
     ChevronDown,
@@ -377,7 +421,9 @@ export default {
     ListboxOptions,
     ListboxOption,
     PatientModal,
-    SearchIcon
+    PatientDetailModal,
+    SearchIcon,
+    Eye
   },
   data() {
     return {
@@ -405,7 +451,10 @@ export default {
       order: 'desc',
       modalOpen: false,
       modalLoading: false,
-      editingPatient: null
+      editingPatient: null,
+      detailModalOpen: false,
+      selectedPatient: null,
+      activeActionMenu: null
     }
   },
   computed: {
@@ -486,6 +535,43 @@ export default {
     openEdit(patient) {
       this.editingPatient = { ...patient }
       this.modalOpen = true
+    },
+    openDetail(patient) {
+      this.selectedPatient = { ...patient }
+      this.detailModalOpen = true
+    },
+    handleQueueOPD(patient) {
+      console.log('จัดคิว OPD สำหรับ:', patient)
+      // TODO: Implement queue OPD functionality
+    },
+    handleQueueIPD(patient) {
+      console.log('จัดคิว IPD สำหรับ:', patient)
+      // TODO: Implement queue IPD functionality
+    },
+    handleQueueService(patient) {
+      console.log('จัดคิว บริการ สำหรับ:', patient)
+      // TODO: Implement queue service functionality
+    },
+    handleAddReceipt(patient) {
+      console.log('เพิ่มใบเสร็จ สำหรับ:', patient)
+      // TODO: Implement add receipt functionality
+    },
+    toggleActionMenu(patientId) {
+      this.activeActionMenu = this.activeActionMenu === patientId ? null : patientId
+    },
+    closeActionMenu() {
+      this.activeActionMenu = null
+    },
+    getDropdownPosition(patientId) {
+      // Find the button element for this patient
+      const button = document.querySelector(`[data-patient-id="${patientId}"]`)
+      if (!button) return {}
+      
+      const rect = button.getBoundingClientRect()
+      return {
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.right - 192}px` // 192px = w-48 (12rem)
+      }
     },
     async handleSave(data) {
       // Confirm before action

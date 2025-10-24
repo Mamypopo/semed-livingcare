@@ -241,6 +241,11 @@ export default {
           ]
         },
         {
+          name: 'คิวการตรวจ',
+          icon: 'BarChart3',
+          submenu: [{ name: 'คิวตรวจ OPD', href: '/main/queue/opd' }]
+        },
+        {
           name: 'สาขา',
           icon: 'Building',
           submenu: [{ name: 'รายชื่อสาขา', href: '/main/branches' }]
