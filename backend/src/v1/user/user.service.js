@@ -1,6 +1,39 @@
 import { prisma } from "../config/db.js";
 
 /**
+ * Get all doctors for dropdown
+ * @returns {Array} List of doctors
+ */
+export const getAllDoctorsForDropdown = async () => {
+  try {
+    const doctors = await prisma.user.findMany({
+      where: {
+        role: 'DOCTOR',
+        isActive: true
+      },
+      select: {
+        id: true,
+        name: true
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
+    return {
+      success: true,
+      data: doctors
+    };
+  } catch (error) {
+    console.error('Error getting doctors for dropdown:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+/**
  * Get all users
  * @param {Object} filters - Filter options
  * @returns {Array} List of users

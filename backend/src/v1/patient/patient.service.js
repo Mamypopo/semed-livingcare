@@ -1,6 +1,57 @@
 import { prisma } from '../config/db.js'
 import { generateHN } from '../utils/hnGenerator.js'
 
+// ค้นหาผู้ป่วยสำหรับ dropdown (เฉพาะสาขา)
+export const searchPatientsForDropdown = async (searchQuery, branchId, limit = 10) => {
+  try {
+    const where = {
+      isActive: true,
+      branchId: parseInt(branchId)
+    }
+
+    if (searchQuery && searchQuery.trim()) {
+      where.OR = [
+        { hn: { contains: searchQuery, mode: 'insensitive' } },
+        { first_name: { contains: searchQuery, mode: 'insensitive' } },
+        { last_name: { contains: searchQuery, mode: 'insensitive' } },
+        { national_id: { contains: searchQuery, mode: 'insensitive' } }
+      ]
+    }
+
+    const patients = await prisma.patient.findMany({
+      where,
+      select: {
+        id: true,
+        hn: true,
+        prefix: true,
+        first_name: true,
+        last_name: true,
+        national_id: true,
+        patientGroup: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: {
+        hn: 'asc'
+      },
+      take: limit
+    })
+
+    return {
+      success: true,
+      data: patients
+    }
+  } catch (error) {
+    console.error('Error searching patients for dropdown:', error)
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
 // ดึงข้อมูลผู้ป่วยทั้งหมด (พร้อม pagination และ filter)
 export const getAllPatients = async (params = {}) => {
     const {

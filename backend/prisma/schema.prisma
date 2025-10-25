@@ -16,6 +16,20 @@ enum RoleEnum {
   DOCTOR
 }
 
+enum QueueType {
+  OPD
+  IPD
+}
+
+enum QueueStatus {
+  WAITING
+  EXAMINING
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+
 model Branch {
   id           Int      @id @default(autoincrement())
   code         String   @unique          // เช่น BR001, BR002
@@ -32,6 +46,9 @@ model Branch {
   patients  Patient[]
   files     File[]
   systemLogs SystemLog[]
+  registrations Registration[]
+  queues    Queue[]
+  registrationLogs RegistrationLog[]
 }
 
 model User {
@@ -71,6 +88,10 @@ model User {
   usersUpdated User[] @relation("UserUpdatedBy")
   patientsCreated Patient[] @relation("PatientCreatedBy")
   patientsUpdated Patient[] @relation("PatientUpdatedBy")
+  registrations Registration[]
+  registrationLogs RegistrationLog[]
+  cancelledRegistrations Registration[] @relation("CancelledRegistrations")
+  cancelledQueues Queue[] @relation("CancelledQueues")
 }
 
 model Patient {
@@ -151,6 +172,7 @@ model Patient {
   contactPersons     ContactPerson[]
   files              File[]
   patientTags        PatientTag[]
+  registrations      Registration[]
 
   // Audit fields
   createdBy          Int?
@@ -291,4 +313,99 @@ model SystemLog {
   @@index([action])
   @@index([createdAt])
   @@index([hn])
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String
+  isActive    Boolean  @default(true)
+  createdBy   String
+  updatedBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  registrations Registration[]
+  queues       Queue[]
+  registrationLogs RegistrationLog[]
+}
+
+model Registration {
+  id              String      @id @default(cuid())
+  vnNumber        String      @unique
+  type            QueueType   @default(OPD)
+  reason          String?     // เหตุผลการยกเลิก
+  cancelledAt     DateTime?   // วันที่ยกเลิก
+  cancelledBy     Int?        // ผู้ยกเลิก
+  appointmentDate DateTime
+  appointmentTime DateTime?
+  
+  // Relations
+  patientId       Int
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  
+  doctorId        Int?
+  doctor          User?             @relation(fields: [doctorId], references: [id])
+  
+  departmentId    String?
+  department      Department?       @relation(fields: [departmentId], references: [id])
+  
+  branchId        Int
+  branch          Branch            @relation(fields: [branchId], references: [id])
+  
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  // Relations
+  queue           Queue?
+  registrationLogs RegistrationLog[]
+  cancelledByUser User?             @relation("CancelledRegistrations", fields: [cancelledBy], references: [id])
+}
+
+model Queue {
+  id              String      @id @default(cuid())
+  queueNumber     String      // Q001, Q002, ...
+  status          QueueStatus @default(WAITING)
+  reason          String?     // เหตุผลการยกเลิก
+  cancelledAt     DateTime?   // วันที่ยกเลิก
+  cancelledBy     Int?        // ผู้ยกเลิก
+  
+  // Relations
+  registrationId  String      @unique
+  registration    Registration @relation(fields: [registrationId], references: [id])
+  
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  
+  branchId        Int
+  branch          Branch      @relation(fields: [branchId], references: [id])
+  
+  createdBy       String
+  updatedBy       String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  cancelledByUser User?       @relation("CancelledQueues", fields: [cancelledBy], references: [id])
+}
+
+model RegistrationLog {
+  id              String      @id @default(cuid())
+  registrationId  String
+  action          String      // CREATE, UPDATE, CANCEL, COMPLETE
+  details         String?     // รายละเอียดการกระทำ
+  reason          String?     // เหตุผล
+  userId          Int?        // ใครทำ
+  user            User?       @relation(fields: [userId], references: [id])
+  branchId        Int?        // สาขา
+  branch          Branch?     @relation(fields: [branchId], references: [id])
+  hn              String?     // HN ของผู้ป่วย
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  department      Department? @relation(fields: [departmentId], references: [id])
+  departmentId    String?
+  registration    Registration? @relation(fields: [registrationId], references: [id])
 }

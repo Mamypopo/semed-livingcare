@@ -10,6 +10,9 @@ router.use(authenticateToken);
 // Get all users
 router.get("/", userController.getAllUsers);
 
+// Get all doctors for dropdown
+router.get("/doctors/dropdown", userController.getAllDoctorsForDropdown);
+
 // Get user statistics
 router.get("/stats", userController.getUserStats);
 

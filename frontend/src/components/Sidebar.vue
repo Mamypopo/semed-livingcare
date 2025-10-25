@@ -253,7 +253,10 @@ export default {
         {
           name: 'จัดการ',
           icon: 'Settings',
-          submenu: [{ name: 'ผู้ใช้งาน', href: '/main/users' }]
+          submenu: [
+            { name: 'ผู้ใช้งาน', href: '/main/users' },
+            { name: 'แผนก', href: '/main/departments' }
+          ]
         }
       ]
     }

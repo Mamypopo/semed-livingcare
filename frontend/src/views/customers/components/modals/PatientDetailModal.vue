@@ -364,7 +364,7 @@
 
 <script>
 import { Dialog as HeadlessDialog, DialogPanel, TransitionRoot, TransitionChild, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { X, User, Star, Wallet, UserRound, ChevronDown, SearchIcon } from 'lucide-vue-next'
+import { X, User, Star, Wallet, UserRound, ChevronDown, SearchIcon, Users } from 'lucide-vue-next'
 
 export default {
   name: 'PatientDetailModal',
@@ -383,7 +383,8 @@ export default {
     Wallet,
     UserRound,
     ChevronDown,
-    SearchIcon
+    SearchIcon,
+    Users
   },
   props: {
     modelValue: { type: Boolean, required: true },

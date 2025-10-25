@@ -41,5 +41,12 @@ export const userService = {
   async getStats() {
     const response = await apiClient.get('/users/stats')
     return response.data.data
+  },
+
+  // Get all doctors for dropdown
+  async getAllDoctorsForDropdown() {
+    const response = await apiClient.get('/users/doctors/dropdown')
+    return response.data.data
   }
 }
+

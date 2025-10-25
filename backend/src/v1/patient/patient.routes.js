@@ -13,6 +13,9 @@ router.get('/', patientController.getAllPatientsController)
 // GET /api/v1/patients/stats - ดึงสถิติผู้ป่วย
 router.get('/stats', patientController.getPatientStatsController)
 
+// GET /api/v1/patients/search/dropdown - ค้นหาผู้ป่วยสำหรับ dropdown
+router.get('/search/dropdown', patientController.searchPatientsForDropdownController)
+
 // GET /api/v1/patients/:id - ดึงข้อมูลผู้ป่วยตาม ID
 router.get('/:id', patientController.getPatientByIdController)
 

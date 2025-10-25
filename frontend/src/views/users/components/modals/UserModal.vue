@@ -51,7 +51,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Name -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">ชื่อ *</label>
+                    <label class="block text-sm font-medium text-gray-700">ชื่อ <span class="text-red-500">*</span></label>
                     <input
                       v-model.trim="form.name"
                       type="text"
@@ -62,7 +62,7 @@
 
                   <!-- Email -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">อีเมล *</label>
+                    <label class="block text-sm font-medium text-gray-700">อีเมล <span class="text-red-500">*</span></label>
                     <input
                       v-model.trim="form.email"
                       type="email"
@@ -73,7 +73,7 @@
 
                   <!-- Password (only for new users) -->
                   <div v-if="!isEdit">
-                    <label class="block text-sm font-medium text-gray-700">รหัสผ่าน *</label>
+                    <label class="block text-sm font-medium text-gray-700">รหัสผ่าน <span class="text-red-500">*</span></label>
                     <input
                       v-model.trim="form.password"
                       type="password"
@@ -98,7 +98,7 @@
 
                   <!-- Role -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">บทบาท *</label>
+                    <label class="block text-sm font-medium text-gray-700">บทบาท <span class="text-red-500">*</span></label>
                     <Listbox v-model="form.role" as="div" class="relative">
                       <div>
                         <ListboxButton

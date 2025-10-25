@@ -3,6 +3,36 @@ import { createSystemLog } from "../utils/logger.js";
 import bcrypt from "bcryptjs";
 
 /**
+ * Get all doctors for dropdown
+ * GET /api/v1/users/doctors/dropdown
+ */
+export const getAllDoctorsForDropdown = async (req, res) => {
+  try {
+    const result = await userService.getAllDoctorsForDropdown();
+    
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: result.error || 'เกิดข้อผิดพลาดในการดึงข้อมูลแพทย์'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result.data
+    });
+
+  } catch (error) {
+    console.error("Get doctors for dropdown error:", error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูลแพทย์'
+    });
+  }
+};
+
+/**
  * Get all users
  * GET /api/v1/users
  */
@@ -123,7 +153,7 @@ export const createUser = async (req, res) => {
     }
 
     // Role validation
-    const validRoles = ['ADMIN', 'STAFF', 'GUEST'];
+    const validRoles = ['ADMIN', 'STAFF', 'GUEST', 'DOCTOR'];
     if (role && !validRoles.includes(role)) {
       return res.status(400).json({
         success: false,
@@ -200,7 +230,7 @@ export const updateUser = async (req, res) => {
 
     // Role validation (if provided)
     if (role) {
-      const validRoles = ['ADMIN', 'STAFF', 'GUEST'];
+      const validRoles = ['ADMIN', 'STAFF', 'GUEST', 'DOCTOR'];
       if (!validRoles.includes(role)) {
         return res.status(400).json({
           success: false,

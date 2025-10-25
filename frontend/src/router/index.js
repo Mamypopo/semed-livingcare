@@ -83,6 +83,12 @@ const router = createRouter({
           component: () => import('@/views/customers/InsuranceTypes.vue'),
           meta: { requiresBranch: true, title: 'ประเภทประกัน' }
         },
+        {
+          path: 'departments',
+          name: 'Departments',
+          component: () => import('@/views/departments/Departments.vue'),
+          meta: { requiresBranch: true, title: 'แผนก' }
+        },
         // Queue Management
         {
           path: 'queue/opd',

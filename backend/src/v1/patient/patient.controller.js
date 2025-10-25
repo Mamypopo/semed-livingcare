@@ -1,5 +1,7 @@
 import * as patientService from './patient.service.js'
 import { createSystemLog } from '../utils/logger.js'
+
+
 // ดึงข้อมูลผู้ป่วยทั้งหมด
 export const getAllPatientsController = async (req, res) => {
     try {
@@ -170,4 +172,38 @@ export const getPatientStatsController = async (req, res) => {
         message: error.message || 'เกิดข้อผิดพลาดในการดึงสถิติผู้ป่วย'
       })
     }
+}
+
+// ค้นหาผู้ป่วยสำหรับ dropdown
+export const searchPatientsForDropdownController = async (req, res) => {
+  try {
+    const { search, branchId, limit = 10 } = req.query
+    
+    if (!branchId) {
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณาระบุ branchId'
+      })
+    }
+
+    const result = await patientService.searchPatientsForDropdown(search, branchId, parseInt(limit))
+    
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: result.error || 'เกิดข้อผิดพลาดในการค้นหาผู้ป่วย'
+      })
+    }
+
+    res.json({
+      success: true,
+      data: result.data
+    })
+  } catch (error) {
+    console.error('Search patients for dropdown error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการค้นหาผู้ป่วย'
+    })
+  }
 }

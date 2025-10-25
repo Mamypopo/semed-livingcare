@@ -475,16 +475,24 @@ export default {
   },
   methods: {
     async reload() {
+      console.log('🔄 Reloading patients with params:', {
+        page: this.meta.page,
+        limit: this.pageSize,
+        search: this.query || '',
+        status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive'
+      })
+      
       this.loading = true
       try {
         const { data, pagination } = await patientService.getAllPatients({
           page: this.meta.page,
           limit: this.pageSize,
-          search: this.query || undefined,
-          status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive',
-          sort: this.sort,
-          order: this.order
+          search: this.query || '',
+          status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive'
         })
+        
+        console.log('✅ Patients loaded:', data)
+        console.log('📊 Pagination:', pagination)
         this.patients = data
         this.meta = {
           page: pagination.page,
@@ -517,11 +525,13 @@ export default {
       return d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: '2-digit' })
     },
     onFilterInput() {
+      console.log('🔍 Filter input changed:', this.query)
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
+        console.log('⏰ Search timer triggered, reloading...')
         this.meta.page = 1
         this.reload()
-      }, 300)
+      }, 500)
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
