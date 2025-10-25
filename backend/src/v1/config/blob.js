@@ -2,7 +2,7 @@ import { BlobServiceClient, BlobSASPermissions, generateBlobSASQueryParameters }
 
 // Azure Blob Storage configuration
 const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || ''
-const AZURE_CONTAINER_NAME = process.env.AZURE_CONTAINER_NAME || 'semed-files'
+const AZURE_CONTAINER_NAME = process.env.AZURE_CONTAINER_NAME || 'semed-clinic'
 
 let blobServiceClient = null
 

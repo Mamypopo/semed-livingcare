@@ -336,6 +336,7 @@ export default {
     return {
       loading: false,
       query: '',
+      searchQuery: '', // สำหรับ debounce
       // ใช้ผ่าน Listbox
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
@@ -378,21 +379,25 @@ export default {
     },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
+    },
+    branchParams() {
+      return {
+        page: this.meta.page,
+        pageSize: this.pageSize,
+        search: this.searchQuery || undefined,
+        isActive: this.isActive === '' ? undefined : this.isActive,
+        sort: this.sort,
+        order: this.order
+      }
     }
   },
   methods: {
-    // เมื่อเลือกสถานะใหม่ จะรีเฟรชอัตโนมัติผ่าน watch ด้านล่าง
     async reload() {
       this.loading = true
       try {
-        const { data, meta } = await branchService.getAll({
-          page: this.meta.page,
-          pageSize: this.pageSize,
-          search: this.query || undefined,
-          isActive: this.isActive === '' ? undefined : this.isActive,
-          sort: this.sort,
-          order: this.order
-        })
+        const params = this.branchParams
+        
+        const { data, meta } = await branchService.getAll(params)
         this.branches = data
         this.meta = meta
       } finally {
@@ -407,7 +412,6 @@ export default {
         this.order = 'asc'
       }
       this.meta.page = 1
-      this.reload()
     },
     formatDate(iso) {
       if (!iso) return '-'
@@ -417,22 +421,19 @@ export default {
     onFilterInput() {
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
+        this.searchQuery = this.query
         this.meta.page = 1
-        this.reload()
-      }, 300)
+      }, 500)
     },
     changePageSize() {
       this.meta.page = 1
-      this.reload()
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
       this.meta.page = p
-      this.reload()
     },
     async openCreate() {
       this.editingBranch = null
-      // ดึงรหัสล่าสุดจาก service แล้วส่งเข้า modal เป็นค่าเริ่มต้น
       try {
         const code = await branchService.getLatestCode()
         this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true, isMainBranch: false }
@@ -555,16 +556,18 @@ export default {
     this.reload()
   },
   watch: {
-    statusOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    pageSizeOption: {
+    branchParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.reload()
+        }
+      },
       deep: true,
-      handler(newVal) {
-        this.pageSize = newVal.value
-        this.meta.page = 1
-        this.reload()
+      immediate: false
+    },
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger branchParams watcher automatically
       }
     }
   }

@@ -300,6 +300,7 @@
       :initialData="editingPatientGroup"
       :loading="modalLoading"
       @save="handleSave"
+      @update:modelValue="onModalClose"
     />
   </div>
 </template>
@@ -341,6 +342,7 @@ export default {
     return {
       loading: false,
       query: '',
+      searchQuery: '', // สำหรับ debounce
       // Status options
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
@@ -381,19 +383,26 @@ export default {
     isActive() {
       return this.statusOption.value
     },
+    // Best Practice: Centralized parameters for API calls
+    patientGroupParams() {
+      return {
+        page: this.meta.page,
+        pageSize: this.pageSize,
+        search: this.searchQuery || undefined,
+        isActive: this.isActive === '' ? undefined : this.isActive,
+        sort: this.sort,
+        order: this.order
+      }
+    }
   },
   methods: {
     async reload() {
       this.loading = true
       try {
-        const { data, meta } = await patientGroupService.getAll({
-          page: this.meta.page,
-          pageSize: this.pageSize,
-          search: this.query || undefined,
-          isActive: this.isActive === '' ? undefined : this.isActive,
-          sort: this.sort,
-          order: this.order,
-        })
+        // Best Practice: Use computed property
+        const params = this.patientGroupParams
+        
+        const { data, meta } = await patientGroupService.getAll(params)
         this.patientGroups = data
         this.meta = meta
       } finally {
@@ -408,7 +417,6 @@ export default {
         this.order = 'asc'
       }
       this.meta.page = 1
-      this.reload()
     },
     formatDate(iso) {
       if (!iso) return '-'
@@ -418,14 +426,13 @@ export default {
     onFilterInput() {
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
+        this.searchQuery = this.query
         this.meta.page = 1
-        this.reload()
-      }, 300)
+      }, 500)
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
       this.meta.page = p
-      this.reload()
     },
     async openCreate() {
       this.editingPatientGroup = null
@@ -434,6 +441,13 @@ export default {
     openEdit(group) {
       this.editingPatientGroup = { ...group }
       this.modalOpen = true
+    },
+    onModalClose(isOpen) {
+      if (!isOpen) {
+        // Modal ปิด - reset editingPatientGroup
+        this.editingPatientGroup = null
+        this.modalLoading = false
+      }
     },
     async handleSave(data) {
       // Confirm before action
@@ -465,7 +479,6 @@ export default {
             toast: true,
             position: 'top-end',
           })
-          // Reload data to get latest information
           await this.reload()
         } else {
           const res = await patientGroupService.create(data)
@@ -479,7 +492,6 @@ export default {
             toast: true,
             position: 'top-end',
           })
-          // Reload data to get latest information
           await this.reload()
         }
       } catch (e) {
@@ -514,7 +526,6 @@ export default {
           toast: true,
           position: 'top-end',
         })
-        // Reload data to get latest information
         await this.reload()
       } catch (e) {
         Swal.fire({
@@ -535,18 +546,20 @@ export default {
     }
   },
   watch: {
-    statusOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    pageSizeOption: {
-      deep: true,
-      handler(newVal) {
-        this.pageSize = newVal.value
-        this.meta.page = 1
-        this.reload()
+    patientGroupParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.reload()
+        }
       },
+      deep: true,
+      immediate: false
     },
-  },
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger patientGroupParams watcher automatically
+      }
+    }
+  }
 }
 </script>

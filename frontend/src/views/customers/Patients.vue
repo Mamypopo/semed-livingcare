@@ -404,6 +404,7 @@ import {
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'PatientsPage',
@@ -427,8 +428,10 @@ export default {
   },
   data() {
     return {
+      authStore: useAuthStore(),
       loading: false,
       query: '',
+      searchQuery: '', // สำหรับ debounce
       // Status options
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
@@ -471,28 +474,30 @@ export default {
     },
     isActive() {
       return this.statusOption.value
+    },
+    // Best Practice: Centralized parameters for API calls
+    patientParams() {
+      const currentBranchId = this.authStore.currentBranch?.id || this.authStore.user?.branchId
+      return {
+        page: this.meta.page,
+        limit: this.pageSize,
+        search: this.searchQuery || '', // ใช้ searchQuery แทน query
+        status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive',
+        branchId: currentBranchId,
+        sort: this.sort,
+        order: this.order
+      }
     }
   },
   methods: {
-    async reload() {
-      console.log('🔄 Reloading patients with params:', {
-        page: this.meta.page,
-        limit: this.pageSize,
-        search: this.query || '',
-        status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive'
-      })
-      
+    async reload() {       
       this.loading = true
       try {
-        const { data, pagination } = await patientService.getAllPatients({
-          page: this.meta.page,
-          limit: this.pageSize,
-          search: this.query || '',
-          status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive'
-        })
+        // Best Practice: Use computed property
+        const params = this.patientParams
         
-        console.log('✅ Patients loaded:', data)
-        console.log('📊 Pagination:', pagination)
+        const { data, pagination } = await patientService.getAllPatients(params)
+      
         this.patients = data
         this.meta = {
           page: pagination.page,
@@ -517,7 +522,7 @@ export default {
         this.order = 'asc'
       }
       this.meta.page = 1
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     formatDate(iso) {
       if (!iso) return '-'
@@ -525,18 +530,16 @@ export default {
       return d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: '2-digit' })
     },
     onFilterInput() {
-      console.log('🔍 Filter input changed:', this.query)
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
-        console.log('⏰ Search timer triggered, reloading...')
+        this.searchQuery = this.query 
         this.meta.page = 1
-        this.reload()
       }, 500)
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
       this.meta.page = p
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     async openCreate() {
       this.editingPatient = null
@@ -697,16 +700,19 @@ export default {
     }
   },
   watch: {
-    statusOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    pageSizeOption: {
+    patientParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.reload()
+        }
+      },
       deep: true,
-      handler(newVal) {
-        this.pageSize = newVal.value
-        this.meta.page = 1
-        this.reload()
+      immediate: false // Don't run on initial load
+    },
+    // Watch searchQuery separately for debounce
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger patientParams watcher automatically
       }
     }
   }

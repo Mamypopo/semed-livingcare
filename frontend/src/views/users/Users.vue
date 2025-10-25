@@ -460,6 +460,7 @@ export default {
     return {
       loading: false,
       query: '',
+      searchQuery: '', // สำหรับ debounce
       // Role options
       roleOptions: [
         { label: 'บทบาททั้งหมด', value: '' },
@@ -522,22 +523,27 @@ export default {
     },
     isAdmin() {
       return this.authStore && this.authStore.userRole === 'ADMIN'
+    },
+    userParams() {
+      return {
+        page: this.meta.page,
+        pageSize: this.pageSize,
+        search: this.searchQuery || undefined,
+        role: this.role === '' ? undefined : this.role,
+        isActive: this.isActive === '' ? undefined : this.isActive,
+        branchId: this.branchId === '' ? undefined : this.branchId,
+        sort: this.sort,
+        order: this.order
+      }
     }
   },
   methods: {
     async reload() {
       this.loading = true
       try {
-        const { data, meta } = await userService.getAll({
-          page: this.meta.page,
-          pageSize: this.pageSize,
-          search: this.query || undefined,
-          role: this.role === '' ? undefined : this.role,
-          isActive: this.isActive === '' ? undefined : this.isActive,
-          branchId: this.branchId === '' ? undefined : this.branchId,
-          sort: this.sort,
-          order: this.order
-        })
+        const params = this.userParams
+        
+        const { data, meta } = await userService.getAll(params)
         this.users = data
         this.meta = meta
       } finally {
@@ -552,7 +558,7 @@ export default {
         this.order = 'asc'
       }
       this.meta.page = 1
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     formatDate(iso) {
       if (!iso) return '-'
@@ -562,14 +568,14 @@ export default {
     onFilterInput() {
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
+        this.searchQuery = this.query
         this.meta.page = 1
-        this.reload()
-      }, 300)
+      }, 500)
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
       this.meta.page = p
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     async openCreate() {
       this.editingUser = null
@@ -730,9 +736,7 @@ export default {
       }, 300)
     },
     async onBranchDropdownOpen() {
-      // Load branches only when dropdown is opened
       if (this.branchOptions.length === 1) {
-        // Only "ทุกสาขา" option
         await this.loadBranches()
       }
     }
@@ -750,24 +754,18 @@ export default {
     }
   },
   watch: {
-    roleOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    statusOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    branchOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    pageSizeOption: {
+    userParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.reload()
+        }
+      },
       deep: true,
-      handler(newVal) {
-        this.pageSize = newVal.value
-        this.meta.page = 1
-        this.reload()
+      immediate: false
+    },
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger userParams watcher automatically
       }
     }
   }

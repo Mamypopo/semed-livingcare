@@ -49,6 +49,7 @@ model Branch {
   registrations Registration[]
   queues    Queue[]
   registrationLogs RegistrationLog[]
+  queueLogs QueueLog[]
 }
 
 model User {
@@ -92,6 +93,7 @@ model User {
   registrationLogs RegistrationLog[]
   cancelledRegistrations Registration[] @relation("CancelledRegistrations")
   cancelledQueues Queue[] @relation("CancelledQueues")
+  queueLogs QueueLog[]
 }
 
 model Patient {
@@ -327,7 +329,6 @@ model Department {
   // Relations
   registrations Registration[]
   queues       Queue[]
-  registrationLogs RegistrationLog[]
 }
 
 model Registration {
@@ -338,7 +339,6 @@ model Registration {
   cancelledAt     DateTime?   // วันที่ยกเลิก
   cancelledBy     Int?        // ผู้ยกเลิก
   appointmentDate DateTime
-  appointmentTime DateTime?
   
   // Relations
   patientId       Int
@@ -389,6 +389,7 @@ model Queue {
   
   // Relations
   cancelledByUser User?       @relation("CancelledQueues", fields: [cancelledBy], references: [id])
+  queueLogs       QueueLog[]
 }
 
 model RegistrationLog {
@@ -405,7 +406,23 @@ model RegistrationLog {
   createdAt       DateTime    @default(now())
   
   // Relations
-  department      Department? @relation(fields: [departmentId], references: [id])
-  departmentId    String?
   registration    Registration? @relation(fields: [registrationId], references: [id])
+}
+
+model QueueLog {
+  id              String      @id @default(cuid())
+  queueId         String
+  action          String      // CREATE, UPDATE_STATUS, CANCEL
+  details         String?     // รายละเอียดการกระทำ
+  reason          String?     // เหตุผล
+  userId          Int?        // ใครทำ
+  user            User?       @relation(fields: [userId], references: [id])
+  branchId        Int?        // สาขา
+  branch          Branch?     @relation(fields: [branchId], references: [id])
+  queueNumber     String?     // หมายเลขคิว
+  hn              String?     // HN ของผู้ป่วย
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  queue           Queue       @relation(fields: [queueId], references: [id])
 }

@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot appear :show="isOpen" as="template">
+  <TransitionRoot appear :show="modelValue" as="template">
     <DialogModal as="div" class="relative z-50" @close="requestClose">
       <TransitionChild
         as="template"
@@ -98,7 +98,7 @@
                   ยกเลิก
                 </button>
                 <button
-                  @click="handleSubmit"
+                  @click="onSubmit"
                   :disabled="loading"
                   class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
                 >
@@ -124,7 +124,6 @@ import {
   TransitionRoot
 } from '@headlessui/vue'
 import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
-import departmentService from '@/services/department.js'
 
 export default {
   name: 'DepartmentModal',
@@ -138,43 +137,68 @@ export default {
     ConfirmClosePopover
   },
   props: {
-    isOpen: {
-      type: Boolean,
-      default: false
-    },
-    department: {
-      type: Object,
-      default: null
-    },
-    mode: {
-      type: String,
-      default: 'create' // 'create' or 'edit'
-    }
+    modelValue: { type: Boolean, required: true },
+    initialData: { type: Object, default: null },
+    loading: { type: Boolean, default: false },
   },
-  emits: ['close', 'saved'],
+  emits: ['update:modelValue', 'save'],
   data() {
     return {
-      loading: false,
-      showConfirmClose: false,
-      errors: {},
       form: {
+        id: null,
         name: '',
-        isActive: true
-      }
+        isActive: true,
+      },
+      errors: {},
+      originalSnapshot: null,
+      showConfirmClose: false,
     }
   },
   computed: {
     isEdit() {
-      return this.mode === 'edit'
-    }
+      return !!(this.form && this.form.id)
+    },
+    defaultForm() {
+      return {
+        id: null,
+        name: '',
+        isActive: true,
+      }
+    },
+  },
+  watch: {
+    modelValue: {
+      handler(newValue) {
+        if (newValue) {
+          // Modal เปิด - reset form
+          this.resetForm()
+        } else {
+          // Modal ปิด - cleanup
+          this.errors = {}
+          this.showConfirmClose = false
+        }
+      },
+    },
+    initialData: {
+      immediate: true,
+      handler(v) {
+        this.resetForm()
+      },
+    },
   },
   methods: {
     resetForm() {
-      this.form = {
-        name: '',
-        isActive: true
+      if (this.initialData) {
+        this.form = {
+          id: this.initialData.id || null,
+          name: this.initialData.name || '',
+          isActive: this.initialData.isActive ?? true,
+        }
+      } else {
+        this.form = { ...this.defaultForm }
       }
       this.errors = {}
+      this.originalSnapshot = JSON.stringify(this.form)
     },
     validateForm() {
       this.errors = {}
@@ -191,78 +215,30 @@ export default {
       
       return true
     },
-    async handleSubmit() {
+    async onSubmit() {
       if (!this.validateForm()) return
-      
-      try {
-        this.loading = true
-        
-        if (this.isEdit) {
-          await departmentService.update(this.department.id, {
-            name: this.form.name.trim(),
-            isActive: this.form.isActive
-          })
-        } else {
-          await departmentService.create({
-            name: this.form.name.trim()
-          })
+
+      // Prepare data for saving
+      const dataToSave = { ...this.form }
+
+      this.$emit('save', dataToSave)
+    },
+    onClose() {
+      if (!this.loading) {
+        const isDirty = JSON.stringify(this.form) !== this.originalSnapshot
+        if (isDirty) {
+          this.showConfirmClose = true
+          return
         }
-        
-        this.$emit('saved')
-      } catch (error) {
-        console.error('Error saving department:', error)
-        
-        if (error.response?.data?.message) {
-          this.errors.name = error.response.data.message
-        } else {
-          this.errors.name = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
-        }
-      } finally {
-        this.loading = false
+        this.$emit('update:modelValue', false)
       }
     },
     requestClose() {
-      if (this.loading) return
-      
-      // Check if form has changes
-      const hasChanges = this.isEdit 
-        ? (this.form.name !== this.department?.name || this.form.isActive !== this.department?.isActive)
-        : this.form.name.trim() !== ''
-      
-      if (hasChanges) {
-        this.showConfirmClose = true
-      } else {
-        this.forceClose()
-      }
+      this.onClose()
     },
     forceClose() {
       this.showConfirmClose = false
-      this.resetForm()
-      this.$emit('close')
-    }
-  },
-  watch: {
-    isOpen(newValue) {
-      if (newValue) {
-        this.resetForm()
-        if (this.isEdit && this.department) {
-          this.form = {
-            name: this.department.name || '',
-            isActive: this.department.isActive ?? true
-          }
-        }
-      }
-    },
-    department: {
-      handler(newValue) {
-        if (newValue && this.isEdit) {
-          this.form = {
-            name: newValue.name || '',
-            isActive: newValue.isActive ?? true
-          }
-        }
-      },
-      deep: true
+      this.$emit('update:modelValue', false)
     }
   }
 }

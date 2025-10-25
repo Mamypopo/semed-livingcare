@@ -8,6 +8,8 @@ import insuranceTypeRoutes from "../insurance-type/insurance-type.routes.js";
 import patientRoutes from "../patient/patient.routes.js";
 import fileRoutes from "../file/file.routes.js";
 import departmentRoutes from "../department/department.routes.js";
+import registrationRoutes from "../registration/registration.routes.js";
+import queueRoutes from "../queue/queue.routes.js";
 
 const router = express.Router();
 
@@ -20,6 +22,8 @@ router.use("/tags", tagRoutes);
 router.use("/insurance-types", insuranceTypeRoutes);
 router.use("/patients", patientRoutes);
 router.use("/departments", departmentRoutes);
+router.use("/registrations", registrationRoutes);
+router.use("/queues", queueRoutes);
 router.use("/", fileRoutes);
 
 export default router;

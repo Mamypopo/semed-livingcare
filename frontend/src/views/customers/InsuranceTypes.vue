@@ -291,6 +291,7 @@
       :initialData="editingInsuranceType"
       :loading="modalLoading"
       @save="handleSave"
+      @update:modelValue="onModalClose"
     />
   </div>
 </template>
@@ -330,6 +331,7 @@ export default {
     return {
       loading: false,
       query: '',
+      searchQuery: '', // สำหรับ debounce
       // Status options
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
@@ -369,20 +371,26 @@ export default {
     },
     isActive() {
       return this.statusOption.value
+    },
+    insuranceTypeParams() {
+      return {
+        page: this.meta.page,
+        pageSize: this.pageSize,
+        search: this.searchQuery || undefined,
+        isActive: this.isActive === '' ? undefined : this.isActive,
+        sort: this.sort,
+        order: this.order
+      }
     }
   },
   methods: {
     async reload() {
       this.loading = true
       try {
-        const { data, meta } = await insuranceTypeService.getAll({
-          page: this.meta.page,
-          pageSize: this.pageSize,
-          search: this.query || undefined,
-          isActive: this.isActive === '' ? undefined : this.isActive,
-          sort: this.sort,
-          order: this.order
-        })
+        // Best Practice: Use computed property
+        const params = this.insuranceTypeParams
+        
+        const { data, meta } = await insuranceTypeService.getAll(params)
         this.insuranceTypes = data
         this.meta = meta
       } finally {
@@ -397,7 +405,7 @@ export default {
         this.order = 'asc'
       }
       this.meta.page = 1
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     formatDate(iso) {
       if (!iso) return '-'
@@ -407,14 +415,14 @@ export default {
     onFilterInput() {
       clearTimeout(this.typingTimer)
       this.typingTimer = setTimeout(() => {
+        this.searchQuery = this.query
         this.meta.page = 1
-        this.reload()
-      }, 300)
+      }, 500)
     },
     go(p) {
       if (p < 1 || p > this.totalPages) return
       this.meta.page = p
-      this.reload()
+      // No need to call reload() - watcher will handle it automatically
     },
     async openCreate() {
       this.editingInsuranceType = null
@@ -423,6 +431,13 @@ export default {
     openEdit(insuranceType) {
       this.editingInsuranceType = { ...insuranceType }
       this.modalOpen = true
+    },
+    onModalClose(isOpen) {
+      if (!isOpen) {
+        // Modal ปิด - reset editingInsuranceType
+        this.editingInsuranceType = null
+        this.modalLoading = false
+      }
     },
     async handleSave(data) {
       // Confirm before action
@@ -518,22 +533,23 @@ export default {
     this.reload()
   },
   beforeUnmount() {
-    // Cleanup timers
     if (this.typingTimer) {
       clearTimeout(this.typingTimer)
     }
   },
   watch: {
-    statusOption() {
-      this.meta.page = 1
-      this.reload()
-    },
-    pageSizeOption: {
+    insuranceTypeParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.reload()
+        }
+      },
       deep: true,
-      handler(newVal) {
-        this.pageSize = newVal.value
-        this.meta.page = 1
-        this.reload()
+      immediate: false
+    },
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger insuranceTypeParams watcher automatically
       }
     }
   }

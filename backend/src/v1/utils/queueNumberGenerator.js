@@ -1,0 +1,48 @@
+import { prisma } from '../config/db.js'
+
+/**
+ * สร้างหมายเลขคิวอัตโนมัติสำหรับแผนกและประเภทคิวที่กำหนด
+ * Format: 1, 2, 3, 4, 5...
+ * รีเซ็ททุกวัน
+ *
+ * @param {number} branchId - ID ของสาขา
+ * @param {number} departmentId - ID ของแผนก
+ * @param {string} queueType - ประเภทคิว (OPD, IPD)
+ * @returns {Promise<string>} หมายเลขคิวที่สร้างขึ้น
+ */
+export const generateQueueNumber = async (branchId, departmentId, queueType) => {
+  try {
+    const today = new Date()
+    const startOfDay = new Date(today.toISOString().slice(0, 10) + 'T00:00:00.000Z')
+    const endOfDay = new Date(today.toISOString().slice(0, 10) + 'T23:59:59.999Z')
+
+    // ค้นหาคิวสุดท้ายของวันนี้สำหรับแผนกและประเภทคิวที่กำหนด
+    const lastQueue = await prisma.queue.findFirst({
+      where: {
+        branchId: parseInt(branchId),
+        departmentId: departmentId,
+        createdAt: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+      orderBy: {
+        queueNumber: 'desc', // เรียงจากมากไปน้อยเพื่อหาหมายเลขสูงสุด
+      },
+    })
+
+    let nextNumber = 1
+    if (lastQueue) {
+      // ถ้ามีคิวอยู่แล้ว ให้เพิ่มหมายเลขจากคิวสุดท้าย
+      nextNumber = parseInt(lastQueue.queueNumber) + 1
+    }
+
+    // สร้างหมายเลขคิวใหม่ (ไม่ต้อง pad ด้วย 0)
+    const queueNumber = nextNumber.toString()
+
+    return queueNumber
+  } catch (error) {
+    console.error('Error generating queue number:', error)
+    throw new Error(`ไม่สามารถสร้างหมายเลขคิวได้: ${error.message}`)
+  }
+}

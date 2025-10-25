@@ -7,7 +7,7 @@
       </div>
       <div class="flex items-center gap-2">
         <div class="relative">
-          <Search
+          <SearchIcon
             class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
           />
           <input
@@ -242,11 +242,11 @@
 
     <!-- Department Modal -->
     <DepartmentModal
-      :isOpen="isModalOpen"
-      :department="selectedDepartment"
-      :mode="modalMode"
-      @close="closeModal"
-      @saved="handleDepartmentSaved"
+      v-model="modalOpen"
+      :initialData="editingDepartment"
+      :loading="modalLoading"
+      @save="handleSave"
+      @update:modelValue="onModalClose"
     />
   </div>
 </template>
@@ -268,9 +268,9 @@ import departmentService from '@/services/department.js'
 import Swal from 'sweetalert2'
 
 export default {
-  name: 'Departments',
+  name: 'DepartmentsPage',
   components: {
-    Search,
+    SearchIcon: Search,
     Pencil,
     Building,
     ToggleRight,
@@ -287,10 +287,11 @@ export default {
   data() {
     return {
       query: '',
+      searchQuery: '', // สำหรับ debounce
       loading: false,
-      isModalOpen: false,
-      selectedDepartment: null,
-      modalMode: 'create', // 'create' or 'edit'
+      modalOpen: false,
+      modalLoading: false,
+      editingDepartment: null,
       departments: [],
       total: 0,
       currentPage: 1,
@@ -329,6 +330,14 @@ export default {
       }
       
       return pages
+    },
+    departmentParams() {
+      return {
+        search: this.searchQuery || undefined,
+        isActive: this.statusOption.value === '' ? undefined : this.statusOption.value,
+        page: this.currentPage,
+        pageSize: this.pageSizeOption.value
+      }
     }
   },
   methods: {
@@ -336,20 +345,16 @@ export default {
       // Debounce search
       clearTimeout(this.searchTimer)
       this.searchTimer = setTimeout(() => {
+        this.searchQuery = this.query
         this.currentPage = 1
-        this.loadDepartments()
-      }, 300)
+      }, 500)
     },
     async loadDepartments() {
       try {
         this.loading = true
-        const filters = {
-          search: this.query || undefined,
-          isActive: this.statusOption.value === '' ? undefined : this.statusOption.value,
-          page: this.currentPage,
-          pageSize: this.pageSizeOption.value
-        }
-        const response = await departmentService.getAll(filters)
+        const params = this.departmentParams
+        
+        const response = await departmentService.getAll(params)
         
         this.departments = response.data
         this.total = response.meta.total
@@ -357,27 +362,86 @@ export default {
         this.pageSize = response.meta.pageSize
       } catch (error) {
         console.error('Error loading departments:', error)
+        this.departments = []
+        this.total = 0
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถโหลดข้อมูลแผนกได้'
+        })
       } finally {
         this.loading = false
       }
     },
     openCreateModal() {
-      this.selectedDepartment = null
-      this.modalMode = 'create'
-      this.isModalOpen = true
+      this.editingDepartment = null
+      this.modalOpen = true
     },
     openEditModal(department) {
-      this.selectedDepartment = department
-      this.modalMode = 'edit'
-      this.isModalOpen = true
+      this.editingDepartment = { ...department }
+      this.modalOpen = true
     },
-    closeModal() {
-      this.isModalOpen = false
-      this.selectedDepartment = null
+    onModalClose(isOpen) {
+      if (!isOpen) {
+        // Modal ปิด - reset editingDepartment
+        this.editingDepartment = null
+        this.modalLoading = false
+      }
     },
-    handleDepartmentSaved() {
-      this.closeModal()
-      this.loadDepartments()
+    async handleSave(data) {
+      // Confirm before action
+      const isEdit = !!data.id
+      const confirm = await Swal.fire({
+        title: isEdit ? 'ยืนยันการแก้ไขแผนก?' : 'ยืนยันการสร้างแผนกใหม่?',
+        text: isEdit
+          ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${data.name}" หรือไม่`
+          : `ต้องการสร้างแผนก "${data.name}" หรือไม่`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'บันทึก',
+        cancelButtonText: 'ยกเลิก',
+        reverseButtons: true,
+      })
+      if (!confirm.isConfirmed) return
+
+      this.modalLoading = true
+      try {
+        if (isEdit) {
+          const res = await departmentService.update(data.id, data)
+          this.modalOpen = false
+          this.modalLoading = false
+          Swal.fire({
+            icon: 'success',
+            title: 'แก้ไขแผนกสำเร็จ',
+            timer: 1600,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+          })
+          await this.loadDepartments()
+        } else {
+          const res = await departmentService.create(data)
+          this.modalOpen = false
+          this.modalLoading = false
+          Swal.fire({
+            icon: 'success',
+            title: 'สร้างแผนกสำเร็จ',
+            timer: 1600,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+          })
+          await this.loadDepartments()
+        }
+      } catch (e) {
+        this.modalLoading = false
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
+        })
+      }
     },
     async toggleActive(department) {
       const desired = !department.isActive
@@ -388,7 +452,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true,
+        reverseButtons: true
       })
       if (!res.isConfirmed) return
 
@@ -400,21 +464,20 @@ export default {
           timer: 1200,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end',
+          position: 'top-end'
         })
         await this.loadDepartments()
       } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'อัปเดตสถานะไม่สำเร็จ',
-          text: error?.response?.data?.message || error.message || 'กรุณาลองใหม่อีกครั้ง',
+          text: error?.response?.data?.message || error.message || 'กรุณาลองใหม่อีกครั้ง'
         })
       }
     },
     goToPage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page
-        this.loadDepartments()
       }
     },
     formatDate(dateString) {
@@ -428,13 +491,19 @@ export default {
     }
   },
   watch: {
-    statusOption() {
-      this.currentPage = 1
-      this.loadDepartments()
+    departmentParams: {
+      handler(newParams, oldParams) {
+        if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+          this.loadDepartments()
+        }
+      },
+      deep: true,
+      immediate: false
     },
-    pageSizeOption() {
-      this.currentPage = 1
-      this.loadDepartments()
+    searchQuery(newQuery, oldQuery) {
+      if (newQuery !== oldQuery) {
+        // This will trigger departmentParams watcher automatically
+      }
     }
   },
   mounted() {

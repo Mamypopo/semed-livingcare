@@ -301,26 +301,35 @@ export default {
     isEdit() {
       return !!(this.form && this.form.id)
     },
+    defaultForm() {
+      return {
+        id: null,
+        name: '',
+        note: '',
+        color: '#22C55E',
+        discount_type: '',
+        discount_amount: null,
+        isActive: true,
+      }
+    },
   },
   watch: {
+    modelValue: {
+      handler(newValue) {
+        if (newValue) {
+          // Modal เปิด - reset form
+          this.resetForm()
+        } else {
+          // Modal ปิด - cleanup
+          this.errors = {}
+          this.showConfirmClose = false
+        }
+      },
+    },
     initialData: {
       immediate: true,
       handler(v) {
-        if (v) {
-          this.form = {
-            id: v.id || null,
-            name: v.name || '',
-            note: v.note || '',
-            color: v.color || '#22C55E',
-            discount_type: v.discount_type || '',
-            discount_amount: v.discount_amount || null,
-            isActive: v.isActive ?? true,
-          }
-        } else {
-          this.resetForm()
-        }
-        this.errors = {}
-        this.originalSnapshot = JSON.stringify(this.form)
+        this.resetForm()
       },
     },
   },
@@ -337,16 +346,9 @@ export default {
           isActive: this.initialData.isActive ?? true,
         }
       } else {
-        this.form = {
-          id: null,
-          name: '',
-          note: '',
-          color: '#22C55E',
-          discount_type: '',
-          discount_amount: null,
-          isActive: true,
-        }
+        this.form = { ...this.defaultForm }
       }
+      this.errors = {}
       this.originalSnapshot = JSON.stringify(this.form)
     },
 

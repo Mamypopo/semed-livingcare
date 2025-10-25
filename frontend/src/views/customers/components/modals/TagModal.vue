@@ -187,27 +187,36 @@ export default {
   computed: {
     isEdit() {
       return !!(this.form && this.form.id)
-    }
+    },
+    defaultForm() {
+      return {
+        id: null,
+        name: '',
+        note: '',
+        color: '#3B82F6',
+        isActive: true,
+      }
+    },
   },
   watch: {
+    modelValue: {
+      handler(newValue) {
+        if (newValue) {
+          // Modal เปิด - reset form
+          this.resetForm()
+        } else {
+          // Modal ปิด - cleanup
+          this.errors = {}
+          this.showConfirmClose = false
+        }
+      },
+    },
     initialData: {
       immediate: true,
       handler(v) {
-        if (v) {
-          this.form = {
-            id: v.id || null,
-            name: v.name || '',
-            note: v.note || '',
-            color: v.color || '#3B82F6',
-            isActive: v.isActive ?? true
-          }
-        } else {
-          this.resetForm()
-        }
-        this.errors = {}
-        this.originalSnapshot = JSON.stringify(this.form)
-      }
-    }
+        this.resetForm()
+      },
+    },
   },
   methods: {
     resetForm() {
@@ -217,17 +226,12 @@ export default {
           name: this.initialData.name || '',
           note: this.initialData.note || '',
           color: this.initialData.color || '#3B82F6',
-          isActive: this.initialData.isActive ?? true
+          isActive: this.initialData.isActive ?? true,
         }
       } else {
-        this.form = {
-          id: null,
-          name: '',
-          note: '',
-          color: '#3B82F6',
-          isActive: true
-        }
+        this.form = { ...this.defaultForm }
       }
+      this.errors = {}
       this.originalSnapshot = JSON.stringify(this.form)
     },
 
@@ -260,7 +264,6 @@ export default {
           this.showConfirmClose = true
           return
         }
-        this.resetForm()
         this.$emit('update:modelValue', false)
       }
     },
@@ -268,7 +271,6 @@ export default {
       this.onClose()
     },
     forceClose() {
-      this.resetForm()
       this.showConfirmClose = false
       this.$emit('update:modelValue', false)
     }
