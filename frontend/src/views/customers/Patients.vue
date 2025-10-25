@@ -440,7 +440,6 @@ export default {
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
       // Page size options
-      pageSize: 10,
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
@@ -463,14 +462,14 @@ export default {
   computed: {
     from() {
       if (this.meta.total === 0) return 0
-      return (this.meta.page - 1) * this.pageSize + 1
+      return (this.meta.page - 1) * this.pageSizeOption.value + 1
     },
     to() {
-      return Math.min(this.meta.page * this.pageSize, this.meta.total)
+      return Math.min(this.meta.page * this.pageSizeOption.value, this.meta.total)
     },
     totalPages() {
-      if (this.pageSize <= 0) return 1
-      return Math.max(1, Math.ceil(this.meta.total / this.pageSize))
+      if (this.pageSizeOption.value <= 0) return 1
+      return Math.max(1, Math.ceil(this.meta.total / this.pageSizeOption.value))
     },
     isActive() {
       return this.statusOption.value
@@ -480,7 +479,7 @@ export default {
       const currentBranchId = this.authStore.currentBranch?.id || this.authStore.user?.branchId
       return {
         page: this.meta.page,
-        limit: this.pageSize,
+        limit: this.pageSizeOption.value,
         search: this.searchQuery || '', // ใช้ searchQuery แทน query
         status: this.isActive === '' ? 'all' : this.isActive ? 'active' : 'inactive',
         branchId: currentBranchId,
