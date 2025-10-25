@@ -465,36 +465,24 @@
                   </div>
                 </td>
                 <td class="px-4 py-3 text-right">
-                  <div class="relative inline-block text-left">
-                    <HeadlessMenu as="div" class="relative">
-                      <MenuButton
-                        class="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-blue-200 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        ทำรายการ
-                        <ChevronDown class="w-3 h-3" />
-                      </MenuButton>
-
-                      <MenuItems
-                        class="absolute right-0 z-50 mt-1 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      >
-                        <div class="py-1">
-                     
-                          <div class="border-t border-gray-100"></div>
-                          <MenuItem v-slot="{ active }">
-                            <button
-                              @click="cancelQueue(queue)"
-                              :class="[
-                                active ? 'bg-red-50 text-red-700' : 'text-red-700',
-                                'flex items-center gap-2 w-full px-4 py-2 text-sm'
-                              ]"
-                            >
-                              <X class="w-4 h-4" />
-                              ยกเลิกคิว
-                            </button>
-                          </MenuItem>
-                        </div>
-                    </MenuItems>
-                  </HeadlessMenu>
+                  <div class="flex items-center gap-2 justify-end">
+                    <!-- ทำรายการ Button -->
+                    <button
+                      @click="openOPDManagement(queue)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-md hover:from-violet-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200"
+                    >
+                      <Navigation class="w-3.5 h-3.5" />
+                      ทำรายการ
+                    </button>
+                    
+                    <!-- Cancel Button -->
+                    <button
+                      @click="cancelQueue(queue)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-red-200 rounded-md bg-white text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200"
+                    >
+                      <X class="w-3.5 h-3.5" />
+                      ยกเลิก
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -557,12 +545,9 @@ import {
   UserRound,
   X,
   Check,
-  Eye,
-  Pencil,
-  Hand,
-  DollarSign
+  Navigation
 } from 'lucide-vue-next'
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Menu as HeadlessMenu, MenuButton, MenuItems, MenuItem, TransitionRoot } from '@headlessui/vue'
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, TransitionRoot } from '@headlessui/vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import departmentService from '@/services/department.js'
@@ -588,18 +573,11 @@ export default {
     UserRound,
     X,
     Check,
-    Eye,
-    Pencil,
-    Hand,
-    DollarSign,
+    Navigation,
     Listbox,
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    HeadlessMenu,
-    MenuButton,
-    MenuItems,
-    MenuItem,
     TransitionRoot,
     VueDatePicker
   },
@@ -950,7 +928,18 @@ export default {
       }
       return statusMap[status] || status
     },
-   
+    openOPDManagement(queue) {
+      // Navigate to OPD Management page with queue data
+      this.$router.push({
+        name: 'OPDManagement',
+        params: { queueId: queue.id },
+        query: { 
+          queueNumber: queue.queueNumber,
+          vnNumber: queue.registration?.vnNumber,
+          patientId: queue.registration?.patient?.id
+        }
+      })
+    },
     cancelQueue(queue) {
       Swal.fire({
         title: 'ยืนยันการยกเลิกคิว',

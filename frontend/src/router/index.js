@@ -95,6 +95,12 @@ const router = createRouter({
           name: 'OPDQueue',
           component: () => import('@/views/queue/OPDQueue.vue'),
           meta: { requiresBranch: true, title: 'คิวตรวจ OPD' }
+        },
+        {
+          path: 'queue/opd/:queueId',
+          name: 'OPDManagement',
+          component: () => import('@/views/opd/OPDManagement.vue'),
+          meta: { requiresBranch: true, title: 'ทำรายการ OPD' }
         }
       ]
     },

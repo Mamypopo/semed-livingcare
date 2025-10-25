@@ -10,6 +10,7 @@ import fileRoutes from "../file/file.routes.js";
 import departmentRoutes from "../department/department.routes.js";
 import registrationRoutes from "../registration/registration.routes.js";
 import queueRoutes from "../queue/queue.routes.js";
+import opdRoutes from "../opd/opd.routes.js";
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router.use("/patients", patientRoutes);
 router.use("/departments", departmentRoutes);
 router.use("/registrations", registrationRoutes);
 router.use("/queues", queueRoutes);
+router.use("/opd", opdRoutes);
 router.use("/", fileRoutes);
 
 export default router;
