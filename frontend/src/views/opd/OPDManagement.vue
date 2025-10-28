@@ -138,47 +138,46 @@
 
     <!-- Tabs and Action Buttons -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-      <!-- Tabs -->
-      <div class="border-b border-gray-200">
-        <nav class="flex space-x-8 px-6" aria-label="Tabs">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            @click="activeTab = tab.id"
-            :class="[
-              activeTab === tab.id
-                ? 'border-emerald-500 text-emerald-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-              'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2'
-            ]"
-          >
-            <component :is="tab.icon" class="w-4 h-4" />
-            {{ tab.name }}
-          </button>
-        </nav>
-      </div>
+      <!-- Tabs and Action Buttons in same row -->
+      <div class="border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Tabs -->
+          <nav class="flex space-x-8" aria-label="Tabs">
+            <button
+              v-for="tab in tabs"
+              :key="tab.id"
+              @click="activeTab = tab.id"
+              :class="[
+                activeTab === tab.id
+                  ? 'border-emerald-500 text-emerald-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2'
+              ]"
+            >
+              <component :is="tab.icon" class="w-4 h-4" />
+              {{ tab.name }}
+            </button>
+          </nav>
 
-      <!-- Action Buttons -->
-      <div class="px-6 py-4 flex justify-end gap-3">
-        <button
-          @click="openVitalsSign"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-        >
-          <Plus class="w-4 h-4" />
-          Vitals Sign
-        </button>
-        <button
-          class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          <Camera class="w-4 h-4" />
-          รูปภาพ
-        </button>
-        <button
-          class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          <X class="w-4 h-4" />
-          ปิด
-        </button>
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button
+              @click="openVitalsSign"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            >
+              <Plus class="w-4 h-4" />
+              Vitals Sign
+            </button>
+           
+            <button
+              @click="goBack"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              <X class="w-4 h-4" />
+              ปิด
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -193,14 +192,14 @@
         </div>
       </div>
 
-      <!-- History Tab -->
-      <div v-if="activeTab === 'history'" class="p-6">
-        <div class="text-center text-gray-500 py-8">
-          <Clock class="w-12 h-12 mx-auto mb-4 text-gray-300" />
-          <p>ส่วนประวัติการรักษา</p>
-          <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
-        </div>
-      </div>
+       <!-- History Tab -->
+       <div v-if="activeTab === 'history'" class="p-6">
+         <div class="text-center text-gray-500 py-8">
+           <Clock class="w-12 h-12 mx-auto mb-4 text-gray-300" />
+           <p>ส่วนรายการประวัติ</p>
+           <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
+         </div>
+       </div>
 
       <!-- Images Tab -->
       <div v-if="activeTab === 'images'" class="p-6">
@@ -273,6 +272,9 @@
         </table>
       </div>
     </div>
+
+    <!-- Vitals Sign Modal -->
+    <VitalsSignModal :isOpen="showVitalsModal" @close="showVitalsModal = false" />
   </div>
 </template>
 
@@ -289,6 +291,7 @@ import {
 } from 'lucide-vue-next'
 import opdService from '@/services/opd.js'
 import Swal from 'sweetalert2'
+import VitalsSignModal from '@/views/opd/components/VitalsSignModal.vue'
 
 export default {
   name: 'OPDManagement',
@@ -300,7 +303,8 @@ export default {
     Clock,
     ImageIcon,
     FileText,
-    Camera
+    Camera,
+    VitalsSignModal
   },
   data() {
     return {
@@ -310,6 +314,7 @@ export default {
       patientData: null,
       medicalHistory: [],
       activeTab: 'diagnosis',
+      showVitalsModal: false,
       tabs: [
         { id: 'diagnosis', name: 'การวินิจฉัยโรค', icon: Stethoscope },
         { id: 'history', name: 'รายการประวัติ', icon: Clock },
@@ -396,12 +401,11 @@ export default {
     },
     
     openVitalsSign() {
-      Swal.fire({
-        title: 'Vitals Sign',
-        text: 'กำลังพัฒนา...',
-        icon: 'info',
-        confirmButtonText: 'ตกลง'
-      })
+      this.showVitalsModal = true
+    },
+    
+    goBack() {
+      this.$router.push({ name: 'OPDQueue' })
     },
     
     formatDateTime(iso) {
