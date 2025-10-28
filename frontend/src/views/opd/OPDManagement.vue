@@ -274,7 +274,11 @@
     </div>
 
     <!-- Vitals Sign Modal -->
-    <VitalsSignModal :isOpen="showVitalsModal" @close="showVitalsModal = false" />
+    <VitalsSignModal
+      :isOpen="showVitalsModal"
+      :departmentName="queueData?.department?.name || ''"
+      @close="showVitalsModal = false"
+    />
   </div>
 </template>
 

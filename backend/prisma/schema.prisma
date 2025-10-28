@@ -50,6 +50,7 @@ model Branch {
   queues    Queue[]
   registrationLogs RegistrationLog[]
   queueLogs QueueLog[]
+  visits    Visit[]
 }
 
 model User {
@@ -94,6 +95,8 @@ model User {
   cancelledRegistrations Registration[] @relation("CancelledRegistrations")
   cancelledQueues Queue[] @relation("CancelledQueues")
   queueLogs QueueLog[]
+  visitsAsDoctor Visit[] @relation("VisitDoctor")
+  visitsAsOperator Visit[] @relation("VisitOperator")
 }
 
 model Patient {
@@ -175,6 +178,7 @@ model Patient {
   files              File[]
   patientTags        PatientTag[]
   registrations      Registration[]
+  visits          Visit[]
 
   // Audit fields
   createdBy          Int?
@@ -329,6 +333,7 @@ model Department {
   // Relations
   registrations Registration[]
   queues       Queue[]
+  visits       Visit[]
 }
 
 model Registration {
@@ -362,6 +367,7 @@ model Registration {
   queue           Queue?
   registrationLogs RegistrationLog[]
   cancelledByUser User?             @relation("CancelledRegistrations", fields: [cancelledBy], references: [id])
+  visits          Visit[]
 }
 
 model Queue {
@@ -425,4 +431,140 @@ model QueueLog {
   
   // Relations
   queue           Queue       @relation(fields: [queueId], references: [id])
+}
+
+// ==========================================
+// Visit - การมารับบริการ (OPD)
+// ==========================================
+model Visit {
+  id           String    @id @default(cuid())
+
+  // อ้างอิงหลัก
+  registrationId String?
+  registration   Registration? @relation(fields: [registrationId], references: [id])
+
+  patientId    Int
+  patient      Patient   @relation(fields: [patientId], references: [id])
+
+  doctorId     Int?
+  doctor       User?     @relation("VisitDoctor", fields: [doctorId], references: [id])
+
+  operatorId   Int?
+  operator     User?     @relation("VisitOperator", fields: [operatorId], references: [id])
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  branchId     Int
+  branch       Branch    @relation(fields: [branchId], references: [id])
+
+  visitAt      DateTime  @default(now())
+
+  // Vital signs / Basic Info
+  weightKg             Decimal? @db.Decimal(5, 2)
+  heightCm             Decimal? @db.Decimal(5, 2)
+  bmi                  Decimal? @db.Decimal(5, 2)
+  bsa                  Decimal? @db.Decimal(5, 2)
+  temperatureC         Decimal? @db.Decimal(4, 1)
+  bpSys                Int?
+  bpDia                Int?
+  pulseRate            Int?
+  respiratoryRate      Int?
+  vas                  Decimal? @db.Decimal(3, 1)
+  o2Sat                Decimal? @db.Decimal(4, 1)
+  crt                  String?
+  headCircumferenceCm  Decimal? @db.Decimal(5, 2)
+  chestCircumferenceCm Decimal? @db.Decimal(5, 2)
+  waistCircumferenceCm Decimal? @db.Decimal(5, 2)
+  alcohol              String?   // none, sometimes, yes
+  smoking              String?   // none, sometimes, yes
+  customFields         Json?     // เก็บข้อมูล custom field หลายค่า เช่น { "cannabis": "ไม่สูบ", "exercise": "..." }
+  measuredAt           DateTime?
+
+  // Clinical Notes
+  cc           String?
+  hpi          String?
+  pmh          String?
+  dxText       String?
+  ga           String?
+  pe           String?
+  doctorAdvice String?
+  doctorNote   String?
+
+  // Pain Assessment
+  painVas      Decimal? @db.Decimal(3, 1)
+  painType     String?  // none, mild, moderate, severe, very_severe
+  painLocation String?
+
+  // Swelling Assessment
+  swellingLevel     String?  // 1+, 2+, 3+, 4+
+  swellingLevelText String?
+  swellingType      String?  // Pitting, Non-Pitting
+  swellingLocation  String?
+
+  // Medical Certificate (OPD)
+  mcNotRest  Boolean?
+  mcRestFrom DateTime?
+  mcRestTo   DateTime?
+  mcCanFly   Boolean?
+
+  // Audit fields
+  isActive  Boolean  @default(true)
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  diagnoses VisitDiagnosis[]
+
+  @@index([patientId, visitAt])
+  @@index([registrationId])
+  @@index([doctorId, visitAt])
+  @@index([branchId, visitAt])
+}
+
+// ==========================================
+// ICD10 - Catalog ของรหัสการวินิจฉัยโรค
+// ==========================================
+model Icd10 {
+  id               Int      @id @default(autoincrement())
+  code             String   @unique   // รหัสโรคย่อย_NO_POINT (ไม่มีจุด)
+  groupCode        String?            // กลุ่มรหัสโรค
+  nameTh           String             // ชื่อสามัญ (ชื่อรหัสย่อย) [TH]
+  nameEn           String?            // ชื่อสามัญ (ชื่อรหัสย่อย) [Eng]
+  groupNameTh      String?            // ชื่อกลุ่มรหัสโรค [TH]
+  groupNameEn      String?            // ชื่อกลุ่มรหัสโรค [Eng]
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  visits VisitDiagnosis[]
+
+  @@index([code])
+  @@index([groupCode])
+  @@index([isActive])
+}
+
+// ==========================================
+// VisitDiagnosis - การวินิจฉัยโรคในแต่ละ Visit
+// ==========================================
+model VisitDiagnosis {
+  id         Int      @id @default(autoincrement())
+  
+  visitId    String
+  visit      Visit    @relation(fields: [visitId], references: [id])
+
+  icd10Id    Int
+  icd10      Icd10    @relation(fields: [icd10Id], references: [id])
+
+  note       String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([visitId, icd10Id])
+  @@index([visitId])
+  @@index([icd10Id])
 }
