@@ -915,6 +915,8 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useAuthStore } from '@/stores/auth.js'
 import icd10Service from '@/services/icd10.js'
+import visitService from '@/services/visit.js'
+import Swal from 'sweetalert2'
 
 export default {
   name: 'VitalsSignModal',
@@ -946,7 +948,12 @@ export default {
     departmentName: {
       type: String,
       default: ''
-    }
+    },
+    patientId: { type: [String, Number], default: null },
+    registrationId: { type: String, default: null },
+    doctorId: { type: [String, Number], default: null },
+    departmentId: { type: String, default: null },
+    branchId: { type: [String, Number], default: null }
   },
   emits: ['close'],
   data() {
@@ -1104,16 +1111,48 @@ export default {
       })
       this.formData.dx = lines.join('\n')
     },
-    saveData() {
-      // TODO: บันทึกข้อมูล
+    async saveData() {
+      const auth = useAuthStore()
       const payload = {
+        patientId: this.patientId,
+        registrationId: this.registrationId,
+        doctorId: this.doctorId,
+        operatorId: auth?.user?.id || null,
+        departmentId: this.departmentId,
+        branchId: this.branchId || auth?.currentBranch?.id || auth?.user?.branchId,
+        visitAt: this.vitalsData.operationDate || new Date(),
         vitals: this.vitalsData,
         clinical: this.formData,
         pain: this.clinicalData,
         swelling: this.swellingData,
         diagnoses: this.selectedDiagnoses
       }
-      console.log('Payload to save:', payload)
+      try {
+        const { data } = await visitService.create(payload)
+        if (data?.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ',
+            text: 'ข้อมูล Visit ถูกบันทึกเรียบร้อย',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+          })
+          this.$emit('close')
+        }
+      } catch (error) {
+        console.error('Save visit error', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'บันทึกไม่สำเร็จ',
+          text: error?.response?.data?.message || 'เกิดข้อผิดพลาดในการบันทึก',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2500
+        })
+      }
     },
     calculateBMI() {
       if (this.vitalsData.weight && this.vitalsData.height) {

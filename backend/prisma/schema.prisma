@@ -51,6 +51,7 @@ model Branch {
   registrationLogs RegistrationLog[]
   queueLogs QueueLog[]
   visits    Visit[]
+  visitLogs VisitLog[]
 }
 
 model User {
@@ -95,6 +96,7 @@ model User {
   cancelledRegistrations Registration[] @relation("CancelledRegistrations")
   cancelledQueues Queue[] @relation("CancelledQueues")
   queueLogs QueueLog[]
+  visitLogs VisitLog[]
   visitsAsDoctor Visit[] @relation("VisitDoctor")
   visitsAsOperator Visit[] @relation("VisitOperator")
 }
@@ -338,7 +340,7 @@ model Department {
 
 model Registration {
   id              String      @id @default(cuid())
-  vnNumber        String      @unique
+  vnNumber        String
   type            QueueType   @default(OPD)
   reason          String?     // เหตุผลการยกเลิก
   cancelledAt     DateTime?   // วันที่ยกเลิก
@@ -402,7 +404,7 @@ model RegistrationLog {
   id              String      @id @default(cuid())
   registrationId  String
   action          String      // CREATE, UPDATE, CANCEL, COMPLETE
-  details         String?     // รายละเอียดการกระทำ
+  details         Json?       // รายละเอียดการกระทำ
   reason          String?     // เหตุผล
   userId          Int?        // ใครทำ
   user            User?       @relation(fields: [userId], references: [id])
@@ -419,7 +421,7 @@ model QueueLog {
   id              String      @id @default(cuid())
   queueId         String
   action          String      // CREATE, UPDATE_STATUS, CANCEL
-  details         String?     // รายละเอียดการกระทำ
+  details         Json?       // รายละเอียดการกระทำ
   reason          String?     // เหตุผล
   userId          Int?        // ใครทำ
   user            User?       @relation(fields: [userId], references: [id])
@@ -517,6 +519,7 @@ model Visit {
 
   // Relations
   diagnoses VisitDiagnosis[]
+  logs VisitLog[]
 
   @@index([patientId, visitAt])
   @@index([registrationId])
@@ -567,4 +570,34 @@ model VisitDiagnosis {
   @@unique([visitId, icd10Id])
   @@index([visitId])
   @@index([icd10Id])
+}
+
+// ==========================================
+// VisitLog - บันทึกเหตุการณ์ของ Visit
+// ==========================================
+model VisitLog {
+  id        String   @id @default(cuid())
+
+  visitId   String
+  visit     Visit    @relation(fields: [visitId], references: [id])
+
+  action    String   // CREATE_VISIT, UPDATE_VISIT, ADD_DX, REMOVE_DX, etc.
+  details   Json?
+
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  branchId  Int?
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+
+  hn        String?
+
+  createdAt DateTime @default(now())
+
+  @@index([visitId])
+  @@index([userId])
+  @@index([branchId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([hn])
 }

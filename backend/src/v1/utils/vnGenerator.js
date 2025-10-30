@@ -1,4 +1,5 @@
 import { prisma } from '../config/db.js'
+import { getLocalDayBounds } from './dateUtils.js'
 
 /**
  * สร้าง VN (Visit Number) อัตโนมัติ
@@ -8,23 +9,15 @@ import { prisma } from '../config/db.js'
  * @param {number} branchId - ID ของสาขา
  * @returns {Promise<string>} VN ที่สร้างขึ้น
  */
-export const generateVN = async (branchId) => {
+export const generateVN = async (branchId, prismaOrTx = prisma, forDate = null) => {
   try {
-    const today = new Date()
-    const dateStr = today.toISOString().slice(0, 10) // YYYY-MM-DD
-    
-    // หา VN สุดท้ายของวันนี้ในสาขานี้
-    const lastRegistration = await prisma.registration.findFirst({
+    const { startOfDay: start, endOfDay: end } = getLocalDayBounds(forDate)
+    const lastRegistration = await prismaOrTx.registration.findFirst({
       where: {
         branchId: parseInt(branchId),
-        createdAt: {
-          gte: new Date(today.toISOString().slice(0, 10) + 'T00:00:00.000Z'),
-          lt: new Date(today.toISOString().slice(0, 10) + 'T23:59:59.999Z')
-        }
+        createdAt: { gte: start, lt: end }
       },
-      orderBy: {
-        vnNumber: 'desc'
-      }
+      orderBy: { vnNumber: 'desc' }
     })
     
     let nextNumber = 1
@@ -34,19 +27,26 @@ export const generateVN = async (branchId) => {
       nextNumber = lastNumber + 1
     }
     
-    // สร้าง VN ใหม่ (แค่หมายเลข)
-    const vn = nextNumber.toString()
-    
-    // ตรวจสอบว่า VN ไม่ซ้ำ
-    const existingVN = await prisma.registration.findUnique({
-      where: { vnNumber: vn }
+    // สร้าง VN ใหม่ (แค่หมายเลข ต่อวัน)
+    // กลไกกันชนแบบ count+retry เผื่อ concurrency
+    const baseCount = await prismaOrTx.registration.count({
+      where: { branchId: parseInt(branchId), createdAt: { gte: start, lt: end } }
     })
-    
-    if (existingVN) {
-      throw new Error(`VN ${vn} already exists`)
+
+    const maxAttempts = 5
+    for (let i = 0; i < maxAttempts; i++) {
+      const candidate = (Math.max(baseCount, nextNumber - 1) + 1 + i).toString()
+      const exists = await prismaOrTx.registration.findFirst({
+        where: {
+          branchId: parseInt(branchId),
+          createdAt: { gte: start, lt: end },
+          vnNumber: candidate
+        }
+      })
+      if (!exists) return candidate
     }
-    
-    return vn
+
+    throw new Error('VN generation exceeded retry attempts')
   } catch (error) {
     console.error('Error generating VN:', error)
     throw new Error(`ไม่สามารถสร้าง VN ได้: ${error.message}`)

@@ -1,12 +1,11 @@
 import { prisma } from '../config/db.js'
 
-/**
- * สร้าง Registration Log
- * @param {object} data - ข้อมูล log
- * @returns {Promise<object>} ข้อมูล log ที่สร้างขึ้น
- */
-export const createRegistrationLog = async (data) => {
+// รองรับทั้งแบบส่ง tx/prisma + data หรือส่ง data อย่างเดียว (ย้อนกลับได้)
+export const createRegistrationLog = async (clientOrData, maybeData) => {
   try {
+    const client = maybeData ? clientOrData : prisma
+    const data = maybeData || clientOrData
+
     const {
       registrationId,
       action,
@@ -15,13 +14,13 @@ export const createRegistrationLog = async (data) => {
       userId = null,
       branchId = null,
       hn = null
-    } = data
+    } = data || {}
 
-    const log = await prisma.registrationLog.create({
+    const log = await client.registrationLog.create({
       data: {
         registrationId,
         action,
-        details: details ? JSON.stringify(details) : null,
+        details: details ? toJson(details) : null,
         reason,
         userId: userId ? parseInt(userId) : null,
         branchId: branchId ? parseInt(branchId) : null,
@@ -157,5 +156,14 @@ export const getAllRegistrationLogs = async (params = {}) => {
   } catch (error) {
     console.error('Error getting all registration logs:', error)
     throw error
+  }
+}
+
+function toJson(v) {
+  if (v == null) return null
+  try {
+    return typeof v === 'string' ? { message: v } : v
+  } catch {
+    return { message: String(v) }
   }
 }

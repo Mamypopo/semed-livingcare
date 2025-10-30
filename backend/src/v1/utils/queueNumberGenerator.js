@@ -1,4 +1,5 @@
 import { prisma } from '../config/db.js'
+import { getLocalDayBounds } from './dateUtils.js'
 
 /**
  * สร้างหมายเลขคิวอัตโนมัติสำหรับแผนกและประเภทคิวที่กำหนด
@@ -10,14 +11,12 @@ import { prisma } from '../config/db.js'
  * @param {string} queueType - ประเภทคิว (OPD, IPD)
  * @returns {Promise<string>} หมายเลขคิวที่สร้างขึ้น
  */
-export const generateQueueNumber = async (branchId, departmentId, queueType) => {
+export const generateQueueNumber = async (branchId, departmentId, queueType, prismaOrTx = prisma, forDate = null) => {
   try {
-    const today = new Date()
-    const startOfDay = new Date(today.toISOString().slice(0, 10) + 'T00:00:00.000Z')
-    const endOfDay = new Date(today.toISOString().slice(0, 10) + 'T23:59:59.999Z')
+    const { startOfDay, endOfDay } = getLocalDayBounds(forDate)
 
     // ค้นหาคิวสุดท้ายของวันนี้สำหรับแผนกและประเภทคิวที่กำหนด
-    const lastQueue = await prisma.queue.findFirst({
+    const lastQueue = await prismaOrTx.queue.findFirst({
       where: {
         branchId: parseInt(branchId),
         departmentId: departmentId,

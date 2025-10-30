@@ -1,5 +1,4 @@
 import * as registrationService from './registration.service.js'
-import { createRegistrationLog } from '../utils/registrationLogger.js'
 
 /**
  * สร้างการลงทะเบียนใหม่
@@ -7,24 +6,6 @@ import { createRegistrationLog } from '../utils/registrationLogger.js'
 export const createRegistrationController = async (req, res) => {
   try {
     const registration = await registrationService.createRegistration(req.body, req.user?.id)
-    
-    // บันทึก log การสร้างการลงทะเบียน
-    await createRegistrationLog({
-      registrationId: registration.id,
-      action: 'CREATE',
-      details: {
-        vn: registration.vn,
-        patientName: `${registration.patient.first_name} ${registration.patient.last_name}`,
-        patientHN: registration.patient.hn,
-        doctorName: registration.doctor.name,
-        departmentName: registration.department.name,
-        status: registration.status,
-        note: registration.note
-      },
-      userId: req.user?.id,
-      branchId: registration.branchId,
-      hn: registration.patient.hn
-    })
     
     res.status(201).json({
       success: true,
@@ -103,32 +84,7 @@ export const cancelRegistrationController = async (req, res) => {
   try {
     const { id } = req.params
     const { reason } = req.body
-    
-    // ดึงข้อมูลการลงทะเบียนเดิมก่อนยกเลิก
-    const oldRegistration = await registrationService.getRegistrationById(id)
-    
     const registration = await registrationService.cancelRegistration(id, req.user?.id, reason)
-    
-    // บันทึก log การยกเลิกการลงทะเบียน
-    await createRegistrationLog({
-      registrationId: registration.id,
-      action: 'CANCEL',
-      details: {
-        vn: registration.vn,
-        patientName: `${registration.patient.first_name} ${registration.patient.last_name}`,
-        patientHN: registration.patient.hn,
-        doctorName: registration.doctor.name,
-        departmentName: registration.department.name,
-        changes: {
-          before: { status: oldRegistration.status },
-          after: { status: registration.status }
-        }
-      },
-      reason: reason,
-      userId: req.user?.id,
-      branchId: registration.branchId,
-      hn: registration.patient.hn
-    })
     
     res.json({
       success: true,

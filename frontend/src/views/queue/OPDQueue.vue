@@ -5,36 +5,47 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-900">คิวตรวจ OPD</h1>
       </div>
-      
     </div>
 
     <!-- Create Queue Card -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-   
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
         <!-- Patient Search -->
         <div class="md:col-span-2">
           <label class="block text-sm font-medium text-gray-700 mb-1">เลือกผู้ป่วย</label>
           <div class="relative">
             <div class="relative">
-              <SearchIcon v-if="!isSearchingPatients" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <SearchIcon
+                v-if="!isSearchingPatients"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              />
               <div v-else class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4">
-                <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-emerald-500"></div>
+                <div
+                  class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-emerald-500"
+                ></div>
               </div>
               <input
-                :value="selectedPatient ? `${selectedPatient.hn} - ${selectedPatient.prefix || ''} ${selectedPatient.first_name} ${selectedPatient.last_name}` : patientSearchQuery"
+                :value="
+                  selectedPatient
+                    ? `${selectedPatient.hn} - ${selectedPatient.prefix || ''} ${selectedPatient.first_name} ${selectedPatient.last_name}`
+                    : patientSearchQuery
+                "
                 @input="onPatientSearchInput"
                 @focus="onPatientSearchFocus"
                 @blur="onPatientSearchBlur"
                 @keydown.escape="showPatientResults = false"
                 @keydown.enter="onPatientSearchEnter"
                 type="text"
-                :placeholder="selectedPatient ? `${selectedPatient.hn} - ${selectedPatient.prefix || ''} ${selectedPatient.first_name} ${selectedPatient.last_name}` : 'ค้นหา HN, ชื่อ, บัตรประชาชน'"
+                :placeholder="
+                  selectedPatient
+                    ? `${selectedPatient.hn} - ${selectedPatient.prefix || ''} ${selectedPatient.first_name} ${selectedPatient.last_name}`
+                    : 'ค้นหา HN, ชื่อ, บัตรประชาชน'
+                "
                 :class="[
                   'patient-search-input w-full px-3 py-2 text-sm border rounded-lg shadow-sm pl-10 pr-10 transition-colors duration-200 focus:outline-none',
-                  selectedPatient 
-                    ? 'border-emerald-400 bg-emerald-50 text-emerald-900' 
-                    : 'border-gray-200 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 hover:border-emerald-400'
+                  selectedPatient
+                    ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                    : 'border-gray-200 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 hover:border-emerald-400',
                 ]"
                 :readonly="!!selectedPatient"
               />
@@ -47,7 +58,7 @@
                 <X class="w-4 h-4" />
               </button>
             </div>
-              
+
             <TransitionRoot
               :show="showPatientResults"
               as="template"
@@ -58,14 +69,24 @@
               leave-from="transform opacity-100 scale-100"
               leave-to="transform opacity-0 scale-95"
             >
-              <div class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg focus:outline-none">
+              <div
+                class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg focus:outline-none"
+              >
                 <!-- Loading State -->
-                <div v-if="isSearchingPatients" class="px-3 py-2 text-sm text-gray-500 text-center flex items-center justify-center gap-2">
-                  <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-emerald-500"></div>
+                <div
+                  v-if="isSearchingPatients"
+                  class="px-3 py-2 text-sm text-gray-500 text-center flex items-center justify-center gap-2"
+                >
+                  <div
+                    class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-emerald-500"
+                  ></div>
                   กำลังค้นหา...
                 </div>
                 <!-- Empty State -->
-                <div v-else-if="filteredPatients.length === 0 && patientSearchQuery !== ''" class="px-3 py-2 text-sm text-gray-500 text-center">
+                <div
+                  v-else-if="filteredPatients.length === 0 && patientSearchQuery !== ''"
+                  class="px-3 py-2 text-sm text-gray-500 text-center"
+                >
                   <div class="flex flex-col items-center gap-2">
                     <UserRound class="w-8 h-8 text-gray-300" />
                     <div>ไม่พบผู้ป่วยที่ค้นหา</div>
@@ -73,7 +94,10 @@
                   </div>
                 </div>
                 <!-- No Search Query -->
-                <div v-else-if="!patientSearchQuery.trim()" class="px-3 py-2 text-sm text-gray-500 text-center">
+                <div
+                  v-else-if="!patientSearchQuery.trim()"
+                  class="px-3 py-2 text-sm text-gray-500 text-center"
+                >
                   <div class="flex flex-col items-center gap-2">
                     <SearchIcon class="w-8 h-8 text-gray-300" />
                     <div>เริ่มพิมพ์เพื่อค้นหาผู้ป่วย</div>
@@ -87,19 +111,26 @@
                   class="relative cursor-pointer select-none py-3 px-3 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-900 text-gray-900"
                 >
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div
+                      class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0"
+                    >
                       <UserRound class="w-4 h-4 text-white" />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <div 
-                        class="text-sm font-medium truncate" 
-                        v-tooltip:top="`${patient.hn} - ${patient.prefix || ''} ${patient.first_name} ${patient.last_name}`"
+                      <div
+                        class="text-sm font-medium truncate"
+                        v-tooltip:top="
+                          `${patient.hn} - ${patient.prefix || ''} ${patient.first_name} ${patient.last_name}`
+                        "
                       >
                         <span class="font-semibold text-gray-900">{{ patient.hn }}</span>
-                        <span class="text-gray-600"> - {{ patient.prefix || '' }} {{ patient.first_name }} {{ patient.last_name }}</span>
+                        <span class="text-gray-600">
+                          - {{ patient.prefix || '' }} {{ patient.first_name }}
+                          {{ patient.last_name }}</span
+                        >
                       </div>
-                      <div 
-                        class="text-xs text-gray-500 truncate mt-1" 
+                      <div
+                        class="text-xs text-gray-500 truncate mt-1"
                         v-tooltip:top="patient.national_id"
                       >
                         บัตรประชาชน: {{ patient.national_id }}
@@ -118,7 +149,7 @@
           <Listbox v-model="selectedDoctor" as="div" class="relative">
             <div>
               <ListboxButton
-                class="relative w-full text-sm  cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               >
                 <span class="block truncate">{{ selectedDoctor?.name || '- เลือกแพทย์ -' }}</span>
                 <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -151,7 +182,7 @@
                     :class="[
                       active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                       'relative cursor-default select-none py-2 pr-4',
-                      selected ? 'pl-10' : 'pl-3'
+                      selected ? 'pl-10' : 'pl-3',
                     ]"
                   >
                     <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
@@ -178,7 +209,9 @@
               <ListboxButton
                 class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               >
-                <span class="block truncate">{{ selectedDepartment?.name || '- เลือกแผนก -' }}</span>
+                <span class="block truncate">{{
+                  selectedDepartment?.name || '- เลือกแผนก -'
+                }}</span>
                 <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <ChevronDown class="h-5 w-5 text-gray-400" />
                 </span>
@@ -205,7 +238,7 @@
                     :class="[
                       active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
                       'relative cursor-default select-none py-2 pr-4',
-                      selected ? 'pl-10' : 'pl-3'
+                      selected ? 'pl-10' : 'pl-3',
                     ]"
                   >
                     <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
@@ -237,38 +270,36 @@
           />
         </div>
 
-         <!-- Add Button -->
-         <div class="flex items-end">
-           <button
-             class="w-full px-3 py-2 text-sm bg-purple-400 text-white rounded-md hover:bg-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-             :disabled="!selectedPatient || !selectedDoctor || !selectedDepartment"
-             @click="openCreateQueue"
-           >
-             <Plus class="w-4 h-4 inline mr-1" />
-             เพิ่มคิว
-           </button>
-         </div>
+        <!-- Add Button -->
+        <div class="flex items-end">
+          <button
+            class="w-full px-3 py-2 text-sm bg-purple-400 text-white rounded-md hover:bg-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="!selectedPatient || !selectedDoctor || !selectedDepartment"
+            @click="openCreateQueue"
+          >
+            <Plus class="w-4 h-4 inline mr-1" />
+            เพิ่มคิว
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Search and Filter Card -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    
       <div class="flex justify-end gap-4">
         <!-- General Search -->
         <div class="w-80">
           <label class="block text-sm font-medium text-gray-700 mb-1">ค้นหา</label>
           <div class="relative">
-            <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <SearchIcon
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+            />
             <input
               v-model.trim="searchQuery"
               @input="onSearchInput"
               type="text"
               placeholder="ค้นหาชื่อลูกค้า / เลขบัตรประชาชน"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 
-                bg-white text-gray-700 placeholder-gray-400 
-                focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-                focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
             />
           </div>
         </div>
@@ -307,7 +338,7 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                     ]"
                   >
                     <span>{{ opt.label }}</span>
@@ -351,7 +382,7 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                     ]"
                   >
                     <span>{{ status.label }}</span>
@@ -368,8 +399,7 @@
     <!-- Queue Table Card -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
       <!-- <div class="overflow-x-auto"> -->
-        <div >
-
+      <div>
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -411,39 +441,59 @@
               <tr v-for="queue in queues" :key="queue.id" class="hover:bg-gray-50">
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
-                    <div :class="[
-                      'w-2.5 h-2.5 rounded-full',
-                      queue.status === 'WAITING' ? 'bg-yellow-500' :
-                      queue.status === 'EXAMINING' ? 'bg-blue-500' :
-                      queue.status === 'COMPLETED' ? 'bg-green-500' :
-                      queue.status === 'CANCELLED' ? 'bg-red-500' :
-                      'bg-gray-500'
-                    ]"></div>
+                    <div
+                      :class="[
+                        'w-2.5 h-2.5 rounded-full',
+                        queue.status === 'WAITING'
+                          ? 'bg-yellow-500'
+                          : queue.status === 'EXAMINING'
+                            ? 'bg-blue-500'
+                            : queue.status === 'COMPLETED'
+                              ? 'bg-green-500'
+                              : queue.status === 'CANCELLED'
+                                ? 'bg-red-500'
+                                : 'bg-gray-500',
+                      ]"
+                    ></div>
                     <div>
-                      <div class="text-sm font-medium text-gray-500">Queue:{{ queue.queueNumber }}</div>
-                      <div class="text-sm font-medium text-gray-500">VN: {{ queue.registration?.vnNumber || '-' }}</div>
+                      <div class="text-sm font-medium text-gray-500">
+                        Queue:{{ queue.queueNumber }}
+                      </div>
+                      <div class="text-sm font-medium text-gray-500">
+                        VN: {{ queue.registration?.vnNumber || '-' }}
+                      </div>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
                   <div>
                     <div class="text-sm text-gray-900">{{ queue.department?.name || '-' }}</div>
-                    <div class="text-xs text-gray-500">{{ formatDateTime(queue.createdAt) }}</div>
+                    <div class="text-xs text-gray-500">
+                      {{ formatDateTime(queue.createdAt) }}
+                    </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="text-sm text-gray-900">{{ queue.registration?.doctor?.name || '-' }}</div>
+                  <div class="text-sm text-gray-900">
+                    {{ queue.registration?.doctor?.name || '-' }}
+                  </div>
                 </td>
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center">
+                    <div
+                      class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center"
+                    >
                       <UserRound class="w-4 h-4 text-white" />
                     </div>
                     <div>
                       <div class="text-sm font-medium text-gray-900">
-                        {{ queue.registration?.patient?.prefix || '' }} {{ queue.registration?.patient?.first_name || '' }} {{ queue.registration?.patient?.last_name || '' }}
+                        {{ queue.registration?.patient?.prefix || '' }}
+                        {{ queue.registration?.patient?.first_name || '' }}
+                        {{ queue.registration?.patient?.last_name || '' }}
                       </div>
-                      <div class="text-xs text-gray-500">{{ queue.registration?.patient?.hn || '-' }}</div>
+                      <div class="text-xs text-gray-500">
+                        {{ queue.registration?.patient?.hn || '-' }}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -452,16 +502,19 @@
                     <button
                       :class="[
                         'px-3 py-1 text-xs font-medium rounded-full',
-                        queue.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                        queue.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                        queue.status === 'EXAMINING' ? 'bg-blue-100 text-blue-800' :
-                        queue.status === 'WAITING' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
+                        queue.status === 'CANCELLED'
+                          ? 'bg-red-100 text-red-800'
+                          : queue.status === 'COMPLETED'
+                            ? 'bg-green-100 text-green-800'
+                            : queue.status === 'EXAMINING'
+                              ? 'bg-blue-100 text-blue-800'
+                              : queue.status === 'WAITING'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800',
                       ]"
                     >
                       {{ getStatusLabel(queue.status) }}
                     </button>
-                   
                   </div>
                 </td>
                 <td class="px-4 py-3 text-right">
@@ -474,7 +527,7 @@
                       <Navigation class="w-3.5 h-3.5" />
                       ทำรายการ
                     </button>
-                    
+
                     <!-- Cancel Button -->
                     <button
                       @click="cancelQueue(queue)"
@@ -499,7 +552,9 @@
       </div>
 
       <!-- Footer: pagination -->
-      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm">
+      <div
+        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+      >
         <div class="text-gray-600">
           แสดง
           <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
@@ -518,7 +573,9 @@
             <ChevronLeft class="w-3.5 h-3.5" />
             ก่อนหน้า
           </button>
-          <span class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700">
+          <span
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+          >
             หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
@@ -545,9 +602,15 @@ import {
   UserRound,
   X,
   Check,
-  Navigation
+  Navigation,
 } from 'lucide-vue-next'
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption, TransitionRoot } from '@headlessui/vue'
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+  TransitionRoot,
+} from '@headlessui/vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import departmentService from '@/services/department.js'
@@ -579,7 +642,7 @@ export default {
     ListboxOptions,
     ListboxOption,
     TransitionRoot,
-    VueDatePicker
+    VueDatePicker,
   },
   data() {
     return {
@@ -600,24 +663,24 @@ export default {
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
-        { label: '50 ต่อหน้า', value: 50 }
+        { label: '50 ต่อหน้า', value: 50 },
       ],
       meta: { page: 1, totalPages: 1, total: 0 },
       prefilledPatient: null,
-      
+
       // Data
       doctors: [],
       departments: [],
-   
+
       statusOptions: [
         { label: 'ทั้งหมด', value: 'all' },
         { label: 'รอตรวจ', value: 'WAITING' },
         { label: 'กำลังตรวจ', value: 'EXAMINING' },
         { label: 'เสร็จสิ้น', value: 'COMPLETED' },
         { label: 'ยกเลิก', value: 'CANCELLED' },
-        { label: 'ไม่มา', value: 'NO_SHOW' }
+        { label: 'ไม่มา', value: 'NO_SHOW' },
       ],
-      queues: []
+      queues: [],
     }
   },
   computed: {
@@ -647,9 +710,9 @@ export default {
         queueType: 'OPD',
         branchId: currentBranchId,
         sort: 'createdAt',
-        order: 'desc'
+        order: 'desc',
       }
-    }
+    },
   },
   methods: {
     onSearchInput() {
@@ -660,7 +723,7 @@ export default {
     },
     onPatientSearchInput(event) {
       this.patientSearchQuery = event.target.value
-      
+
       // ถ้าผู้ใช้เริ่มพิมพ์ใหม่ ให้ล้างข้อมูลผู้ป่วยที่เลือกไว้
       if (this.selectedPatient) {
         const selectedDisplayName = `${this.selectedPatient.hn} - ${this.selectedPatient.prefix || ''} ${this.selectedPatient.first_name} ${this.selectedPatient.last_name}`
@@ -668,7 +731,7 @@ export default {
           this.selectedPatient = null
         }
       }
-      
+
       clearTimeout(this.patientSearchTimer)
       this.patientSearchTimer = setTimeout(() => {
         this.searchPatients()
@@ -702,30 +765,29 @@ export default {
       this.showPatientResults = false
     },
     async searchPatients() {
-      
       if (!this.patientSearchQuery.trim()) {
         this.patientSearchResults = []
         this.isSearchingPatients = false
         return
       }
-      
+
       this.isSearchingPatients = true
-      
+
       try {
         const currentBranchId = this.authStore.currentBranch?.id || this.authStore.user?.branchId
-        
+
         if (!currentBranchId) {
           console.warn('⚠️ No branch ID found')
           this.patientSearchResults = []
           return
         }
-        
+
         const response = await patientService.searchForDropdown(
           this.patientSearchQuery,
           currentBranchId,
-          10
+          10,
         )
-        
+
         this.patientSearchResults = response.data || []
         this.showPatientResults = true
       } catch (error) {
@@ -748,36 +810,36 @@ export default {
           title: 'กรุณาเลือกผู้ป่วย',
           text: 'คุณต้องเลือกผู้ป่วยก่อนสร้างคิว',
           confirmButtonText: 'ตกลง',
-          confirmButtonColor: '#8b5cf6'
+          confirmButtonColor: '#8b5cf6',
         })
         return
       }
-      
+
       if (!this.selectedDoctor) {
         Swal.fire({
           icon: 'warning',
           title: 'กรุณาเลือกแพทย์',
           text: 'คุณต้องเลือกแพทย์ก่อนสร้างคิว',
           confirmButtonText: 'ตกลง',
-          confirmButtonColor: '#8b5cf6'
+          confirmButtonColor: '#8b5cf6',
         })
         return
       }
-      
+
       if (!this.selectedDepartment) {
         Swal.fire({
           icon: 'warning',
           title: 'กรุณาเลือกแผนก',
           text: 'คุณต้องเลือกแผนกก่อนสร้างคิว',
           confirmButtonText: 'ตกลง',
-          confirmButtonColor: '#8b5cf6'
+          confirmButtonColor: '#8b5cf6',
         })
         return
       }
-      
+
       // แสดงข้อมูลที่จะสร้างคิว
       const patientName = `${this.selectedPatient.prefix || ''} ${this.selectedPatient.first_name} ${this.selectedPatient.last_name}`
-      
+
       const result = await Swal.fire({
         title: 'ยืนยันการสร้างคิว',
         html: `
@@ -802,13 +864,13 @@ export default {
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#8b5cf6',
         cancelButtonColor: '#6b7280',
-        reverseButtons: true
+        reverseButtons: true,
       })
-      
+
       if (!result.isConfirmed) {
         return
       }
-      
+
       // แสดง loading
       Swal.fire({
         title: 'กำลังสร้างคิว...',
@@ -818,32 +880,33 @@ export default {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading()
-        }
+        },
       })
-      
+
       try {
         const currentBranchId = this.authStore.currentBranch?.id || this.authStore.user?.branchId
-        
+
         if (!currentBranchId) {
           throw new Error('ไม่พบข้อมูลสาขา')
         }
-        
+
         const response = await createRegistrationWithQueue({
           patientId: this.selectedPatient.id,
           doctorId: this.selectedDoctor.id,
           departmentId: this.selectedDepartment.id,
           branchId: currentBranchId,
-          queueType: 'OPD'
+          queueType: 'OPD',
+          createdDate: this.selectedDate,
         })
-                
+
         // รีเฟรชข้อมูลคิว
         await this.loadQueues()
-        
+
         // ล้างข้อมูลที่เลือก
         this.selectedPatient = null
         this.selectedDoctor = null
         this.selectedDepartment = null
-        
+
         // แสดงข้อความสำเร็จ
         Swal.fire({
           icon: 'success',
@@ -853,12 +916,11 @@ export default {
           position: 'top-end',
           showConfirmButton: false,
           timer: 3000,
-          timerProgressBar: true
+          timerProgressBar: true,
         })
-        
       } catch (error) {
         console.error('❌ Error creating registration with queue:', error)
-        
+
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
@@ -867,13 +929,13 @@ export default {
           position: 'top-end',
           showConfirmButton: false,
           timer: 5000,
-          timerProgressBar: true
+          timerProgressBar: true,
         })
       }
     },
     async loadQueues() {
       this.loading = true
-      
+
       try {
         // Best Practice: Use computed property
         const params = this.queueParams
@@ -883,17 +945,16 @@ export default {
           this.meta.total = 0
           return
         }
-                
+
         const response = await queueService.getAllQueues(params)
         this.queues = response.data || []
         this.meta.total = response.pagination?.total || 0
         this.meta.totalPages = response.pagination?.totalPages || 1
-                
       } catch (error) {
         console.error('❌ Error loading queues:', error)
         this.queues = []
         this.meta.total = 0
-        
+
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
@@ -902,7 +963,7 @@ export default {
           position: 'top-end',
           showConfirmButton: false,
           timer: 5000,
-          timerProgressBar: true
+          timerProgressBar: true,
         })
       } finally {
         this.loading = false
@@ -916,7 +977,11 @@ export default {
     formatDateTime(iso) {
       if (!iso) return '-'
       const d = new Date(iso)
-      return d.toLocaleDateString('th-TH') + ' ' + d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+      return (
+        d.toLocaleDateString('th-TH') +
+        ' ' +
+        d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+      )
     },
     getStatusLabel(status) {
       const statusMap = {
@@ -924,7 +989,7 @@ export default {
         EXAMINING: 'กำลังตรวจ',
         COMPLETED: 'เสร็จสิ้น',
         CANCELLED: 'ยกเลิก',
-        NO_SHOW: 'ไม่มา'
+        NO_SHOW: 'ไม่มา',
       }
       return statusMap[status] || status
     },
@@ -933,11 +998,11 @@ export default {
       this.$router.push({
         name: 'OPDManagement',
         params: { queueId: queue.id },
-        query: { 
+        query: {
           queueNumber: queue.queueNumber,
           vnNumber: queue.registration?.vnNumber,
-          patientId: queue.registration?.patient?.id
-        }
+          patientId: queue.registration?.patient?.id,
+        },
       })
     },
     cancelQueue(queue) {
@@ -982,11 +1047,11 @@ export default {
             return false
           }
           return reason
-        }
+        },
       }).then(async (result) => {
         if (result.isConfirmed) {
           const reason = result.value
-          
+
           // แสดง loading
           Swal.fire({
             title: 'กำลังยกเลิกคิว...',
@@ -996,16 +1061,16 @@ export default {
             showConfirmButton: false,
             didOpen: () => {
               Swal.showLoading()
-            }
+            },
           })
-          
+
           try {
             // Call cancel queue API
             await queueService.cancelQueue(queue.id, reason)
-            
+
             // รีเฟรชข้อมูลคิว
             await this.loadQueues()
-            
+
             // แสดงข้อความสำเร็จ
             Swal.fire({
               icon: 'success',
@@ -1015,12 +1080,11 @@ export default {
               position: 'top-end',
               showConfirmButton: false,
               timer: 3000,
-              timerProgressBar: true
+              timerProgressBar: true,
             })
-            
           } catch (error) {
             console.error('❌ Error cancelling queue:', error)
-            
+
             Swal.fire({
               icon: 'error',
               title: 'เกิดข้อผิดพลาด',
@@ -1029,7 +1093,7 @@ export default {
               position: 'top-end',
               showConfirmButton: false,
               timer: 5000,
-              timerProgressBar: true
+              timerProgressBar: true,
             })
           }
         }
@@ -1055,7 +1119,7 @@ export default {
       } catch (error) {
         console.error('❌ Error loading doctors:', error)
       }
-    }
+    },
   },
   watch: {
     selectedPatient(newPatient, oldPatient) {
@@ -1080,8 +1144,8 @@ export default {
         }
       },
       deep: true,
-      immediate: false // Don't run on initial load
-    }
+      immediate: false, // Don't run on initial load
+    },
   },
   mounted() {
     if (this.$route.query.patient) {
@@ -1103,7 +1167,7 @@ export default {
     if (this.patientSearchTimer) {
       clearTimeout(this.patientSearchTimer)
     }
-  }
+  },
 }
 </script>
 
@@ -1154,7 +1218,6 @@ export default {
   left: 0.5rem;
   right: auto;
 }
-
 
 :deep(.dp__input_icon_pad) {
   padding-left: 2.5rem;

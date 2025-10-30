@@ -1,5 +1,7 @@
 import { prisma } from '../config/db.js'
 import { generateVN } from '../utils/vnGenerator.js'
+import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
+import { createRegistrationLog } from '../utils/registrationLogger.js'
 
 /**
  * สร้างการลงทะเบียนใหม่
@@ -15,7 +17,8 @@ export const createRegistration = async (data, createdBy) => {
       departmentId,
       branchId,
       note,
-      status = 'COMPLETED'
+      status = 'COMPLETED',
+      createdDate = null
     } = data
 
     // ตรวจสอบข้อมูลที่จำเป็น
@@ -69,67 +72,91 @@ export const createRegistration = async (data, createdBy) => {
       throw new Error('แผนกนี้ถูกปิดใช้งานแล้ว')
     }
 
-    // สร้าง VN อัตโนมัติ
-    const vn = await generateVN(branchId)
+    // ใช้ทรานแซคชันในการสร้าง + log
+    const registration = await prisma.$transaction(async (tx) => {
+      const vn = await generateVN(branchId, tx, createdDate)
+      const dateObj = normalizeCreatedDate(createdDate)
+      const vnDateStart = toLocalStartOfDay(dateObj)
 
-    // สร้างการลงทะเบียน
-    const registration = await prisma.registration.create({
-      data: {
-        vn,
-        patientId: parseInt(patientId),
-        doctorId: parseInt(doctorId),
-        departmentId: parseInt(departmentId),
-        branchId: parseInt(branchId),
-        status,
-        note,
-        registrationDate: new Date(),
-        createdBy: createdBy ? parseInt(createdBy) : null
-      },
-      include: {
-        patient: {
-          select: {
-            id: true,
-            hn: true,
-            prefix: true,
-            first_name: true,
-            last_name: true,
-            gender: true,
-            birth_date: true,
-            phone_1: true,
-            patientGroup: {
-              select: { id: true, name: true, color: true }
+      const created = await tx.registration.create({
+        data: {
+          vnNumber: vn,
+          vnDate: vnDateStart,
+          patientId: parseInt(patientId),
+          doctorId: parseInt(doctorId),
+          departmentId: parseInt(departmentId),
+          branchId: parseInt(branchId),
+          status,
+          note,
+          registrationDate: dateObj,
+          createdAt: dateObj,
+          createdBy: createdBy ? parseInt(createdBy) : null
+        },
+        include: {
+          patient: {
+            select: {
+              id: true,
+              hn: true,
+              prefix: true,
+              first_name: true,
+              last_name: true,
+              gender: true,
+              birth_date: true,
+              phone_1: true,
+              patientGroup: {
+                select: { id: true, name: true, color: true }
+              }
+            }
+          },
+          doctor: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          department: {
+            select: {
+              id: true,
+              name: true,
+              code: true
+            }
+          },
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              code: true
+            }
+          },
+          createdByUser: {
+            select: {
+              id: true,
+              name: true,
+              email: true
             }
           }
-        },
-        doctor: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        department: {
-          select: {
-            id: true,
-            name: true,
-            code: true
-          }
-        },
-        branch: {
-          select: {
-            id: true,
-            name: true,
-            code: true
-          }
-        },
-        createdByUser: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
         }
-      }
+      })
+
+      await createRegistrationLog(tx, {
+        registrationId: created.id,
+        action: 'CREATE',
+        details: {
+          vn: created.vnNumber,
+          patientName: `${created.patient.first_name} ${created.patient.last_name}`,
+          patientHN: created.patient.hn,
+          doctorName: created.doctor.name,
+          departmentName: created.department.name,
+          status: created.status,
+          note: created.note
+        },
+        userId: createdBy ? parseInt(createdBy) : null,
+        branchId: created.branchId,
+        hn: created.patient.hn
+      })
+
+      return created
     })
 
     return registration
@@ -197,7 +224,7 @@ export const getAllRegistrations = async (params = {}) => {
     // Search by VN, patient name, HN
     if (search) {
       where.OR = [
-        { vn: { contains: search, mode: 'insensitive' } },
+        { vnNumber: { contains: search, mode: 'insensitive' } },
         { patient: { hn: { contains: search, mode: 'insensitive' } } },
         { patient: { first_name: { contains: search, mode: 'insensitive' } } },
         { patient: { last_name: { contains: search, mode: 'insensitive' } } }
@@ -373,70 +400,64 @@ export const getRegistrationById = async (id) => {
  */
 export const cancelRegistration = async (id, cancelledBy, reason = '') => {
   try {
-    const registration = await prisma.registration.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        queues: true
+    const result = await prisma.$transaction(async (tx) => {
+      const registration = await tx.registration.findUnique({
+        where: { id: parseInt(id) },
+        include: { queues: true, patient: { select: { hn: true, first_name: true, last_name: true } }, doctor: { select: { name: true } }, department: { select: { name: true } } }
+      })
+
+      if (!registration) {
+        throw new Error('ไม่พบข้อมูลการลงทะเบียน')
       }
-    })
 
-    if (!registration) {
-      throw new Error('ไม่พบข้อมูลการลงทะเบียน')
-    }
-
-    if (registration.status === 'CANCELLED') {
-      throw new Error('การลงทะเบียนนี้ถูกยกเลิกแล้ว')
-    }
-
-    // อัปเดตสถานะการลงทะเบียน
-    const updatedRegistration = await prisma.registration.update({
-      where: { id: parseInt(id) },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-        cancelledBy: cancelledBy ? parseInt(cancelledBy) : null,
-        cancellationReason: reason,
-        updatedBy: cancelledBy ? parseInt(cancelledBy) : null
-      },
-      include: {
-        patient: {
-          select: {
-            id: true,
-            hn: true,
-            prefix: true,
-            first_name: true,
-            last_name: true
-          }
-        },
-        doctor: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
-        department: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
+      if (registration.status === 'CANCELLED') {
+        throw new Error('การลงทะเบียนนี้ถูกยกเลิกแล้ว')
       }
-    })
 
-    // อัปเดตสถานะคิวที่เกี่ยวข้อง
-    if (registration.queues.length > 0) {
-      await prisma.queue.updateMany({
-        where: {
-          registrationId: parseInt(id)
-        },
+      const updatedRegistration = await tx.registration.update({
+        where: { id: parseInt(id) },
         data: {
           status: 'CANCELLED',
-          cancelledAt: new Date()
+          cancelledAt: new Date(),
+          cancelledBy: cancelledBy ? parseInt(cancelledBy) : null,
+          cancellationReason: reason,
+          updatedBy: cancelledBy ? parseInt(cancelledBy) : null
+        },
+        include: {
+          patient: { select: { id: true, hn: true, prefix: true, first_name: true, last_name: true } },
+          doctor: { select: { id: true, name: true } },
+          department: { select: { id: true, name: true } }
         }
       })
-    }
 
-    return updatedRegistration
+      if (registration.queues.length > 0) {
+        await tx.queue.updateMany({
+          where: { registrationId: parseInt(id) },
+          data: { status: 'CANCELLED', cancelledAt: new Date() }
+        })
+      }
+
+      await createRegistrationLog(tx, {
+        registrationId: updatedRegistration.id,
+        action: 'CANCEL',
+        details: {
+          vn: updatedRegistration.vnNumber,
+          patientName: `${updatedRegistration.patient.first_name} ${updatedRegistration.patient.last_name}`,
+          patientHN: updatedRegistration.patient.hn,
+          doctorName: updatedRegistration.doctor.name,
+          departmentName: updatedRegistration.department.name,
+          changes: { before: { status: registration.status }, after: { status: updatedRegistration.status } }
+        },
+        reason: reason,
+        userId: cancelledBy ? parseInt(cancelledBy) : null,
+        branchId: updatedRegistration.branchId,
+        hn: updatedRegistration.patient.hn
+      })
+
+      return updatedRegistration
+    })
+
+    return result
   } catch (error) {
     console.error('Error cancelling registration:', error)
     throw error

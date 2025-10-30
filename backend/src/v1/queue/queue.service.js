@@ -1,5 +1,7 @@
 import { prisma } from '../config/db.js'
 import { generateQueueNumber } from '../utils/queueNumberGenerator.js'
+import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
+import { createQueueLog } from '../utils/queueLogger.js'
 
 /**
  * สร้างคิวใหม่
@@ -13,10 +15,9 @@ export const createQueue = async (data, createdBy) => {
       registrationId,
       branchId,
       queueType = 'OPD',
-      roomId = null,
-      bedId = null,
       note = null,
-      status = 'WAITING'
+      status = 'WAITING',
+      createdDate = null
     } = data
 
     // ตรวจสอบข้อมูลที่จำเป็น
@@ -60,76 +61,100 @@ export const createQueue = async (data, createdBy) => {
       throw new Error('การลงทะเบียนนี้มีคิวอยู่แล้ว')
     }
 
-    // สร้างหมายเลขคิวอัตโนมัติ
-    const queueNumber = await generateQueueNumber(branchId, queueType)
+    const result = await prisma.$transaction(async (tx) => {
+      const dateObj = normalizeCreatedDate(createdDate)
+      // ใช้ departmentId จาก registration เพื่อรีเซ็ตเลขต่อแผนก
+      const depId = registration?.departmentId || null
+      const queueNumber = await generateQueueNumber(branchId, depId, queueType, tx, createdDate)
+      const queueDateStart = toLocalStartOfDay(dateObj)
 
-    // สร้างคิว
-    const queue = await prisma.queue.create({
-      data: {
-        queueNumber,
-        registrationId,
-        branchId: parseInt(branchId),
-        queueType,
-        roomId: roomId ? parseInt(roomId) : null,
-        bedId: bedId ? parseInt(bedId) : null,
-        status,
-        note,
-        createdBy: createdBy ? parseInt(createdBy) : null
-      },
-      include: {
-        registration: {
-          include: {
-            patient: {
-              select: {
-                id: true,
-                hn: true,
-                prefix: true,
-                first_name: true,
-                last_name: true,
-                gender: true,
-                phone_1: true,
-                patientGroup: {
-                  select: { id: true, name: true, color: true }
+      // สร้างคิว
+      const queue = await tx.queue.create({
+        data: {
+          queueNumber,
+          registrationId,
+          branchId: parseInt(branchId),
+          queueType,
+          departmentId: depId,
+          status,
+          note,
+          queueDate: queueDateStart,
+          createdAt: dateObj,
+          createdBy: createdBy ? parseInt(createdBy) : null
+        },
+        include: {
+          registration: {
+            include: {
+              patient: {
+                select: {
+                  id: true,
+                  hn: true,
+                  prefix: true,
+                  first_name: true,
+                  last_name: true,
+                  gender: true,
+                  phone_1: true,
+                  patientGroup: {
+                    select: { id: true, name: true, color: true }
+                  }
+                }
+              },
+              doctor: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              },
+              department: {
+                select: {
+                  id: true,
+                  name: true,
+                  code: true
                 }
               }
-            },
-            doctor: {
-              select: {
-                id: true,
-                name: true,
-                email: true
-              }
-            },
-            department: {
-              select: {
-                id: true,
-                name: true,
-                code: true
-              }
+            }
+          },
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              code: true
+            }
+          },
+          createdByUser: {
+            select: {
+              id: true,
+              name: true,
+              email: true
             }
           }
-        },
-        room: {
-          select: { id: true, name: true, number: true }
-        },
-        branch: {
-          select: {
-            id: true,
-            name: true,
-            code: true
-          }
-        },
-        createdByUser: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
         }
-      }
+      })
+
+      // Log ภายใน transaction
+      await createQueueLog(tx, {
+        queueId: queue.id,
+        action: 'CREATE',
+        details: {
+          queueNumber: queue.queueNumber,
+          queueType: queue.queueType,
+          status: queue.status,
+          patientName: `${queue.registration.patient.first_name} ${queue.registration.patient.last_name}`,
+          patientHN: queue.registration.patient.hn,
+          doctorName: queue.registration.doctor?.name,
+          departmentName: queue.registration.department?.name
+        },
+        userId: createdBy ? parseInt(createdBy) : null,
+        branchId: queue.branchId,
+        queueNumber: queue.queueNumber,
+        hn: queue.registration.patient.hn
+      })
+
+      return queue
     })
 
-    return queue
+    return result
   } catch (error) {
     console.error('Error creating queue:', error)
     throw error
@@ -390,70 +415,96 @@ export const getQueueById = async (id) => {
  */
 export const cancelQueue = async (id, cancelledBy, reason = '') => {
   try {
-    const queue = await prisma.queue.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        registration: {
-          include: {
-            patient: {
-              select: { id: true, hn: true, first_name: true, last_name: true }
-            }
-          }
-        }
-      }
-    })
-
-    if (!queue) {
-      throw new Error('ไม่พบข้อมูลคิว')
-    }
-
-    if (queue.status === 'CANCELLED') {
-      throw new Error('คิวนี้ถูกยกเลิกแล้ว')
-    }
-
-    if (queue.status === 'COMPLETED') {
-      throw new Error('ไม่สามารถยกเลิกคิวที่เสร็จสิ้นแล้ว')
-    }
-
-    const updatedQueue = await prisma.queue.update({
-      where: { id: parseInt(id) },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-        cancelledBy: cancelledBy ? parseInt(cancelledBy) : null,
-        cancellationReason: reason,
-        updatedBy: cancelledBy ? parseInt(cancelledBy) : null
-      },
-      include: {
-        registration: {
-          include: {
-            patient: {
-              select: {
-                id: true,
-                hn: true,
-                prefix: true,
-                first_name: true,
-                last_name: true
-              }
-            },
-            doctor: {
-              select: {
-                id: true,
-                name: true
-              }
-            },
-            department: {
-              select: {
-                id: true,
-                name: true
+    const result = await prisma.$transaction(async (tx) => {
+      const queue = await tx.queue.findUnique({
+        where: { id: parseInt(id) },
+        include: {
+          registration: {
+            include: {
+              patient: {
+                select: { id: true, hn: true, first_name: true, last_name: true }
               }
             }
           }
         }
+      })
+
+      if (!queue) {
+        throw new Error('ไม่พบข้อมูลคิว')
       }
+
+      if (queue.status === 'CANCELLED') {
+        throw new Error('คิวนี้ถูกยกเลิกแล้ว')
+      }
+
+      if (queue.status === 'COMPLETED') {
+        throw new Error('ไม่สามารถยกเลิกคิวที่เสร็จสิ้นแล้ว')
+      }
+
+      const updatedQueue = await tx.queue.update({
+        where: { id: parseInt(id) },
+        data: {
+          status: 'CANCELLED',
+          cancelledAt: new Date(),
+          cancelledBy: cancelledBy ? parseInt(cancelledBy) : null,
+          cancellationReason: reason,
+          updatedBy: cancelledBy ? parseInt(cancelledBy) : null
+        },
+        include: {
+          registration: {
+            include: {
+              patient: {
+                select: {
+                  id: true,
+                  hn: true,
+                  prefix: true,
+                  first_name: true,
+                  last_name: true
+                }
+              },
+              doctor: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              },
+              department: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      })
+
+      await createQueueLog(tx, {
+        queueId: updatedQueue.id,
+        action: 'CANCEL',
+        details: {
+          queueNumber: updatedQueue.queueNumber,
+          queueType: updatedQueue.queueType,
+          changes: {
+            before: { status: queue.status },
+            after: { status: updatedQueue.status }
+          },
+          patientName: `${updatedQueue.registration.patient.first_name} ${updatedQueue.registration.patient.last_name}`,
+          patientHN: updatedQueue.registration.patient.hn,
+          doctorName: updatedQueue.registration.doctor?.name,
+          departmentName: updatedQueue.registration.department?.name
+        },
+        reason: reason,
+        userId: cancelledBy ? parseInt(cancelledBy) : null,
+        branchId: updatedQueue.branchId,
+        queueNumber: updatedQueue.queueNumber,
+        hn: updatedQueue.registration.patient.hn
+      })
+
+      return updatedQueue
     })
 
-    return updatedQueue
+    return result
   } catch (error) {
     console.error('Error cancelling queue:', error)
     throw error

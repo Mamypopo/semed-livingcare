@@ -348,7 +348,6 @@ export default {
       this.loading = true
       try {
         const response = await opdService.getQueueForOPDManagement(this.queueId)
-        console.log(response)
         const data = response.data
         
         // ตั้งค่าข้อมูลคิว

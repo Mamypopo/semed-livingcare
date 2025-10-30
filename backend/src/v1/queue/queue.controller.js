@@ -1,5 +1,4 @@
 import * as queueService from './queue.service.js'
-import { createQueueLog } from '../utils/queueLogger.js'
 
 /**
  * สร้างคิวใหม่
@@ -7,25 +6,6 @@ import { createQueueLog } from '../utils/queueLogger.js'
 export const createQueueController = async (req, res) => {
   try {
     const queue = await queueService.createQueue(req.body, req.user?.id)
-    
-    // บันทึก log การสร้างคิว
-    await createQueueLog({
-      queueId: queue.id,
-      action: 'CREATE',
-      details: {
-        queueNumber: queue.queueNumber,
-        queueType: queue.queueType,
-        status: queue.status,
-        patientName: `${queue.registration.patient.first_name} ${queue.registration.patient.last_name}`,
-        patientHN: queue.registration.patient.hn,
-        doctorName: queue.registration.doctor.name,
-        departmentName: queue.registration.department.name
-      },
-      userId: req.user?.id,
-      branchId: queue.branchId,
-      queueNumber: queue.queueNumber,
-      hn: queue.registration.patient.hn
-    })
     
     res.status(201).json({
       success: true,
@@ -105,34 +85,7 @@ export const cancelQueueController = async (req, res) => {
   try {
     const { id } = req.params
     const { reason } = req.body
-    
-    // ดึงข้อมูลคิวเดิมก่อนยกเลิก
-    const oldQueue = await queueService.getQueueById(id)
-    
     const queue = await queueService.cancelQueue(id, req.user?.id, reason)
-    
-    // บันทึก log การยกเลิกคิว
-    await createQueueLog({
-      queueId: queue.id,
-      action: 'CANCEL',
-      details: {
-        queueNumber: queue.queueNumber,
-        queueType: queue.queueType,
-        changes: {
-          before: { status: oldQueue.status },
-          after: { status: queue.status }
-        },
-        patientName: `${queue.registration.patient.first_name} ${queue.registration.patient.last_name}`,
-        patientHN: queue.registration.patient.hn,
-        doctorName: queue.registration.doctor.name,
-        departmentName: queue.registration.department.name
-      },
-      reason: reason,
-      userId: req.user?.id,
-      branchId: queue.branchId,
-      queueNumber: queue.queueNumber,
-      hn: queue.registration.patient.hn
-    })
     
     res.json({
       success: true,

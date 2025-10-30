@@ -5,8 +5,14 @@ import { prisma } from '../config/db.js'
  * @param {object} data - ข้อมูล log
  * @returns {Promise<object>} ข้อมูล log ที่สร้างขึ้น
  */
-export const createQueueLog = async (data) => {
+export const createQueueLog = async (clientOrData, maybeData) => {
   try {
+    // Support both signatures:
+    // - createQueueLog(data)
+    // - createQueueLog(txOrPrisma, data)
+    const client = maybeData ? clientOrData : prisma
+    const data = maybeData || clientOrData
+
     const {
       queueId,
       action,
@@ -18,11 +24,11 @@ export const createQueueLog = async (data) => {
       hn = null
     } = data
 
-    const log = await prisma.queueLog.create({
+    const log = await client.queueLog.create({
       data: {
         queueId,
         action,
-        details: details ? JSON.stringify(details) : null,
+        details: details ? toJson(details) : null,
         reason,
         userId: userId ? parseInt(userId) : null,
         branchId: branchId ? parseInt(branchId) : null,
@@ -175,81 +181,11 @@ export const getAllQueueLogs = async (params = {}) => {
   }
 }
 
-/**
- * ดึงสถิติ Queue Logs
- * @param {object} params - พารามิเตอร์การค้นหา
- * @returns {Promise<object>} สถิติ logs
- */
-export const getQueueLogStats = async (params = {}) => {
+function toJson(v) {
+  if (v == null) return null
   try {
-    const { branchId, dateFrom, dateTo } = params
-    
-    const where = {}
-    
-    if (branchId) {
-      where.branchId = parseInt(branchId)
-    }
-    
-    if (dateFrom || dateTo) {
-      where.createdAt = {}
-      if (dateFrom) {
-        where.createdAt.gte = new Date(dateFrom)
-      }
-      if (dateTo) {
-        where.createdAt.lte = new Date(dateTo)
-      }
-    }
-    
-    const [
-      total,
-      byAction,
-      byUser,
-      byQueueType
-    ] = await Promise.all([
-      prisma.queueLog.count({ where }),
-      prisma.queueLog.groupBy({
-        by: ['action'],
-        _count: { action: true },
-        where
-      }),
-      prisma.queueLog.groupBy({
-        by: ['userId'],
-        _count: { userId: true },
-        where,
-        include: {
-          user: {
-            select: { id: true, name: true }
-          }
-        }
-      }),
-      prisma.queueLog.groupBy({
-        by: ['queue'],
-        _count: { queueId: true },
-        where,
-        include: {
-          queue: {
-            include: {
-              registration: {
-                include: {
-                  department: {
-                    select: { id: true, name: true }
-                  }
-                }
-              }
-            }
-          }
-        }
-      })
-    ])
-    
-    return {
-      total,
-      byAction,
-      byUser,
-      byQueueType
-    }
-  } catch (error) {
-    console.error('Error getting queue log stats:', error)
-    throw error
+    return typeof v === 'string' ? { message: v } : v
+  } catch {
+    return { message: String(v) }
   }
 }

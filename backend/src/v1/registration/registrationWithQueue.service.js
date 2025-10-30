@@ -1,6 +1,7 @@
 import { prisma } from '../config/db.js'
 import { generateVN } from '../utils/vnGenerator.js'
 import { generateQueueNumber } from '../utils/queueNumberGenerator.js'
+import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
 import { createRegistrationLog } from '../utils/registrationLogger.js'
 import { createQueueLog } from '../utils/queueLogger.js'
 
@@ -17,7 +18,8 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
     departmentId, 
     branchId, 
     queueType, 
-    note = null 
+    note = null,
+    createdDate = null 
   } = data
 
   // ตรวจสอบข้อมูลที่จำเป็น
@@ -72,18 +74,22 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
 
   // เริ่ม transaction
   const result = await prisma.$transaction(async (tx) => {
-    // สร้าง VN
-    const vn = await generateVN(branchId)
+    const dateObj = normalizeCreatedDate(createdDate)
+    const vnDateStart = toLocalStartOfDay(dateObj)
+    // สร้าง VN ตามวันที่เลือก
+    const vn = await generateVN(branchId, tx, createdDate)
 
     // สร้าง Registration
     const registration = await tx.registration.create({
       data: {
         vnNumber: vn,
+        vnDate: vnDateStart,
         patientId: parseInt(patientId),
         doctorId: parseInt(doctorId),
         departmentId: departmentId,
         branchId: parseInt(branchId),
-        appointmentDate: new Date(),
+        appointmentDate: dateObj,
+        createdAt: dateObj,
         createdBy: createdBy.toString(),
         updatedBy: createdBy.toString()
       },
@@ -103,8 +109,8 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
       }
     })
 
-    // สร้าง Queue Number
-    const queueNumber = await generateQueueNumber(branchId, departmentId, queueType)
+    // สร้าง Queue Number ต่อสาขา+แผนก ตามวันที่เลือก
+    const queueNumber = await generateQueueNumber(branchId, departmentId, queueType, tx, createdDate)
 
     // สร้าง Queue
     const queue = await tx.queue.create({
@@ -114,6 +120,8 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
         departmentId: departmentId,
         branchId: parseInt(branchId),
         status: 'WAITING',
+        queueDate: vnDateStart,
+        createdAt: dateObj,
         createdBy: createdBy.toString(),
         updatedBy: createdBy.toString()
       },
@@ -143,44 +151,43 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
       }
     })
 
+    // Log ภายในทรานแซคชัน
+    await createRegistrationLog(tx, {
+      registrationId: registration.id,
+      action: 'CREATE',
+      details: {
+        vn: registration.vnNumber,
+        patientName: `${registration.patient.first_name} ${registration.patient.last_name}`,
+        patientHN: registration.patient.hn,
+        doctorName: registration.doctor.name,
+        departmentName: registration.department.name,
+        status: 'COMPLETED',
+        note: note
+      },
+      userId: createdBy,
+      branchId: parseInt(branchId),
+      hn: registration.patient.hn
+    })
+
+    await createQueueLog(tx, {
+      queueId: queue.id,
+      action: 'CREATE',
+      details: {
+        queueNumber: queue.queueNumber,
+        queueType: queue.queueType,
+        status: queue.status,
+        patientName: `${queue.registration.patient.first_name} ${queue.registration.patient.last_name}`,
+        patientHN: queue.registration.patient.hn,
+        doctorName: queue.registration.doctor.name,
+        departmentName: queue.registration.department.name
+      },
+      userId: createdBy,
+      branchId: parseInt(branchId),
+      queueNumber: queue.queueNumber,
+      hn: queue.registration.patient.hn
+    })
+
     return { registration, queue }
-  })
-
-  // บันทึก Registration Log
-  await createRegistrationLog({
-    registrationId: result.registration.id,
-    action: 'CREATE',
-    details: {
-      vn: result.registration.vnNumber,
-      patientName: `${result.registration.patient.first_name} ${result.registration.patient.last_name}`,
-      patientHN: result.registration.patient.hn,
-      doctorName: result.registration.doctor.name,
-      departmentName: result.registration.department.name,
-      status: 'COMPLETED',
-      note: note
-    },
-    userId: createdBy,
-    branchId: parseInt(branchId),
-    hn: result.registration.patient.hn
-  })
-
-  // บันทึก Queue Log
-  await createQueueLog({
-    queueId: result.queue.id,
-    action: 'CREATE',
-    details: {
-      queueNumber: result.queue.queueNumber,
-      queueType: result.queue.queueType,
-      status: result.queue.status,
-      patientName: `${result.queue.registration.patient.first_name} ${result.queue.registration.patient.last_name}`,
-      patientHN: result.queue.registration.patient.hn,
-      doctorName: result.queue.registration.doctor.name,
-      departmentName: result.queue.registration.department.name
-    },
-    userId: createdBy,
-    branchId: parseInt(branchId),
-    queueNumber: result.queue.queueNumber,
-    hn: result.queue.registration.patient.hn
   })
 
   return result
