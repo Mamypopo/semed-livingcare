@@ -141,6 +141,121 @@ export const visitService = {
       }
     })
     return items
+  },
+  async getById(id) {
+    if (!id) throw new Error('id จำเป็น')
+    const vid = String(id)
+    const item = await prisma.visit.findUnique({
+      where: { id: vid },
+      include: {
+        doctor: { select: { id: true, name: true } },
+        registration: { select: { id: true, vnNumber: true, queue: { select: { queueNumber: true } } } },
+        diagnoses: { include: { icd10: true } }
+      }
+    })
+    return item
+  },
+  async update(id, payload) {
+    if (!id) throw new Error('id จำเป็น')
+    const vid = String(id)
+    const {
+      doctorId,
+      operatorId,
+      departmentId,
+      branchId,
+      visitAt,
+      vitals = {},
+      clinical = {},
+      pain = {},
+      swelling = {},
+      diagnoses = []
+    } = payload || {}
+
+    return await prisma.$transaction(async (tx) => {
+      const visit = await tx.visit.update({
+        where: { id: vid },
+        data: {
+          doctorId: toIntOrNull(doctorId),
+          operatorId: toIntOrNull(operatorId),
+          departmentId: departmentId || null,
+          branchId: branchId ? parseInt(branchId) : undefined,
+          visitAt: visitAt ? new Date(visitAt) : undefined,
+          updatedBy: emptyToNull(payload?.updatedBy),
+
+          weightKg: toDecimalOrNull(vitals.weight),
+          heightCm: toDecimalOrNull(vitals.height),
+          bmi: toDecimalOrNull(vitals.bmi),
+          bsa: toDecimalOrNull(vitals.bsa),
+          temperatureC: toDecimalOrNull(vitals.temperature),
+          bpSys: toIntOrNull(vitals.bpSys),
+          bpDia: toIntOrNull(vitals.bpDia),
+          pulseRate: toIntOrNull(vitals.pulseRate),
+          respiratoryRate: toIntOrNull(vitals.respiratoryRate),
+          vas: toDecimalOrNull(vitals.vas),
+          o2Sat: toDecimalOrNull(vitals.o2sat),
+          crt: emptyToNull(vitals.crt),
+          headCircumferenceCm: toDecimalOrNull(vitals.headCircumference),
+          chestCircumferenceCm: toDecimalOrNull(vitals.chestCircumference),
+          waistCircumferenceCm: toDecimalOrNull(vitals.waistCircumference),
+          alcohol: emptyToNull(vitals.alcohol),
+          smoking: emptyToNull(vitals.smoking),
+          customFields: payload?.vitals?.customFields || null,
+          measuredAt: vitals.measuredAt ? new Date(vitals.measuredAt) : null,
+
+          cc: emptyToNull(clinical.cc),
+          hpi: emptyToNull(clinical.hpi),
+          pmh: emptyToNull(clinical.pmh),
+          dxText: emptyToNull(clinical.dx),
+          ga: emptyToNull(clinical.ga),
+          pe: emptyToNull(clinical.pe),
+          doctorAdvice: emptyToNull(clinical.doctorAdvice),
+          doctorNote: emptyToNull(clinical.doctorNote),
+
+          painVas: toDecimalOrNull(pain.painLevel ?? pain.vas),
+          painType: emptyToNull(pain.painType),
+          painLocation: emptyToNull(pain.painLocation),
+
+          swellingLevel: emptyToNull(swelling.level),
+          swellingLevelText: emptyToNull(swelling.levelText),
+          swellingType: emptyToNull(swelling.type),
+          swellingLocation: emptyToNull(swelling.location),
+
+          mcNotRest: payload?.vitals?.mcNotRest ?? null,
+          mcRestFrom: payload?.vitals?.mcStartDate ? new Date(payload.vitals.mcStartDate) : null,
+          mcRestTo: payload?.vitals?.mcEndDate ? new Date(payload.vitals.mcEndDate) : null,
+          mcCanFly: payload?.vitals?.canFly ?? null
+        },
+        include: { patient: { select: { hn: true } } }
+      })
+
+      // replace diagnoses
+      await tx.visitDiagnosis.deleteMany({ where: { visitId: vid } })
+      let created = 0
+      if (Array.isArray(diagnoses) && diagnoses.length) {
+        for (const dx of diagnoses) {
+          const code = (dx?.code || '').trim()
+          if (!code) continue
+          const icd = await tx.icd10.findUnique({ where: { code } })
+          if (!icd) continue
+          await tx.visitDiagnosis.create({ data: { visitId: vid, icd10Id: icd.id } })
+          created++
+        }
+      }
+
+      await logVisit(tx, {
+        visitId: visit.id,
+        action: 'UPDATE_VISIT',
+        details: {
+          hasDiagnoses: Array.isArray(diagnoses) && diagnoses.length > 0,
+          diagnoses: (Array.isArray(diagnoses) ? diagnoses : []).map(d => ({ code: (d?.code || '').trim() })).filter(d => d.code)
+        },
+        userId: toIntOrNull(payload?.operatorId) || toIntOrNull(payload?.doctorId) || null,
+        branchId: visit.branchId,
+        hn: visit?.patient?.hn || null
+      })
+
+      return { visit, diagnosesUpdated: created }
+    })
   }
 }
 

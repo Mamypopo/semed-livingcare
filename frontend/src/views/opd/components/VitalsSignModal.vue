@@ -29,7 +29,7 @@
               <div class="bg-white px-6 py-4 rounded-t-2xl border-b border-gray-100 flex-shrink-0">
                 <div class="flex items-center justify-between">
                   <DialogTitle class="text-lg font-semibold text-gray-900">
-                    เพิ่มการซักประวัติ
+                    {{ mode === 'edit' ? 'แก้ไขการซักประวัติ' : 'เพิ่มการซักประวัติ' }}
                   </DialogTitle>
                   <div class="grid grid-cols-2 gap-3">
                     <button
@@ -971,6 +971,8 @@ export default {
       type: Boolean,
       default: false
     },
+    mode: { type: String, default: 'create' },
+    visitId: { type: String, default: null },
     departmentName: {
       type: String,
       default: ''
@@ -1070,6 +1072,79 @@ export default {
     }
   },
   methods: {
+    async preloadVisit() {
+      try {
+        const { data } = await visitService.getById(this.visitId)
+        const v = data?.data || {}
+        // map vitals
+        this.vitalsData.weight = v.weightKg ?? ''
+        this.vitalsData.height = v.heightCm ?? ''
+        this.vitalsData.bmi = v.bmi ?? ''
+        this.vitalsData.bsa = v.bsa ?? ''
+        this.vitalsData.temperature = v.temperatureC ?? ''
+        this.vitalsData.bpSys = v.bpSys ?? ''
+        this.vitalsData.bpDia = v.bpDia ?? ''
+        this.vitalsData.pulseRate = v.pulseRate ?? ''
+        this.vitalsData.respiratoryRate = v.respiratoryRate ?? ''
+        this.vitalsData.vas = v.vas ?? ''
+        this.vitalsData.o2sat = v.o2Sat ?? ''
+        this.vitalsData.crt = v.crt ?? ''
+        this.vitalsData.headCircumference = v.headCircumferenceCm ?? ''
+        this.vitalsData.chestCircumference = v.chestCircumferenceCm ?? ''
+        this.vitalsData.waistCircumference = v.waistCircumferenceCm ?? ''
+        this.vitalsData.alcohol = v.alcohol ?? 'ไม่ดื่ม'
+        this.vitalsData.smoking = v.smoking ?? 'ไม่สูบ'
+        this.vitalsData.customFields = v.customFields || {}
+        this.vitalsData.operationDate = v.visitAt ? new Date(v.visitAt) : new Date()
+        this.vitalsData.mcNotRest = v.mcNotRest ?? false
+        this.vitalsData.mcStartDate = v.mcRestFrom ? new Date(v.mcRestFrom) : new Date()
+        this.vitalsData.mcEndDate = v.mcRestTo ? new Date(v.mcRestTo) : new Date()
+        this.vitalsData.canFly = v.mcCanFly ?? true
+
+        // clinical
+        this.formData.cc = v.cc ?? ''
+        this.formData.hpi = v.hpi ?? ''
+        this.formData.pmh = v.pmh ?? ''
+        this.formData.dx = v.dxText ?? ''
+        this.formData.ga = v.ga ?? ''
+        this.formData.pe = v.pe ?? ''
+        this.formData.doctorAdvice = v.doctorAdvice ?? ''
+        this.formData.doctorNote = v.doctorNote ?? ''
+
+        // pain
+        this.clinicalData.painLevel = v.painVas ?? ''
+        this.clinicalData.painType = v.painType ?? ''
+        this.clinicalData.painLocation = v.painLocation ?? ''
+
+        // swelling
+        this.swellingData.level = v.swellingLevel ?? ''
+        this.swellingData.type = v.swellingType ?? ''
+        this.swellingData.location = v.swellingLocation ?? ''
+
+        // custom fields rows
+        const rows = []
+        const cf = this.vitalsData.customFields || {}
+        for (const k of Object.keys(cf)) {
+          rows.push({ key: k, value: cf[k] })
+        }
+        this.customFieldRows = rows.length ? rows.concat([{ key: '', value: '' }]) : [{ key: '', value: '' }]
+
+        // diagnoses
+        const dxs = Array.isArray(v.diagnoses) ? v.diagnoses.map(d => ({
+          id: d.icd10Id,
+          code: d.icd10?.code,
+          nameTh: d.icd10?.nameTh,
+          nameEn: d.icd10?.nameEn,
+          groupCode: d.icd10?.groupCode,
+          groupNameTh: d.icd10?.groupNameTh,
+          groupNameEn: d.icd10?.groupNameEn
+        })) : []
+        this.selectedDiagnoses = dxs
+        this.updateDxFromSelected()
+      } catch (e) {
+        console.error('preload visit failed', e)
+      }
+    },
     closeModal() {
       this.$emit('close')
     },
@@ -1221,7 +1296,9 @@ export default {
         diagnoses: this.selectedDiagnoses
       }
       try {
-        const { data } = await visitService.create(payload)
+        const { data } = this.mode === 'edit' && this.visitId
+          ? await visitService.update(this.visitId, payload)
+          : await visitService.create(payload)
         if (data?.success) {
           await Swal.fire({
             icon: 'success',
@@ -1328,6 +1405,10 @@ export default {
       if (val) {
         const auth = useAuthStore()
         this.vitalsData.operatorName = auth.userName || auth.user?.name || ''
+        // preload when edit
+        if (this.mode === 'edit' && this.visitId) {
+          this.preloadVisit()
+        }
       }
     },
     'vitalsData.mcNotRest'(val) {

@@ -6,6 +6,12 @@ export default {
   },
   listByPatient(patientId) {
     return apiClient.get('/visits', { patientId })
+  },
+  getById(id) {
+    return apiClient.get(`/visits/${id}`)
+  },
+  update(id, data) {
+    return apiClient.put(`/visits/${id}`, data)
   }
 }
 

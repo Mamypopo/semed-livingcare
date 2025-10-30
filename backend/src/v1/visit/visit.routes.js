@@ -12,6 +12,12 @@ router.post('/', visitController.create)
 // List visits by patient
 router.get('/', visitController.list)
 
+// Get visit by id
+router.get('/:id', visitController.getById)
+
+// Update visit
+router.put('/:id', visitController.update)
+
 export default router
 
 

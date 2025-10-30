@@ -227,7 +227,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ rec.doctor?.name || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 whitespace-pre-line">{{ rec.dxText || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-right">
-                  <button class="text-emerald-600 hover:text-emerald-800">แก้ไข</button>
+                  <button @click="openEditVisit(rec)" class="text-emerald-600 hover:text-emerald-800">แก้ไข</button>
                 </td>
               </tr>
             </tbody>
@@ -345,6 +345,8 @@
     <!-- Vitals Sign Modal -->
     <VitalsSignModal
       :isOpen="showVitalsModal"
+      :mode="editingVisitId ? 'edit' : 'create'"
+      :visitId="editingVisitId"
       :departmentName="queueData?.department?.name || ''"
       :patientId="patientId"
       :registrationId="queueData?.registration?.id || null"
@@ -356,7 +358,7 @@
         authStore.user?.branchId ||
         null
       "
-      @close="showVitalsModal = false"
+      @close="onCloseModal"
     />
   </div>
 </template>
@@ -404,6 +406,7 @@ export default {
       medicalHistory: [],
       activeTab: 'diagnosis',
       showVitalsModal: false,
+      editingVisitId: null,
       tabs: [
         { id: 'diagnosis', name: 'การวินิจฉัยโรค', icon: Stethoscope },
         { id: 'history', name: 'รายการประวัติ', icon: Clock },
@@ -498,9 +501,19 @@ export default {
     openVitalsSign() {
       this.showVitalsModal = true
     },
+    openEditVisit(rec) {
+      this.editingVisitId = rec.id
+      this.showVitalsModal = true
+    },
 
     goBack() {
       this.$router.push({ name: 'OPDQueue' })
+    },
+    onCloseModal() {
+      this.showVitalsModal = false
+      this.editingVisitId = null
+      // reload history after save/edit
+      this.loadMedicalHistory()
     },
 
     formatDateTime(iso) {
