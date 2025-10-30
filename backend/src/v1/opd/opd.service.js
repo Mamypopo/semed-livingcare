@@ -78,6 +78,7 @@ export const getQueueForOPDManagement = async (queueId) => {
       registration: {
         id: queue.registration.id,
         vnNumber: queue.registration.vnNumber,
+        opdNumber: queue.registration.opdNumber,
         type: queue.registration.type,
         appointmentDate: queue.registration.appointmentDate,
         reason: queue.registration.reason,

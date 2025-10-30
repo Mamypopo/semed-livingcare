@@ -7,7 +7,7 @@
         <div>
           <div class="text-sm text-gray-600 mb-1">คิวตรวจเลขที่</div>
           <div class="text-lg font-semibold text-gray-700">
-            (OPD) {{ queueData?.queueNumber || '-' }}
+             {{ queueData?.registration?.opdNumber ||  '-' }}
           </div>
           <div class="text-sm text-gray-600 mt-2">
             แผนก: {{ queueData?.department?.name || '-' }}
@@ -335,7 +335,7 @@ export default {
         const data = response.data
 
         // ตั้งค่าข้อมูลคิว
-        this.queueData = {
+          this.queueData = {
           queueNumber: data.queue.queueNumber,
           status: data.queue.status,
           createdAt: data.queue.createdAt,
@@ -343,6 +343,7 @@ export default {
           registration: {
             id: data.registration.id,
             vnNumber: data.registration.vnNumber,
+              opdNumber: data.registration.opdNumber,
             doctor: data.doctor,
           },
         }

@@ -2,6 +2,7 @@ import { prisma } from '../config/db.js'
 import { generateVN } from '../utils/vnGenerator.js'
 import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
 import { createRegistrationLog } from '../Loggers/registrationLogger.js'
+import { getNextOpdNumber } from '../utils/opdNumberGenerator.js'
 
 /**
  * สร้างการลงทะเบียนใหม่
@@ -9,6 +10,8 @@ import { createRegistrationLog } from '../Loggers/registrationLogger.js'
  * @param {number} createdBy - ID ของผู้สร้าง
  * @returns {Promise<object>} ข้อมูลการลงทะเบียนที่สร้างขึ้น
  */
+
+// ลงทะเบียนอย่างเดียว ยังไม่ได้ใช้
 export const createRegistration = async (data, createdBy) => {
   try {
     const {
@@ -77,11 +80,15 @@ export const createRegistration = async (data, createdBy) => {
       const vn = await generateVN(branchId, tx, createdDate)
       const dateObj = normalizeCreatedDate(createdDate)
       const vnDateStart = toLocalStartOfDay(dateObj)
+      const { opdNumber, year, seq: opdSeq } = await getNextOpdNumber(tx, branchId, dateObj)
 
       const created = await tx.registration.create({
         data: {
           vnNumber: vn,
           vnDate: vnDateStart,
+          opdNumber,
+          opdYear: year,
+          opdSeq: opdSeq,
           patientId: parseInt(patientId),
           doctorId: parseInt(doctorId),
           departmentId: parseInt(departmentId),
@@ -144,6 +151,7 @@ export const createRegistration = async (data, createdBy) => {
         action: 'CREATE',
         details: {
           vn: created.vnNumber,
+          opdNumber: created.opdNumber,
           patientName: `${created.patient.first_name} ${created.patient.last_name}`,
           patientHN: created.patient.hn,
           doctorName: created.doctor.name,

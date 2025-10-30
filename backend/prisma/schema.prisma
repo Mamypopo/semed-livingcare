@@ -52,6 +52,7 @@ model Branch {
   queueLogs QueueLog[]
   visits    Visit[]
   visitLogs VisitLog[]
+  opdCounters OpdCounter[]
 }
 
 model User {
@@ -338,6 +339,24 @@ model Department {
   visits       Visit[]
 }
 
+// ==========================================
+// OpdCounter - ตัวนับเลข OPD ต่อสาขา-ต่อปี
+// ==========================================
+model OpdCounter {
+  id       Int      @id @default(autoincrement())
+  branchId Int
+  branch   Branch   @relation(fields: [branchId], references: [id])
+  year     Int
+  current  Int      @default(0) // ค่าปัจจุบัน (ล่าสุดที่ออกให้)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([branchId, year])
+  @@index([branchId])
+  @@index([year])
+}
+
 model Registration {
   id              String      @id @default(cuid())
   vnNumber        String
@@ -346,6 +365,10 @@ model Registration {
   cancelledAt     DateTime?   // วันที่ยกเลิก
   cancelledBy     Int?        // ผู้ยกเลิก
   appointmentDate DateTime
+  // OPD Number (ต่อสาขา-ต่อปี): ตัวอย่าง OPD202500001
+  opdNumber       String?     @unique
+  opdYear         Int?
+  opdSeq          Int?
   
   // Relations
   patientId       Int
@@ -370,6 +393,9 @@ model Registration {
   registrationLogs RegistrationLog[]
   cancelledByUser User?             @relation("CancelledRegistrations", fields: [cancelledBy], references: [id])
   visits          Visit[]
+
+  @@unique([branchId, opdYear, opdSeq])
+  @@index([opdNumber])
 }
 
 model Queue {

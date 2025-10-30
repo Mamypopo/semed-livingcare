@@ -185,6 +185,7 @@
                       selected ? 'pl-10' : 'pl-3',
                     ]"
                   >
+                  
                     <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
                       {{ doctor.name }}
                     </span>
@@ -403,7 +404,7 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">Queue/VN</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">เลขที่</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">แผนก</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">แพทย์</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">ชื่อลูกค้า</th>
@@ -456,12 +457,9 @@
                       ]"
                     ></div>
                     <div>
-                      <div class="text-sm font-medium text-gray-500">
-                        Queue:{{ queue.queueNumber }}
-                      </div>
-                      <div class="text-sm font-medium text-gray-500">
-                        VN: {{ queue.registration?.vnNumber || '-' }}
-                      </div>
+                      <div class="text-sm font-medium text-gray-500">Queue: {{ queue.queueNumber }}</div>
+                      <div class="text-sm font-medium text-gray-500">VN: {{ queue.registration?.vnNumber || '-' }}</div>
+                      <div class="text-sm font-medium text-gray-500">OPD: {{ queue.registration?.opdNumber || '-' }}</div>
                     </div>
                   </div>
                 </td>

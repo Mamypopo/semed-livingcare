@@ -4,6 +4,7 @@ import { generateQueueNumber } from '../utils/queueNumberGenerator.js'
 import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
 import { createRegistrationLog } from '../Loggers/registrationLogger.js'
 import { createQueueLog } from '../Loggers/queueLogger.js'
+import { getNextOpdNumber } from '../utils/opdNumberGenerator.js'
 
 /**
  * สร้าง Registration พร้อม Queue ในครั้งเดียว
@@ -75,15 +76,17 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
   // เริ่ม transaction
   const result = await prisma.$transaction(async (tx) => {
     const dateObj = normalizeCreatedDate(createdDate)
-    const vnDateStart = toLocalStartOfDay(dateObj)
     // สร้าง VN ตามวันที่เลือก
     const vn = await generateVN(branchId, tx, createdDate)
+    const { opdNumber, year, seq: opdSeq } = await getNextOpdNumber(tx, branchId, dateObj)
 
     // สร้าง Registration
     const registration = await tx.registration.create({
       data: {
         vnNumber: vn,
-        vnDate: vnDateStart,
+        opdNumber,
+        opdYear: year,
+        opdSeq: opdSeq,
         patientId: parseInt(patientId),
         doctorId: parseInt(doctorId),
         departmentId: departmentId,
@@ -120,7 +123,6 @@ export const createRegistrationWithQueue = async (data, createdBy) => {
         departmentId: departmentId,
         branchId: parseInt(branchId),
         status: 'WAITING',
-        queueDate: vnDateStart,
         createdAt: dateObj,
         createdBy: createdBy.toString(),
         updatedBy: createdBy.toString()

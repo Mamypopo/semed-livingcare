@@ -1678,6 +1678,10 @@ export default {
         // ตั้งแท็บเริ่มต้นทุกครั้งที่เปิด
         this.activeMainTab = 'vitals'
         this.activeSubTab = 'basic'
+        // รีเฟรชข้อมูลแผนกทุกครั้งที่เปิด
+        const dep = this.departmentName || ''
+        this.vitalsData.departmentName = dep
+        this.vitalsData.departments = dep ? [dep] : []
         const auth = useAuthStore()
         this.vitalsData.operatorName = auth.userName || auth.user?.name || ''
         // preload when edit

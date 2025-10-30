@@ -141,8 +141,8 @@
       v-model="p.label"
       @input="emitUpdate"
       rows="3"
-      class="w-full text-sm text-gray-700 bg-white/60 border border-gray-200 rounded-lg px-3 py-2 
-             outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent shadow-sm"
+      class="w-full text-sm px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+
       placeholder="รายละเอียดของจุด #{{ i + 1 }}"
     ></textarea>
   </div>
