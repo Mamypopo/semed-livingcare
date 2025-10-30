@@ -1,7 +1,7 @@
 import { prisma } from '../config/db.js'
 import { generateQueueNumber } from '../utils/queueNumberGenerator.js'
 import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
-import { createQueueLog } from '../utils/queueLogger.js'
+import { createQueueLog } from '../Loggers/queueLogger.js'
 
 /**
  * สร้างคิวใหม่

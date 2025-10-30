@@ -1,7 +1,7 @@
 import { prisma } from '../config/db.js'
 import { generateVN } from '../utils/vnGenerator.js'
 import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
-import { createRegistrationLog } from '../utils/registrationLogger.js'
+import { createRegistrationLog } from '../Loggers/registrationLogger.js'
 
 /**
  * สร้างการลงทะเบียนใหม่

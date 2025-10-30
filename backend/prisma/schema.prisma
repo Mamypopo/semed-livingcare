@@ -562,8 +562,6 @@ model VisitDiagnosis {
   icd10Id    Int
   icd10      Icd10    @relation(fields: [icd10Id], references: [id])
 
-  note       String?
-
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

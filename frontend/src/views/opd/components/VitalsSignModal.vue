@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
-    <HeadlessDialog :open="isOpen" @close="closeModal" as="div" class="relative z-50">
+    <HeadlessDialog :open="isOpen" @close="handleRequestClose" as="div" class="relative z-50">
       <TransitionChild
         as="template"
         enter="duration-300 ease-out"
@@ -39,7 +39,7 @@
                       บันทึก
                     </button>
                     <button
-                      @click="closeModal"
+                      @click="showConfirmClose = true"
                       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors"
                     >
                       ยกเลิก
@@ -407,27 +407,44 @@
                             </div>
                           </div>
 
-                          <!-- Custom Fields -->
+                          <!-- Custom Fields (Key/Value JSON) -->
                           <div class="space-y-2 pt-2">
                             <div class="flex items-center gap-2 mb-2">
-                              <label class="text-sm font-medium text-gray-700">กำหนดเอง</label>
+                              <label class="text-sm font-medium text-gray-700">กำหนดเอง (Key/Value)</label>
                             </div>
-                            <div class="grid grid-cols-5 gap-2">
-                              <input
-                                v-model="vitalsData.customField1"
-                                type="text"
-                                class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              />
-                              <input
-                                v-model="vitalsData.customField2"
-                                type="text"
-                                class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                              />
-                              <button
-                                class=" col-span-1 flex items-center justify-center px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 text-sm font-medium transition-colors"
-                              >
-                                <Plus class="w-4 h-4" />
-                              </button>
+                            <div class="space-y-2">
+                              <div v-for="(row, i) in customFieldRows" :key="'cf-'+i" class="grid grid-cols-5 gap-2 items-center">
+                                <input
+                                  v-model="row.key"
+                                  type="text"
+                                  placeholder="หัวข้อ เช่น สูบกัญชา"
+                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                />
+                                <input
+                                  v-model="row.value"
+                                  type="text"
+                                  placeholder="ค่า เช่น นานครั้ง"
+                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                />
+                                <div class="col-span-1 flex items-center justify-end gap-2">
+                                  <button
+                                    v-if="i === customFieldRows.length - 1"
+                                    type="button"
+                                    @click="addCustomRow()"
+                                    class="px-3 py-2 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200"
+                                  >
+                                    <Plus class="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    v-else
+                                    type="button"
+                                    @click="removeCustomRow(i)"
+                                    class="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                  >
+                                    <X class="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
 
@@ -440,25 +457,27 @@
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                               <div>
-                                <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักตั้งแต่</div>
+                            <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักตั้งแต่</div>
                                 <VueDatePicker
                                   v-model="vitalsData.mcStartDate"
                                   :auto-apply="true"
                                   :enable-time-picker="false"
                                   :format="'dd/MM/yyyy'"
                                   locale="th"
-                                  class="w-full"
+                              class="w-full"
+                              :disabled="vitalsData.mcNotRest"
                                 />
                               </div>
                               <div>
-                                <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักถึง</div>
+                            <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักถึง</div>
                                 <VueDatePicker
                                   v-model="vitalsData.mcEndDate"
                                   :auto-apply="true"
                                   :enable-time-picker="false"
                                   :format="'dd/MM/yyyy'"
                                   locale="th"
-                                  class="w-full"
+                              class="w-full"
+                              :disabled="vitalsData.mcNotRest"
                                 />
                               </div>
                             </div>
@@ -906,6 +925,11 @@
       </div>
     </HeadlessDialog>
   </TransitionRoot>
+  <ConfirmClosePopover
+    v-if="showConfirmClose"
+    @cancel="showConfirmClose = false"
+    @confirm="resetAndClose"
+  />
 </template>
 
 <script>
@@ -917,6 +941,7 @@ import { useAuthStore } from '@/stores/auth.js'
 import icd10Service from '@/services/icd10.js'
 import visitService from '@/services/visit.js'
 import Swal from 'sweetalert2'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 
 export default {
   name: 'VitalsSignModal',
@@ -938,7 +963,8 @@ export default {
     ChevronDown,
     X,
     SearchIcon,
-    VueDatePicker
+    VueDatePicker,
+    ConfirmClosePopover
   },
   props: {
     isOpen: {
@@ -958,6 +984,7 @@ export default {
   emits: ['close'],
   data() {
     return {
+      showConfirmClose: false,
       activeMainTab: 'vitals',
       activeSubTab: 'basic',
       mainTabs: [
@@ -1017,8 +1044,7 @@ export default {
         chestCircumference: '',
         alcohol: 'none',
         smoking: 'none',
-        customField1: '',
-        customField2: '',
+        customFields: {},
         operationDate: new Date(),
         operatorName: '',
         departmentName: '',
@@ -1028,6 +1054,9 @@ export default {
         canFly: true,
         departments: []
       },
+      newCustomKey: '',
+      newCustomValue: '',
+      customFieldRows: [{ key: '', value: '' }],
       formData: {
         cc: '',
         hpi: '',
@@ -1042,6 +1071,36 @@ export default {
   },
   methods: {
     closeModal() {
+      this.$emit('close')
+    },
+    handleRequestClose() {
+      this.showConfirmClose = true
+    },
+    resetAndClose() {
+      // รีเซ็ตค่าฟอร์มหลักๆ แล้วปิด modal
+      this.diagnosisSearch = ''
+      this.icdResults = []
+      this.showIcdDropdown = false
+      this.loadingIcd = false
+      this.icdDebounceTimer = null
+      this.selectedDiagnoses = []
+
+      this.clinicalData = { painLevel: '', painType: '', painLocation: '' }
+      this.swellingData = { level: '', type: '', location: '' }
+      this.vitalsData = {
+        weight: '', height: '', bmi: '', temperature: '', bpSys: '', bpDia: '', pulseRate: '',
+        respiratoryRate: '', vas: '', bsa: '', crt: '', o2sat: '', headCircumference: '',
+        waistCircumference: '', chestCircumference: '', alcohol: 'none', smoking: 'none',
+        customFields: {}, operationDate: new Date(), operatorName: '',
+        departmentName: '', mcNotRest: false, mcStartDate: new Date(), mcEndDate: new Date(),
+        canFly: true, departments: []
+      }
+      this.newCustomKey = ''
+      this.newCustomValue = ''
+      this.customFieldRows = [{ key: '', value: '' }]
+      this.formData = { cc: '', hpi: '', pmh: '', dx: '', ga: '', pe: '', doctorAdvice: '', doctorNote: '' }
+
+      this.showConfirmClose = false
       this.$emit('close')
     },
     handleGlobalClick(evt) {
@@ -1111,8 +1170,32 @@ export default {
       })
       this.formData.dx = lines.join('\n')
     },
+    addCustomField() {
+      const key = (this.newCustomKey || '').trim()
+      if (!key) return
+      if (!this.vitalsData.customFields || typeof this.vitalsData.customFields !== 'object') {
+        this.vitalsData.customFields = {}
+      }
+      this.vitalsData.customFields[key] = this.newCustomValue
+      this.newCustomKey = ''
+      this.newCustomValue = ''
+    },
+    removeCustomField(key) {
+      if (this.vitalsData.customFields && Object.prototype.hasOwnProperty.call(this.vitalsData.customFields, key)) {
+        const copy = { ...this.vitalsData.customFields }
+        delete copy[key]
+        this.vitalsData.customFields = copy
+      }
+    },
     async saveData() {
       const auth = useAuthStore()
+      const cf = {}
+      for (const r of this.customFieldRows) {
+        const k = (r.key || '').trim()
+        if (!k) continue
+        cf[k] = r.value ?? ''
+      }
+      this.vitalsData.customFields = cf
       const payload = {
         patientId: this.patientId,
         registrationId: this.registrationId,
@@ -1171,6 +1254,16 @@ export default {
         this.vitalsData.departments.splice(index, 1)
       }
     },
+    addCustomRow() {
+      this.customFieldRows.push({ key: '', value: '' })
+    },
+    removeCustomRow(index) {
+      if (this.customFieldRows.length <= 1) {
+        this.customFieldRows = [{ key: '', value: '' }]
+        return
+      }
+      this.customFieldRows.splice(index, 1)
+    },
     updatePainTypeFromVAS() {
       let v = parseFloat(this.clinicalData.painLevel)
       if (isNaN(v)) {
@@ -1214,6 +1307,15 @@ export default {
       if (val) {
         const auth = useAuthStore()
         this.vitalsData.operatorName = auth.userName || auth.user?.name || ''
+      }
+    },
+    'vitalsData.mcNotRest'(val) {
+      if (val) {
+        this.vitalsData.mcStartDate = null
+        this.vitalsData.mcEndDate = null
+      } else {
+        if (!this.vitalsData.mcStartDate) this.vitalsData.mcStartDate = new Date()
+        if (!this.vitalsData.mcEndDate) this.vitalsData.mcEndDate = new Date()
       }
     }
   }

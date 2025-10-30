@@ -1,5 +1,5 @@
 import { prisma } from "../config/db.js"
-import { logVisit } from "../utils/visitLogger.js"
+import { logVisit } from "../Loggers/visitLogger.js"
 
 export const visitService = {
   async create(payload) {
@@ -26,12 +26,12 @@ export const visitService = {
     return await prisma.$transaction(async (tx) => {
       const visit = await tx.visit.create({
         data: {
-          patientId,
+          patientId: parseInt(patientId),
           registrationId: registrationId || null,
-          doctorId: doctorId || null,
-          operatorId: operatorId || null,
+          doctorId: toIntOrNull(doctorId),
+          operatorId: toIntOrNull(operatorId),
           departmentId: departmentId || null,
-          branchId,
+          branchId: parseInt(branchId),
           visitAt: visitAt ? new Date(visitAt) : undefined,
 
           // Vitals
@@ -85,14 +85,15 @@ export const visitService = {
       })
 
       // fetch patient hn for logging
-      const patient = await tx.patient.findUnique({ where: { id: patientId }, select: { hn: true } })
+      const patient = await tx.patient.findUnique({ where: { id: parseInt(patientId) }, select: { hn: true } })
 
       await logVisit(tx, {
         visitId: visit.id,
         action: 'CREATE_VISIT',
         details: {
           registrationId: registrationId || null,
-          hasDiagnoses: Array.isArray(diagnoses) && diagnoses.length > 0
+          hasDiagnoses: Array.isArray(diagnoses) && diagnoses.length > 0,
+          diagnoses: (Array.isArray(diagnoses) ? diagnoses : []).map(d => ({ code: (d?.code || '').trim() })).filter(d => d.code)
         },
         userId: operatorId || doctorId || null,
         branchId,
@@ -109,20 +110,10 @@ export const visitService = {
           await tx.visitDiagnosis.create({
             data: {
               visitId: visit.id,
-              icd10Id: icd.id,
-              note: dx?.note || null
+              icd10Id: icd.id
             }
           })
           created++
-
-          await logVisit(tx, {
-            visitId: visit.id,
-            action: 'ADD_DX',
-            details: { code, icd10Id: icd.id },
-            userId: operatorId || doctorId || null,
-            branchId,
-            hn: patient?.hn || null
-          })
         }
       }
 

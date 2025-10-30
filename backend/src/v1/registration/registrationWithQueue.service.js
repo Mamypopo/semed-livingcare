@@ -2,8 +2,8 @@ import { prisma } from '../config/db.js'
 import { generateVN } from '../utils/vnGenerator.js'
 import { generateQueueNumber } from '../utils/queueNumberGenerator.js'
 import { normalizeCreatedDate, toLocalStartOfDay } from '../utils/dateUtils.js'
-import { createRegistrationLog } from '../utils/registrationLogger.js'
-import { createQueueLog } from '../utils/queueLogger.js'
+import { createRegistrationLog } from '../Loggers/registrationLogger.js'
+import { createQueueLog } from '../Loggers/queueLogger.js'
 
 /**
  * สร้าง Registration พร้อม Queue ในครั้งเดียว
