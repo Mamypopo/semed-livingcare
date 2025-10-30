@@ -11,6 +11,7 @@ import departmentRoutes from "../department/department.routes.js";
 import registrationRoutes from "../registration/registration.routes.js";
 import queueRoutes from "../queue/queue.routes.js";
 import opdRoutes from "../opd/opd.routes.js";
+import icd10Routes from "../icd10/icd10.routes.js";
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.use("/departments", departmentRoutes);
 router.use("/registrations", registrationRoutes);
 router.use("/queues", queueRoutes);
 router.use("/opd", opdRoutes);
+router.use("/icd10", icd10Routes);
 router.use("/", fileRoutes);
 
 export default router;

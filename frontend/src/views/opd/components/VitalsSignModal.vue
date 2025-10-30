@@ -718,34 +718,65 @@
                         <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
                         <label class="text-xs font-semibold text-gray-900">การวินิจฉัยโรค</label>
                       </div>
-                      <div class="flex gap-2">
+                      <div class="flex gap-2 relative" ref="icdDropdownEl">
+                        <SearchIcon class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           v-model="diagnosisSearch"
+                          @input="onSearchIcd"
                           type="text"
-                          class="flex-1 px-4 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                          placeholder="ค้นหารายการวินิจฉัย 3 ตัวอักษร"
+                          class="flex-1 pl-9 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                          placeholder="ค้นหา ICD10 อย่างน้อย 3 ตัวอักษร"
                         />
-                        <button
-                          @click="openIcd10Modal"
-                          class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 text-sm font-medium"
-                        >
-                          +
-                        </button>
+                        
+
+                        <!-- Search dropdown -->
+                        <div v-if="showIcdDropdown" class="absolute top-11 left-0 right-16 z-40 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-auto">
+                          <div v-if="loadingIcd" class="p-3 text-sm text-gray-500">กำลังค้นหา...</div>
+                          <template v-else>
+                            <button
+                              v-for="item in icdResults"
+                              :key="item.id"
+                              :disabled="isIcdSelected(item.code)"
+                              @click="!isIcdSelected(item.code) && addDiagnosis(item)"
+                              :class="[
+                                'w-full text-left px-3 py-2 text-sm flex items-center justify-between',
+                                isIcdSelected(item.code) ? 'cursor-not-allowed opacity-60' : 'hover:bg-emerald-50'
+                              ]"
+                            >
+                              <span class="font-medium text-gray-900">{{ item.code }}</span>
+                              <span class="flex-1 ml-3 text-gray-700 truncate">{{ item.nameTh }}</span>
+                              <span v-if="isIcdSelected(item.code)" class="ml-3 text-emerald-700 bg-emerald-100 border border-emerald-200 text-xs px-2 py-0.5 rounded-full">เลือกแล้ว</span>
+                            </button>
+                            <div v-if="!icdResults.length" class="p-3 text-sm text-gray-500">ไม่พบข้อมูล</div>
+                          </template>
+                        </div>
                       </div>
 
                       <!-- ICD Table -->
                       <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
-                        <div class="bg-emerald-50 px-4 py-2 border-b border-gray-200">
-                          <div class="grid grid-cols-4 gap-4 text-xs font-medium text-emerald-700">
-                            <div>ICD CODE</div>
-                            <div>ชื่อรายการ</div>
-                            <div>ประเภท</div>
-                            <div>ตัวเลือก</div>
+                        <div class="bg-emerald-50 px-4 py-2 border-b border-gray-200 sticky top-0">
+                          <div class="grid grid-cols-3 gap-4 text-xs font-semibold text-gray-700 tracking-wide">
+                            <div class="uppercase">ICD CODE</div>
+                            <div class="uppercase">ชื่อรายการ</div>
+                            <div class="uppercase text-right">ตัวเลือก</div>
                           </div>
                         </div>
-                        <div class="p-4 text-center text-gray-500 text-sm">
+                        <div v-if="selectedDiagnoses.length === 0" class="p-4 text-center text-gray-500 text-sm">
                           <p>ไม่มีข้อมูล</p>
-                          <p class="text-xs text-gray-400 mt-1">คลิก + เพื่อเพิ่มการวินิจฉัยโรค</p>
+                          <p class="text-xs text-gray-400 mt-1">พิมพ์เพื่อค้นหาและเลือกจากรายการ</p>
+                        </div>
+                        <div v-else class="divide-y divide-gray-100">
+                          <div
+                            v-for="(dx, i) in selectedDiagnoses"
+                            :key="dx.code + '-' + i"
+                            class="px-4 py-2 grid grid-cols-3 gap-4 items-center text-sm hover:bg-gray-50"
+                          >
+                            <div class="font-semibold text-gray-700">{{ dx.code }}</div>
+                            <div class="text-gray-500 truncate" :title="dx.nameTh">{{ dx.nameTh }}</div>
+                            <div class="text-right">
+                              <button @click="removeDiagnosis(i)" class="text-red-600 hover:text-red-800">ลบ</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -879,10 +910,11 @@
 
 <script>
 import { Dialog as HeadlessDialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { UserRound, Stethoscope, AlertTriangle, Info, Plus, ChevronDown, X } from 'lucide-vue-next'
+import { UserRound, Stethoscope, AlertTriangle, Info, Plus, ChevronDown, X, Search as SearchIcon } from 'lucide-vue-next'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useAuthStore } from '@/stores/auth.js'
+import icd10Service from '@/services/icd10.js'
 
 export default {
   name: 'VitalsSignModal',
@@ -903,6 +935,7 @@ export default {
     Plus,
     ChevronDown,
     X,
+    SearchIcon,
     VueDatePicker
   },
   props: {
@@ -930,6 +963,11 @@ export default {
         { id: 'swelling', name: 'อาการบวม', icon: AlertTriangle }
       ],
       diagnosisSearch: '',
+      icdResults: [],
+      showIcdDropdown: false,
+      loadingIcd: false,
+      icdDebounceTimer: null,
+      selectedDiagnoses: [],
       painTypes: [
         'ไม่ปวดเลย',
         'ปวดเล็กน้อย',
@@ -999,14 +1037,70 @@ export default {
     closeModal() {
       this.$emit('close')
     },
-    openIcd10Modal() {
-      // TODO: เปิด ICD10 modal
-      console.log('Open ICD10 modal')
+    handleGlobalClick(evt) {
+      if (!this.showIcdDropdown) return
+      const root = this.$refs.icdDropdownEl
+      if (root && !root.contains(evt.target)) {
+        this.showIcdDropdown = false
+      }
+    },
+    onSearchIcd() {
+      if (this.icdDebounceTimer) clearTimeout(this.icdDebounceTimer)
+      this.icdDebounceTimer = setTimeout(this.performSearchIcd, 500)
+    },
+    async performSearchIcd() {
+      const q = (this.diagnosisSearch || '').trim()
+      if (q.length < 3) {
+        this.icdResults = []
+        this.showIcdDropdown = false
+        return
+      }
+      this.loadingIcd = true
+      this.showIcdDropdown = true
+      try {
+        const { data } = await icd10Service.search({ query: q, limit: 20 })
+        const items = data?.data?.items || []
+        this.icdResults = items
+      } catch {
+        this.icdResults = []
+      } finally {
+        this.loadingIcd = false
+      }
+    },
+    isIcdSelected(code) {
+      return this.selectedDiagnoses.some(dx => dx.code === code)
+    },
+    addDiagnosis(item) {
+      if (!item || !item.code) return
+      const exists = this.selectedDiagnoses.some(dx => dx.code === item.code)
+      if (!exists) {
+        this.selectedDiagnoses.push({
+          id: item.id,
+          code: item.code,
+          nameTh: item.nameTh,
+          nameEn: item.nameEn,
+          groupCode: item.groupCode,
+          groupNameTh: item.groupNameTh,
+          groupNameEn: item.groupNameEn
+        })
+      }
+      this.diagnosisSearch = ''
+      this.icdResults = []
+      this.showIcdDropdown = false
+    },
+    removeDiagnosis(index) {
+      if (index >= 0) this.selectedDiagnoses.splice(index, 1)
     },
     saveData() {
       // TODO: บันทึกข้อมูล
-      console.log('Save vitals data:', this.vitalsData)
-      console.log('Save form data:', this.formData)
+      const payload = {
+        vitals: this.vitalsData,
+        clinical: this.formData,
+        pain: this.clinicalData,
+        swelling: this.swellingData,
+        diagnoses: this.selectedDiagnoses
+      }
+      console.log('Payload to save:', payload)
     },
     calculateBMI() {
       if (this.vitalsData.weight && this.vitalsData.height) {
@@ -1042,6 +1136,14 @@ export default {
       else if (v <= 8) this.clinicalData.painType = 'ปวดมาก'
       else this.clinicalData.painType = 'ปวดมากที่สุด'
     }
+  },
+  mounted() {
+    document.addEventListener('mousedown', this.handleGlobalClick)
+    document.addEventListener('touchstart', this.handleGlobalClick)
+  },
+  beforeUnmount() {
+    document.removeEventListener('mousedown', this.handleGlobalClick)
+    document.removeEventListener('touchstart', this.handleGlobalClick)
   },
   watch: {
     departmentName: {
