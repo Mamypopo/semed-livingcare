@@ -1083,6 +1083,7 @@ export default {
           groupNameTh: item.groupNameTh,
           groupNameEn: item.groupNameEn
         })
+        this.updateDxFromSelected()
       }
       this.diagnosisSearch = ''
       this.icdResults = []
@@ -1090,6 +1091,18 @@ export default {
     },
     removeDiagnosis(index) {
       if (index >= 0) this.selectedDiagnoses.splice(index, 1)
+      this.updateDxFromSelected()
+    },
+    updateDxFromSelected() {
+      if (!this.selectedDiagnoses.length) {
+        this.formData.dx = ''
+        return
+      }
+      const lines = this.selectedDiagnoses.map((dx, i) => {
+        const name = dx?.nameTh || dx?.nameEn || ''
+        return `${i + 1}. ${dx.code} ${name}`
+      })
+      this.formData.dx = lines.join('\n')
     },
     saveData() {
       // TODO: บันทึกข้อมูล
