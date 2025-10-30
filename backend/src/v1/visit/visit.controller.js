@@ -46,5 +46,15 @@ export const visitController = {
       next(err)
     }
   }
+  ,
+  async cancel(req, res, next) {
+    try {
+      const userId = req.user?.id
+      const result = await visitService.cancel(req.params.id, userId)
+      res.json({ success: true, data: result })
+    } catch (err) {
+      next(err)
+    }
+  }
 }
 

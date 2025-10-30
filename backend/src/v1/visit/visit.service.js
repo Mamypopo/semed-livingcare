@@ -25,10 +25,21 @@ export const visitService = {
     }
 
     return await prisma.$transaction(async (tx) => {
+      // กำหนดลำดับ visit ภายใต้ registration (ถ้ามี)
+      let visitSeq = null
+      if (registrationId) {
+        await tx.registration.update({
+          where: { id: String(registrationId) },
+          data: { visitSeqCurrent: { increment: 1 } }
+        })
+        const reg = await tx.registration.findUnique({ where: { id: String(registrationId) }, select: { visitSeqCurrent: true } })
+        visitSeq = reg?.visitSeqCurrent || 1
+      }
       const visit = await tx.visit.create({
         data: {
           patientId: parseInt(patientId),
           registrationId: registrationId || null,
+          visitSeq: visitSeq,
           doctorId: toIntOrNull(doctorId),
           operatorId: toIntOrNull(operatorId),
           departmentId: departmentId || null,
@@ -129,14 +140,15 @@ export const visitService = {
     if (!patientId) throw new Error('patientId จำเป็น')
     const pid = parseInt(patientId)
     const items = await prisma.visit.findMany({
-      where: { patientId: pid },
-      orderBy: { createdAt: 'desc' },
+      where: { patientId: pid, isActive: true },
+      orderBy: { createdAt: 'asc' },
       include: {
         doctor: { select: { id: true, name: true } },
         registration: {
           select: {
             id: true,
             vnNumber: true,
+              opdNumber: true,
             queue: { select: { queueNumber: true } }
           }
         }
@@ -151,7 +163,7 @@ export const visitService = {
       where: { id: vid },
       include: {
         doctor: { select: { id: true, name: true } },
-        registration: { select: { id: true, vnNumber: true, queue: { select: { queueNumber: true } } } },
+        registration: { select: { id: true, vnNumber: true, opdNumber: true, queue: { select: { queueNumber: true } } } },
         diagnoses: { include: { icd10: true } }
       }
     })
@@ -259,6 +271,34 @@ export const visitService = {
       })
 
       return { visit, diagnosesUpdated: created }
+    })
+  }
+  ,
+  async cancel(id, userId) {
+    if (!id) throw new Error('id จำเป็น')
+    const vid = String(id)
+    return await prisma.$transaction(async (tx) => {
+      const visit = await tx.visit.update({
+        where: { id: vid },
+        data: {
+          isActive: false,
+          cancelledAt: new Date(),
+          cancelledBy: userId ? parseInt(userId) : null,
+          updatedBy: userId ? String(userId) : undefined,
+        },
+        include: { patient: { select: { hn: true } } }
+      })
+
+      await logVisit(tx, {
+        visitId: visit.id,
+        action: 'CANCEL_VISIT',
+        details: {},
+        userId: userId ? parseInt(userId) : null,
+        branchId: visit.branchId,
+        hn: visit?.patient?.hn || null,
+      })
+
+      return { visit }
     })
   }
 }

@@ -24,7 +24,9 @@
           <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">ไม่มีข้อมูล</td>
         </tr>
         <tr v-else v-for="rec in items" :key="rec.id" class="hover:bg-gray-50">
-          <td class="px-5 py-3 text-sm font-semibold text-gray-900">{{ rec.registration?.vnNumber || '-' }}</td>
+          <td class="px-5 py-3 text-sm font-semibold text-gray-700 whitespace-nowrap w-24 truncate">
+            {{ rec.registration?.opdNumber ? `${rec.registration.opdNumber}${rec.visitSeq ? '-' + rec.visitSeq : ''}` : (rec.registration?.vnNumber || '-') }}
+          </td>
           <td class="px-5 py-3 text-sm text-gray-700">{{ formatDateTime(rec.createdAt) }}</td>
           <td class="px-5 py-3 text-sm text-gray-700">{{ rec.doctor?.name || '-' }}</td>
           <td class="px-5 py-3 text-sm text-gray-700">
@@ -71,6 +73,15 @@
                           <FileCheck2 class="w-4 h-4" /> ใบรับรองแพทย์
                         </button>
                       </MenuItem>
+                      <div class="my-1 h-px bg-gray-100"></div>
+                      <MenuItem v-slot="{ active }">
+                        <button
+                          @click="$emit('cancel', rec)"
+                          :class="[active ? 'bg-red-50 text-red-700' : 'text-red-600','group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm']"
+                        >
+                          ยกเลิก Visit
+                        </button>
+                      </MenuItem>
                     </div>
                   </MenuItems>
                 </Transition>
@@ -93,7 +104,7 @@ export default {
     items: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false }
   },
-  emits: ['edit', 'open-opd', 'open-mc'],
+  emits: ['edit', 'open-opd', 'open-mc', 'cancel'],
   methods: {
     formatDateTime(iso) {
       if (!iso) return '-'

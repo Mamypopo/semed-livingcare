@@ -202,7 +202,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
       <!-- Diagnosis Tab -->
       <div v-if="activeTab === 'diagnosis'" class="p-6">
-        <DiagnosisTable :items="medicalHistory" :loading="loadingHistory" @edit="openEditVisit" />
+        <DiagnosisTable :items="medicalHistory" :loading="loadingHistory" @edit="openEditVisit" @cancel="onCancelVisit" />
       </div>
 
       <!-- History Tab -->
@@ -385,8 +385,8 @@ export default {
           counts[regId] = (counts[regId] || 0) + 1
           rec._ordinal = counts[regId]
         }
-        // เรียงใหม่ตามเวลาใหม่ล่าสุดก่อน
-        this.medicalHistory = ordered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+        // แสดงเก่า -> ใหม่ ตามที่ต้องการ
+        this.medicalHistory = ordered
       } catch (error) {
         console.error('Error loading medical history:', error)
       } finally {
@@ -400,6 +400,26 @@ export default {
     openEditVisit(rec) {
       this.editingVisitId = rec.id
       this.showVitalsModal = true
+    },
+    async onCancelVisit(rec) {
+      if (!rec?.id) return
+      const { isConfirmed } = await Swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการยกเลิก Visit?',
+        text: 'รายการนี้จะถูกซ่อนจากประวัติ แต่เลขลำดับจะยังคงอยู่',
+        showCancelButton: true,
+        confirmButtonText: 'ยกเลิก',
+        cancelButtonText: 'ปิด',
+        confirmButtonColor: '#ef4444'
+      })
+      if (!isConfirmed) return
+      try {
+        await visitService.cancel(rec.id)
+        await this.loadMedicalHistory()
+        Swal.fire({ icon: 'success', title: 'ยกเลิกแล้ว', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' })
+      } catch (e) {
+        Swal.fire({ icon: 'error', title: 'ยกเลิกไม่สำเร็จ', text: e?.response?.data?.message || e.message })
+      }
     },
 
     goBack() {

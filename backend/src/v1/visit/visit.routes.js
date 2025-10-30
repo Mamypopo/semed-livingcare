@@ -18,6 +18,9 @@ router.get('/:id', visitController.getById)
 // Update visit
 router.put('/:id', visitController.update)
 
+// Cancel visit
+router.patch('/:id/cancel', visitController.cancel)
+
 export default router
 
 

@@ -166,7 +166,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
               >
                 <!-- Debug info -->
                 <div v-if="doctors.length === 0" class="px-3 py-2 text-sm text-gray-500">
@@ -180,21 +180,12 @@
                 >
                   <li
                     :class="[
-                      active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
-                      'relative cursor-default select-none py-2 pr-4',
-                      selected ? 'pl-10' : 'pl-3',
+                      'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
+                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                     ]"
                   >
-                  
-                    <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
-                      {{ doctor.name }}
-                    </span>
-                    <span
-                      v-if="selected"
-                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
-                    >
-                      <Check class="h-5 w-5" />
-                    </span>
+                    <span class="block truncate">{{ doctor.name }}</span>
+                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>
@@ -227,7 +218,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
               >
                 <ListboxOption
                   v-for="department in departments"
@@ -237,20 +228,12 @@
                 >
                   <li
                     :class="[
-                      active ? 'bg-emerald-100 text-emerald-900' : 'text-gray-900',
-                      'relative cursor-default select-none py-2 pr-4',
-                      selected ? 'pl-10' : 'pl-3',
+                      'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
+                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                     ]"
                   >
-                    <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
-                      {{ department.name }}
-                    </span>
-                    <span
-                      v-if="selected"
-                      class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600"
-                    >
-                      <Check class="h-5 w-5" />
-                    </span>
+                    <span class="block truncate">{{ department.name }}</span>
+                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>

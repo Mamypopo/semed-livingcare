@@ -369,6 +369,7 @@ model Registration {
   opdNumber       String?     @unique
   opdYear         Int?
   opdSeq          Int?
+  visitSeqCurrent Int      @default(0)
   
   // Relations
   patientId       Int
@@ -470,6 +471,7 @@ model Visit {
   // อ้างอิงหลัก
   registrationId String?
   registration   Registration? @relation(fields: [registrationId], references: [id])
+  visitSeq     Int?
 
   patientId    Int
   patient      Patient   @relation(fields: [patientId], references: [id])
@@ -536,6 +538,8 @@ model Visit {
 
   // Audit fields
   isActive  Boolean  @default(true)
+  cancelledAt DateTime?
+  cancelledBy Int?
   createdBy String?
   updatedBy String?
   createdAt DateTime @default(now())
@@ -546,6 +550,7 @@ model Visit {
   logs VisitLog[]
 
   @@index([patientId, visitAt])
+  @@unique([registrationId, visitSeq])
   @@index([registrationId])
   @@index([doctorId, visitAt])
   @@index([branchId, visitAt])

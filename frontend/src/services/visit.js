@@ -12,6 +12,9 @@ export default {
   },
   update(id, data) {
     return apiClient.put(`/visits/${id}`, data)
+  },
+  cancel(id) {
+    return apiClient.patch(`/visits/${id}/cancel`)
   }
 }
 
