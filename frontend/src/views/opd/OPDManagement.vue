@@ -203,10 +203,35 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
       <!-- Diagnosis Tab -->
       <div v-if="activeTab === 'diagnosis'" class="p-6">
-        <div class="text-center text-gray-500 py-8">
-          <Stethoscope class="w-12 h-12 mx-auto mb-4 text-gray-300" />
-          <p>ส่วนการวินิจฉัยโรค</p>
-          <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-emerald-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">เลขที่</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">วันที่/เวลา</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">แพทย์ผู้ตรวจ</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">การวินิจฉัยโรค</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">ตัวเลือก</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <tr v-if="loadingHistory">
+                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">กำลังโหลด...</td>
+              </tr>
+              <tr v-else-if="medicalHistory.length === 0">
+                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">ไม่มีข้อมูล</td>
+              </tr>
+              <tr v-else v-for="rec in medicalHistory" :key="rec.id" class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ rec.registration?.vnNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ formatDateTime(rec.createdAt) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ rec.doctor?.name || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700 whitespace-pre-line">{{ rec.dxText || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-right">
+                  <button class="text-emerald-600 hover:text-emerald-800">แก้ไข</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -351,6 +376,7 @@ import opdService from '@/services/opd.js'
 import Swal from 'sweetalert2'
 import VitalsSignModal from '@/views/opd/components/VitalsSignModal.vue'
 import { useAuthStore } from '@/stores/auth.js'
+import visitService from '@/services/visit.js'
 
 export default {
   name: 'OPDManagement',
@@ -407,6 +433,7 @@ export default {
       this.loading = true
       try {
         const response = await opdService.getQueueForOPDManagement(this.queueId)
+        console.log(response)
         const data = response.data
 
         // ตั้งค่าข้อมูลคิว
@@ -444,16 +471,23 @@ export default {
     },
 
     async loadMedicalHistory() {
-      if (!this.patientId) return
+      const id = this.patientData?.id || this.patientId
+      if (!id) return
 
       this.loadingHistory = true
       try {
-        // Mock data for now - replace with actual API call
-        this.medicalHistory = []
-
-        // Example API call:
-        // const response = await patientService.getMedicalHistory(this.patientId)
-        // this.medicalHistory = response.data
+        const { data } = await visitService.listByPatient(id)
+        const items = data?.data?.items || []
+        // คำนวณลำดับต่อท้าย (-1, -2) ต่อ registration
+        const counts = {}
+        const ordered = [...items].sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt))
+        for (const rec of ordered) {
+          const regId = rec?.registration?.id || rec.id
+          counts[regId] = (counts[regId] || 0) + 1
+          rec._ordinal = counts[regId]
+        }
+        // เรียงใหม่ตามเวลาใหม่ล่าสุดก่อน
+        this.medicalHistory = ordered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
       } catch (error) {
         console.error('Error loading medical history:', error)
       } finally {
@@ -515,6 +549,12 @@ export default {
 
       return `${years} ปี ${months} เดือน ${days} วัน`
     },
+    formatVisitNo(rec) {
+      const vn = rec?.registration?.vnNumber ? String(rec.registration.vnNumber) : ''
+      const base = `${vn.padStart(4, '0')}`
+      const ord = rec?._ordinal || 1
+      return `${base}-${ord}`
+    }
   },
 
   mounted() {

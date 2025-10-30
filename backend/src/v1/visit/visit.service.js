@@ -33,6 +33,8 @@ export const visitService = {
           departmentId: departmentId || null,
           branchId: parseInt(branchId),
           visitAt: visitAt ? new Date(visitAt) : undefined,
+          createdBy: emptyToNull(payload?.createdBy),
+          updatedBy: emptyToNull(payload?.updatedBy),
 
           // Vitals
           weightKg: toDecimalOrNull(vitals.weight),
@@ -119,6 +121,26 @@ export const visitService = {
 
       return { visit, diagnosesCreated: created }
     })
+  }
+  ,
+  async listByPatient(patientId) {
+    if (!patientId) throw new Error('patientId จำเป็น')
+    const pid = parseInt(patientId)
+    const items = await prisma.visit.findMany({
+      where: { patientId: pid },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        doctor: { select: { id: true, name: true } },
+        registration: {
+          select: {
+            id: true,
+            vnNumber: true,
+            queue: { select: { queueNumber: true } }
+          }
+        }
+      }
+    })
+    return items
   }
 }
 

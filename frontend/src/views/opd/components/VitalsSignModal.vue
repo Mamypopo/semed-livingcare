@@ -113,7 +113,7 @@
                                 </label>
                                 <input
                                   v-model="vitalsData.weight"
-                                  @input="calculateBMI"
+                                  @input="calculate"
                                   type="number"
                                   step="0.1"
                                   class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
@@ -143,7 +143,7 @@
                                 </label>
                                 <input
                                   v-model="vitalsData.height"
-                                  @input="calculateBMI"
+                                  @input="calculate"
                                   type="number"
                                   step="0.1"
                                   class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
@@ -342,7 +342,7 @@
                                 v-model="vitalsData.alcohol"
                                 type="radio"
                                 name="alcohol"
-                                value="none"
+                                value="ไม่ดื่ม"
                                 class="w-4 h-4 text-emerald-500"
                               />
                               <span class="text-sm text-gray-700">ไม่ดื่ม</span>
@@ -352,7 +352,7 @@
                                 v-model="vitalsData.alcohol"
                                 type="radio"
                                 name="alcohol"
-                                value="sometimes"
+                                value="ดื่มบางครั้ง"
                                 class="w-4 h-4 text-emerald-500"
                               />
                               <span class="text-sm text-gray-700">ดื่มบางครั้ง</span>
@@ -362,7 +362,7 @@
                                 v-model="vitalsData.alcohol"
                                 type="radio"
                                 name="alcohol"
-                                value="yes"
+                                value="ดื่ม"
                                 class="w-4 h-4 text-emerald-500"
                               />
                               <span class="text-sm text-gray-700">ดื่ม</span>
@@ -379,7 +379,7 @@
                                 v-model="vitalsData.smoking"
                                 type="radio"
                                 name="smoking"
-                                value="none"
+                                value="ไม่สูบ"
                                 class="w-4 h-4 text-emerald-500"
                               />
                               <span class="text-sm text-gray-700">ไม่สูบ</span>
@@ -389,7 +389,7 @@
                                 v-model="vitalsData.smoking"
                                 type="radio"
                                 name="smoking"
-                                value="sometimes"
+                                value="สูบบางครั้ง"
                                 class="w-4 h-4 text-emerald-500 "
                               />
                               <span class="text-sm text-gray-700">สูบบางครั้ง</span>
@@ -399,7 +399,7 @@
                                 v-model="vitalsData.smoking"
                                 type="radio"
                                 name="smoking"
-                                value="yes"
+                                value="สูบ"
                                 class="w-4 h-4 text-emerald-500"
                               />
                               <span class="text-sm text-gray-700">สูบ</span>
@@ -1189,6 +1189,16 @@ export default {
     },
     async saveData() {
       const auth = useAuthStore()
+      const { isConfirmed } = await Swal.fire({
+        icon: 'question',
+        title: 'ยืนยันการบันทึก?',
+        text: 'ตรวจสอบความถูกต้องของข้อมูลก่อนบันทึก',
+        showCancelButton: true,
+        confirmButtonText: 'บันทึก',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#059669'
+      })
+      if (!isConfirmed) return
       const cf = {}
       for (const r of this.customFieldRows) {
         const k = (r.key || '').trim()
@@ -1237,16 +1247,27 @@ export default {
         })
       }
     },
-    calculateBMI() {
-      if (this.vitalsData.weight && this.vitalsData.height) {
-        const weight = parseFloat(this.vitalsData.weight)
-        const height = parseFloat(this.vitalsData.height) / 100 // แปลง cm เป็น m
-        if (height > 0) {
-          const bmi = (weight / (height * height)).toFixed(2)
-          this.vitalsData.bmi = bmi
-        }
+    calculate() {
+      const wStr = this.vitalsData.weight
+      const hStr = this.vitalsData.height
+      const w = wStr !== '' && wStr != null ? parseFloat(wStr) : NaN
+      const hCm = hStr !== '' && hStr != null ? parseFloat(hStr) : NaN
+
+      // BMI
+      if (!isNaN(w) && !isNaN(hCm) && hCm > 0) {
+        const hM = hCm / 100
+        const bmi = w / (hM * hM)
+        this.vitalsData.bmi = isFinite(bmi) ? bmi.toFixed(2) : ''
       } else {
         this.vitalsData.bmi = ''
+      }
+
+      // BSA (Mosteller)
+      if (!isNaN(w) && !isNaN(hCm) && w > 0 && hCm > 0) {
+        const bsa = Math.sqrt((hCm * w) / 3600)
+        this.vitalsData.bsa = isFinite(bsa) ? bsa.toFixed(2) : ''
+      } else {
+        this.vitalsData.bsa = ''
       }
     },
     removeDepartment(index) {

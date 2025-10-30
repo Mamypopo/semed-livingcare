@@ -9,6 +9,9 @@ router.use(authenticateToken)
 // Create visit
 router.post('/', visitController.create)
 
+// List visits by patient
+router.get('/', visitController.list)
+
 export default router
 
 
