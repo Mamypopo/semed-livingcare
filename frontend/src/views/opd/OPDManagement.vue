@@ -6,7 +6,7 @@
         <!-- Queue & Department Info -->
         <div>
           <div class="text-sm text-gray-600 mb-1">คิวตรวจเลขที่</div>
-          <div class="text-lg font-semibold text-gray-900">
+          <div class="text-lg font-semibold text-gray-700">
             (OPD) {{ queueData?.queueNumber || '-' }}
           </div>
           <div class="text-sm text-gray-600 mt-2">
@@ -17,7 +17,7 @@
         <!-- Date & Priority -->
         <div>
           <div class="text-sm text-gray-600 mb-1">วันที่</div>
-          <div class="text-lg font-semibold text-gray-900">
+          <div class="text-lg font-semibold text-gray-700">
             {{ formatDateTime(queueData?.createdAt) }}
           </div>
         </div>
@@ -49,8 +49,7 @@
             <UserRound class="w-6 h-6 text-white" />
           </div>
           <div class="flex-1">
-            <div class="text-sm text-gray-600 mb-1">รหัสผู้ป่วย</div>
-            <div class="text-lg font-semibold text-gray-900">{{ patientData?.hn || '-' }}</div>
+            <div class="text-lg font-semibold text-gray-700">{{ patientData?.hn || '-' }}</div>
             <div class="text-sm font-medium text-gray-700 mt-2">
               {{ patientData?.prefix || '' }} {{ patientData?.first_name || '' }}
               {{ patientData?.last_name || '' }}
@@ -203,36 +202,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
       <!-- Diagnosis Tab -->
       <div v-if="activeTab === 'diagnosis'" class="p-6">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-emerald-50">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">เลขที่</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">วันที่/เวลา</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">แพทย์ผู้ตรวจ</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">การวินิจฉัยโรค</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">ตัวเลือก</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-              <tr v-if="loadingHistory">
-                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">กำลังโหลด...</td>
-              </tr>
-              <tr v-else-if="medicalHistory.length === 0">
-                <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">ไม่มีข้อมูล</td>
-              </tr>
-              <tr v-else v-for="rec in medicalHistory" :key="rec.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ rec.registration?.vnNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ formatDateTime(rec.createdAt) }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ rec.doctor?.name || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 whitespace-pre-line">{{ rec.dxText || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-right">
-                  <button @click="openEditVisit(rec)" class="text-emerald-600 hover:text-emerald-800">แก้ไข</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <DiagnosisTable :items="medicalHistory" :loading="loadingHistory" @edit="openEditVisit" />
       </div>
 
       <!-- History Tab -->
@@ -263,84 +233,7 @@
       </div>
     </div>
 
-    <!-- Medical History Table -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">ประวัติการรักษา</h3>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                เลขที่
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                วันที่/เวลา
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                แพทย์ผู้ตรวจ
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                การวินิจฉัยโรค
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                ตัวเลือก
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <!-- Loading State -->
-            <tr v-if="loadingHistory">
-              <td colspan="5" class="px-6 py-4 text-center">
-                <div class="flex items-center justify-center">
-                  <div
-                    class="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-emerald-500"
-                  ></div>
-                  <span class="ml-2 text-sm text-gray-500">กำลังโหลดข้อมูล...</span>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Empty State -->
-            <tr v-else-if="medicalHistory.length === 0">
-              <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                <div class="flex flex-col items-center">
-                  <FileText class="w-8 h-8 text-gray-300 mb-2" />
-                  <p>ไม่มีข้อมูล</p>
-                </div>
-              </td>
-            </tr>
-
-            <!-- History Rows -->
-            <tr v-else v-for="record in medicalHistory" :key="record.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ record.id }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatDateTime(record.createdAt) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ record.doctor?.name || '-' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ record.diagnosis || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <button class="text-emerald-600 hover:text-emerald-900">ดูรายละเอียด</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    
 
     <!-- Vitals Sign Modal -->
     <VitalsSignModal
@@ -377,6 +270,7 @@ import {
 import opdService from '@/services/opd.js'
 import Swal from 'sweetalert2'
 import VitalsSignModal from '@/views/opd/components/VitalsSignModal.vue'
+import DiagnosisTable from '@/views/opd/components/DiagnosisTable.vue'
 import { useAuthStore } from '@/stores/auth.js'
 import visitService from '@/services/visit.js'
 
@@ -396,6 +290,7 @@ export default {
     FileText,
     Camera,
     VitalsSignModal,
+    DiagnosisTable,
   },
   data() {
     return {

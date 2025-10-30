@@ -481,8 +481,7 @@ model Visit {
   alcohol              String?   // none, sometimes, yes
   smoking              String?   // none, sometimes, yes
   customFields         Json?     // เก็บข้อมูล custom field หลายค่า เช่น { "cannabis": "ไม่สูบ", "exercise": "..." }
-  measuredAt           DateTime?
-
+  chart                Json?     // เก็บข้อมูล chart หลายค่า เช่น { "chart": "..." }
   // Clinical Notes
   cc           String?
   hpi          String?
@@ -500,7 +499,6 @@ model Visit {
 
   // Swelling Assessment
   swellingLevel     String?  // 1+, 2+, 3+, 4+
-  swellingLevelText String?
   swellingType      String?  // Pitting, Non-Pitting
   swellingLocation  String?
 

@@ -1083,8 +1083,8 @@
                 </div>
 
                 <!-- Chart Tab Content -->
-                <div v-if="activeMainTab === 'chart'" class="text-center text-gray-500 py-8">
-                  <p>Chart - กำลังพัฒนา...</p>
+                <div v-if="activeMainTab === 'chart'">
+                  <ChartTab :chart="chart" @update:chart="val => (chart = val)" />
                 </div>
               </div>
             </DialogPanel>
@@ -1129,6 +1129,7 @@ import icd10Service from '@/services/icd10.js'
 import visitService from '@/services/visit.js'
 import Swal from 'sweetalert2'
 import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
+import ChartTab from '@/views/opd/components/ChartTab.vue'
 
 export default {
   name: 'VitalsSignModal',
@@ -1152,6 +1153,7 @@ export default {
     SearchIcon,
     VueDatePicker,
     ConfirmClosePopover,
+    ChartTab,
   },
   props: {
     isOpen: {
@@ -1192,6 +1194,7 @@ export default {
       loadingIcd: false,
       icdDebounceTimer: null,
       selectedDiagnoses: [],
+      chart: { templateKey: 'main', points: [] },
       painTypes: ['ไม่ปวดเลย', 'ปวดเล็กน้อย', 'ปวดปานกลาง', 'ปวดมาก', 'ปวดมากที่สุด'],
       clinicalData: {
         painLevel: '',
@@ -1303,6 +1306,9 @@ export default {
         this.swellingData.type = v.swellingType ?? ''
         this.swellingData.location = v.swellingLocation ?? ''
 
+        // chart
+        this.chart = v.chart && typeof v.chart === 'object' ? v.chart : { templateKey: 'main', points: [] }
+
         // custom fields rows
         const rows = []
         const cf = this.vitalsData.customFields || {}
@@ -1352,6 +1358,8 @@ export default {
 
     resetAndClose() {
       // รีเซ็ตค่าฟอร์มหลักๆ แล้วปิด modal
+      this.activeMainTab = 'vitals'
+      this.activeSubTab = 'basic'
       this.diagnosisSearch = ''
       this.icdResults = []
       this.showIcdDropdown = false
@@ -1402,6 +1410,7 @@ export default {
         doctorAdvice: '',
         doctorNote: '',
       }
+      this.chart = { templateKey: 'main', points: [] }
 
       this.showConfirmClose = false
       this.initialSnapshot = null
@@ -1427,6 +1436,7 @@ export default {
         swellingData: { ...this.swellingData },
         selectedDiagnoses: this.selectedDiagnoses,
         formData: { ...this.formData },
+        chart: this.chart,
       })
     },
     isFormDirty() {
@@ -1548,6 +1558,7 @@ export default {
         clinical: this.formData,
         pain: this.clinicalData,
         swelling: this.swellingData,
+        chart: this.chart,
         diagnoses: this.selectedDiagnoses,
       }
       try {
@@ -1565,6 +1576,8 @@ export default {
             showConfirmButton: false,
             timer: 2000,
           })
+          // เคลียร์ข้อมูล chart หลังบันทึกสำเร็จเพื่อเริ่มใหม่เมื่อเปิดครั้งถัดไป
+          this.chart = { templateKey: 'main', points: [] }
           this.$emit('close')
         }
       } catch (error) {
@@ -1662,6 +1675,9 @@ export default {
     },
     isOpen(val) {
       if (val) {
+        // ตั้งแท็บเริ่มต้นทุกครั้งที่เปิด
+        this.activeMainTab = 'vitals'
+        this.activeSubTab = 'basic'
         const auth = useAuthStore()
         this.vitalsData.operatorName = auth.userName || auth.user?.name || ''
         // preload when edit

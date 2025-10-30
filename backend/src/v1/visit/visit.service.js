@@ -16,7 +16,8 @@ export const visitService = {
       clinical = {},
       pain = {},
       swelling = {},
-      diagnoses = []
+      diagnoses = [],
+      chart = null
     } = payload || {}
 
     if (!patientId || !branchId) {
@@ -55,7 +56,6 @@ export const visitService = {
           alcohol: emptyToNull(vitals.alcohol),
           smoking: emptyToNull(vitals.smoking),
           customFields: payload?.vitals?.customFields || null,
-          measuredAt: vitals.measuredAt ? new Date(vitals.measuredAt) : null,
 
           // Clinical notes
           cc: emptyToNull(clinical.cc),
@@ -74,7 +74,6 @@ export const visitService = {
 
           // Swelling
           swellingLevel: emptyToNull(swelling.level),
-          swellingLevelText: emptyToNull(swelling.levelText),
           swellingType: emptyToNull(swelling.type),
           swellingLocation: emptyToNull(swelling.location),
 
@@ -82,7 +81,10 @@ export const visitService = {
           mcNotRest: payload?.vitals?.mcNotRest ?? null,
           mcRestFrom: payload?.vitals?.mcStartDate ? new Date(payload.vitals.mcStartDate) : null,
           mcRestTo: payload?.vitals?.mcEndDate ? new Date(payload.vitals.mcEndDate) : null,
-          mcCanFly: payload?.vitals?.canFly ?? null
+          mcCanFly: payload?.vitals?.canFly ?? null,
+
+          // Chart (body marking) JSON payload
+          chart: chart || null
         }
       })
 
@@ -168,7 +170,8 @@ export const visitService = {
       clinical = {},
       pain = {},
       swelling = {},
-      diagnoses = []
+      diagnoses = [],
+      chart = null
     } = payload || {}
 
     return await prisma.$transaction(async (tx) => {
@@ -200,7 +203,6 @@ export const visitService = {
           alcohol: emptyToNull(vitals.alcohol),
           smoking: emptyToNull(vitals.smoking),
           customFields: payload?.vitals?.customFields || null,
-          measuredAt: vitals.measuredAt ? new Date(vitals.measuredAt) : null,
 
           cc: emptyToNull(clinical.cc),
           hpi: emptyToNull(clinical.hpi),
@@ -216,14 +218,16 @@ export const visitService = {
           painLocation: emptyToNull(pain.painLocation),
 
           swellingLevel: emptyToNull(swelling.level),
-          swellingLevelText: emptyToNull(swelling.levelText),
           swellingType: emptyToNull(swelling.type),
           swellingLocation: emptyToNull(swelling.location),
 
           mcNotRest: payload?.vitals?.mcNotRest ?? null,
           mcRestFrom: payload?.vitals?.mcStartDate ? new Date(payload.vitals.mcStartDate) : null,
           mcRestTo: payload?.vitals?.mcEndDate ? new Date(payload.vitals.mcEndDate) : null,
-          mcCanFly: payload?.vitals?.canFly ?? null
+          mcCanFly: payload?.vitals?.canFly ?? null,
+
+          // Chart (body marking)
+          chart: chart === undefined ? undefined : chart
         },
         include: { patient: { select: { hn: true } } }
       })
