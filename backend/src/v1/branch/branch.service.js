@@ -109,6 +109,8 @@ export const getUserBranches = async (user) => {
         name: true,
         address: true,
         phone: true,
+        email: true,
+        licenseNumber: true,
         isActive: true,
         createdAt: true,
         _count: {
@@ -171,7 +173,7 @@ export const getBranchById = async (id) => {
  * @returns {Object} Created branch
  */
 export const createBranch = async (branchData) => {
-  const { code, name, address, phone, isMainBranch } = branchData;
+  const { code, name, address, phone, email, licenseNumber, isMainBranch } = branchData;
 
   // Check if code already exists
   const existingBranch = await prisma.branch.findUnique({
@@ -199,6 +201,8 @@ export const createBranch = async (branchData) => {
       name,
       address: address || null,
       phone: phone || null,
+      email: email || null,
+      licenseNumber: licenseNumber || null,
       isMainBranch: isMainBranch || false,
     },
     include: {
@@ -221,7 +225,7 @@ export const createBranch = async (branchData) => {
  * @returns {Object} Updated branch
  */
 export const updateBranch = async (id, updateData) => {
-  const { code, name, address, phone, isActive, isMainBranch } = updateData;
+  const { code, name, address, phone, email, licenseNumber, isActive, isMainBranch } = updateData;
 
   // Check if branch exists
   const existingBranch = await prisma.branch.findUnique({
@@ -269,6 +273,8 @@ export const updateBranch = async (id, updateData) => {
       ...(name && { name }),
       ...(address !== undefined && { address }),
       ...(phone !== undefined && { phone }),
+      ...(email !== undefined && { email }),
+      ...(licenseNumber !== undefined && { licenseNumber }),
       ...(isActive !== undefined && { isActive }),
       ...(isMainBranch !== undefined && { isMainBranch }),
     },

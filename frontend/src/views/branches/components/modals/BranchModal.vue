@@ -85,6 +85,24 @@
                       class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                   </div>
+
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">อีเมล</label>
+                    <input
+                      v-model.trim="form.email"
+                      type="email"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">เลขที่หนังสือรับรอง</label>
+                    <input
+                      v-model.trim="form.licenseNumber"
+                      type="text"
+                      class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                    />
+                  </div>
                   <div class="space-y-4">
                     <div class="flex items-center">
                       <button
@@ -179,7 +197,7 @@ export default {
   emits: ['update:modelValue', 'save'],
   data() {
     return {
-      form: { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false },
+      form: { id: null, code: '', name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false },
       errors: {},
       originalSnapshot: null,
       showConfirmClose: false,
@@ -201,11 +219,13 @@ export default {
             name: v.name || '',
             address: v.address || '',
             phone: v.phone || '',
+            email: v.email || '',
+            licenseNumber: v.licenseNumber || '',
             isActive: v.isActive ?? true,
             isMainBranch: v.isMainBranch ?? false,
           }
         } else {
-          this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
+          this.form = { id: null, code: '', name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false }
         }
         this.errors = {}
         this.originalSnapshot = JSON.stringify(this.form)
@@ -227,11 +247,13 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
+          email: this.initialData.email || '',
+          licenseNumber: this.initialData.licenseNumber || '',
           isActive: this.initialData.isActive ?? true,
           isMainBranch: this.initialData.isMainBranch ?? false,
         }
       } else {
-        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
+        this.form = { id: null, code: '', name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false }
       }
       this.originalSnapshot = JSON.stringify(this.form)
       this.$emit('update:modelValue', false)
@@ -248,11 +270,13 @@ export default {
           name: this.initialData.name || '',
           address: this.initialData.address || '',
           phone: this.initialData.phone || '',
+          email: this.initialData.email || '',
+          licenseNumber: this.initialData.licenseNumber || '',
           isActive: this.initialData.isActive ?? true,
           isMainBranch: this.initialData.isMainBranch ?? false,
         }
       } else {
-        this.form = { id: null, code: '', name: '', address: '', phone: '', isActive: true, isMainBranch: false }
+        this.form = { id: null, code: '', name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false }
       }
       this.originalSnapshot = JSON.stringify(this.form)
       this.showConfirmClose = false
@@ -262,6 +286,7 @@ export default {
       const e = {}
       if (!this.form.code) e.code = 'กรุณากรอกรหัสสาขา'
       if (!this.form.name) e.name = 'กรุณากรอกชื่อสาขา'
+      if (!this.form.licenseNumber) e.licenseNumber = 'กรุณากรอกเลขที่หนังสือรับรอง'
       this.errors = e
       return Object.keys(e).length === 0
     },

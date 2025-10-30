@@ -331,7 +331,6 @@ export default {
       this.loading = true
       try {
         const response = await opdService.getQueueForOPDManagement(this.queueId)
-        console.log(response)
         const data = response.data
 
         // ตั้งค่าข้อมูลคิว
@@ -375,18 +374,10 @@ export default {
 
       this.loadingHistory = true
       try {
-        const { data } = await visitService.listByPatient(id)
+        const currentRegId = this.queueData?.registration?.id || null
+        const { data } = await visitService.listByPatient(id, currentRegId)
         const items = data?.data?.items || []
-        // คำนวณลำดับต่อท้าย (-1, -2) ต่อ registration
-        const counts = {}
-        const ordered = [...items].sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt))
-        for (const rec of ordered) {
-          const regId = rec?.registration?.id || rec.id
-          counts[regId] = (counts[regId] || 0) + 1
-          rec._ordinal = counts[regId]
-        }
-        // แสดงเก่า -> ใหม่ ตามที่ต้องการ
-        this.medicalHistory = ordered
+        this.medicalHistory = items
       } catch (error) {
         console.error('Error loading medical history:', error)
       } finally {

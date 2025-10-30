@@ -4,8 +4,10 @@ export default {
   create(data) {
     return apiClient.post('/visits', data)
   },
-  listByPatient(patientId) {
-    return apiClient.get('/visits', { patientId })
+  listByPatient(patientId, registrationId) {
+    const params = { patientId }
+    if (registrationId) params.registrationId = registrationId
+    return apiClient.get('/visits', params)
   },
   getById(id) {
     return apiClient.get(`/visits/${id}`)

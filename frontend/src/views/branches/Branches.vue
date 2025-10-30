@@ -435,7 +435,7 @@ export default {
       this.editingBranch = null
       try {
         const code = await branchService.getLatestCode()
-        this.editingBranch = { id: null, code, name: '', address: '', phone: '', isActive: true, isMainBranch: false }
+        this.editingBranch = { id: null, code, name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false }
       } catch (e) {
         this.editingBranch = {
           id: null,
@@ -443,6 +443,8 @@ export default {
           name: '',
           address: '',
           phone: '',
+          email: '',
+          licenseNumber: '',
           isActive: true,
           isMainBranch: false
         }

@@ -17,11 +17,11 @@ export const visitController = {
   },
   async list(req, res, next) {
     try {
-      const { patientId } = req.query
+      const { patientId, registrationId } = req.query
       if (!patientId) {
         return res.status(400).json({ success: false, message: 'patientId จำเป็น' })
       }
-      const items = await visitService.listByPatient(patientId)
+      const items = await visitService.listByPatient(patientId, registrationId)
       res.json({ success: true, data: { items } })
     } catch (err) {
       next(err)

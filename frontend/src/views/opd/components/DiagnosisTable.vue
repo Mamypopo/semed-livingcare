@@ -79,7 +79,7 @@
                           @click="$emit('cancel', rec)"
                           :class="[active ? 'bg-red-50 text-red-700' : 'text-red-600','group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm']"
                         >
-                          ยกเลิก Visit
+                          ยกเลิก
                         </button>
                       </MenuItem>
                     </div>

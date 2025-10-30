@@ -161,7 +161,7 @@ export const getBranchById = async (req, res) => {
  */
 export const createBranch = async (req, res) => {
   try {
-    const { code, name, address, phone, isMainBranch } = req.body;
+    const { code, name, address, phone, email, licenseNumber, isMainBranch } = req.body;
 
     // Basic validation
     if (!code || !name) {
@@ -184,6 +184,8 @@ export const createBranch = async (req, res) => {
       name,
       address,
       phone,
+      email,
+      licenseNumber,
       isMainBranch
     });
 
@@ -221,7 +223,7 @@ export const createBranch = async (req, res) => {
 export const updateBranch = async (req, res) => {
   try {
     const { id } = req.params;
-    const { code, name, address, phone, isActive, isMainBranch } = req.body;
+    const { code, name, address, phone, email, licenseNumber, isActive, isMainBranch } = req.body;
 
     if (!id || isNaN(id)) {
       return res.status(400).json({
@@ -244,6 +246,8 @@ export const updateBranch = async (req, res) => {
       address,
       phone,
       isActive,
+      email,
+      licenseNumber,
       isMainBranch
     });
 

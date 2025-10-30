@@ -136,11 +136,13 @@ export const visitService = {
     })
   }
   ,
-  async listByPatient(patientId) {
+  async listByPatient(patientId, registrationId) {
     if (!patientId) throw new Error('patientId จำเป็น')
     const pid = parseInt(patientId)
+    const where = { patientId: pid, isActive: true }
+    if (registrationId) where.registrationId = String(registrationId)
     const items = await prisma.visit.findMany({
-      where: { patientId: pid, isActive: true },
+      where,
       orderBy: { createdAt: 'asc' },
       include: {
         doctor: { select: { id: true, name: true } },
