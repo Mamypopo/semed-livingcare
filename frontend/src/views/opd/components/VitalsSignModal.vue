@@ -24,7 +24,9 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-[90vw] h-[90vh] transform rounded-2xl bg-white shadow-xl transition-all flex flex-col">
+            <DialogPanel
+              class="w-full max-w-[90vw] h-[90vh] transform rounded-2xl bg-white shadow-xl transition-all flex flex-col"
+            >
               <!-- Header -->
               <div class="bg-white px-6 py-4 rounded-t-2xl border-b border-gray-100 flex-shrink-0">
                 <div class="flex items-center justify-between">
@@ -39,7 +41,7 @@
                       บันทึก
                     </button>
                     <button
-                      @click="showConfirmClose = true"
+                      @click="handleRequestClose"
                       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors"
                     >
                       ยกเลิก
@@ -59,7 +61,7 @@
                       activeMainTab === tab.id
                         ? 'border-emerald-500 text-emerald-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
                     ]"
                   >
                     {{ tab.name }}
@@ -84,7 +86,7 @@
                             activeSubTab === subTab.id
                               ? 'bg-white text-emerald-600 shadow-sm border border-emerald-200'
                               : 'text-gray-600 hover:text-gray-900 hover:bg-white/50',
-                            'whitespace-nowrap py-2 px-3 font-medium text-xs flex items-center gap-1.5 rounded-md transition-all'
+                            'whitespace-nowrap py-2 px-3 font-medium text-xs flex items-center gap-1.5 rounded-md transition-all',
                           ]"
                         >
                           <component :is="subTab.icon" class="w-3.5 h-3.5" />
@@ -107,9 +109,14 @@
                             <!-- Grid Row 1 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   WT
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'น้ำหนัก (กิโลกรัม)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'น้ำหนัก (กิโลกรัม)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.weight"
@@ -121,9 +128,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   PR
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'ชีพจร (ครั้งต่อนาที)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'ชีพจร (ครั้งต่อนาที)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.pulseRate"
@@ -137,9 +149,14 @@
                             <!-- Grid Row 2 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   HT
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'ส่วนสูง (เซนติเมตร)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'ส่วนสูง (เซนติเมตร)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.height"
@@ -151,9 +168,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   RR
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'อัตราการหายใจ (ครั้งต่อนาที)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'อัตราการหายใจ (ครั้งต่อนาที)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.respiratoryRate"
@@ -167,28 +189,40 @@
                             <!-- Grid Row 3 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   BMI
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'Body Mass Index - คำนวณอัตโนมัติจากน้ำหนักและส่วนสูง'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="
+                                      'Body Mass Index - คำนวณอัตโนมัติจากน้ำหนักและส่วนสูง'
+                                    "
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.bmi"
                                   type="number"
                                   readonly
-                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-500  focus:outline-none"
+                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-500 focus:outline-none"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   BSA
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'Body Surface Area - คำนวณอัตโนมัติ'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'Body Surface Area - คำนวณอัตโนมัติ'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.bsa"
                                   type="text"
                                   readonly
-                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-500  focus:outline-none"
+                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-500 focus:outline-none"
                                   placeholder="0"
                                 />
                               </div>
@@ -197,9 +231,14 @@
                             <!-- Grid Row 4 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   TEMP
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'อุณหภูมิร่างกาย (องศาเซลเซียส)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'อุณหภูมิร่างกาย (องศาเซลเซียส)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.temperature"
@@ -209,9 +248,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   CRT
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'Capillary Refill Time - เวลาเลือดไหลกลับ'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'Capillary Refill Time - เวลาเลือดไหลกลับ'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.crt"
@@ -225,9 +269,14 @@
                             <!-- Grid Row 5 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   BP SYS
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'ความดันโลหิตค่าบน (Systolic)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'ความดันโลหิตค่าบน (Systolic)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.bpSys"
@@ -237,9 +286,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   BP DIA
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'ความดันโลหิตค่าล่าง (Diastolic)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'ความดันโลหิตค่าล่าง (Diastolic)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.bpDia"
@@ -253,9 +307,14 @@
                             <!-- Grid Row 6 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   VAS
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'Visual Analog Scale - ระดับความเจ็บปวด'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'Visual Analog Scale - ระดับความเจ็บปวด'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.vas"
@@ -265,9 +324,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   O2sat
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'ความอิ่มตัวของออกซิเจนในเลือด (%)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'ความอิ่มตัวของออกซิเจนในเลือด (%)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.o2sat"
@@ -281,9 +345,14 @@
                             <!-- Grid Row 7 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   HC (cm)
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'รอบศีรษะ (เซนติเมตร)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'รอบศีรษะ (เซนติเมตร)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.headCircumference"
@@ -293,9 +362,14 @@
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   CHC (cm)
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'รอบอก (เซนติเมตร)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'รอบอก (เซนติเมตร)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.chestCircumference"
@@ -309,9 +383,14 @@
                             <!-- Grid Row 8 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]">
+                                <label
+                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                >
                                   WC (cm)
-                                  <Info class="w-3.5 h-3.5 text-gray-400" v-tooltip.right="'รอบเอว (เซนติเมตร)'" />
+                                  <Info
+                                    class="w-3.5 h-3.5 text-gray-400"
+                                    v-tooltip.right="'รอบเอว (เซนติเมตร)'"
+                                  />
                                 </label>
                                 <input
                                   v-model="vitalsData.waistCircumference"
@@ -322,51 +401,51 @@
                               </div>
                               <div></div>
                             </div>
-
-                         
                           </div>
                         </div>
                         <!-- Alcohol & Smoking & Custom -->
                         <div class="space-y-4 border-t border-gray-200 pt-4">
                           <div class="flex items-center gap-2 mb-2">
                             <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                            <label class="text-sm font-semibold text-gray-800">ตรวจการดื่มสุรา/สูบบุหรี่</label>
+                            <label class="text-sm font-semibold text-gray-800"
+                              >ตรวจการดื่มสุรา/สูบบุหรี่</label
+                            >
                           </div>
-                          
+
                           <!-- Alcohol -->
                           <div class="flex items-center gap-4">
                             <span class="text-sm text-gray-600 min-w-[70px]">ดื่มสุรา</span>
                             <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.alcohol"
-                                type="radio"
-                                name="alcohol"
-                                value="ไม่ดื่ม"
-                                class="w-4 h-4 text-emerald-500"
-                              />
-                              <span class="text-sm text-gray-700">ไม่ดื่ม</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.alcohol"
-                                type="radio"
-                                name="alcohol"
-                                value="ดื่มบางครั้ง"
-                                class="w-4 h-4 text-emerald-500"
-                              />
-                              <span class="text-sm text-gray-700">ดื่มบางครั้ง</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.alcohol"
-                                type="radio"
-                                name="alcohol"
-                                value="ดื่ม"
-                                class="w-4 h-4 text-emerald-500"
-                              />
-                              <span class="text-sm text-gray-700">ดื่ม</span>
-                            </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.alcohol"
+                                  type="radio"
+                                  name="alcohol"
+                                  value="ไม่ดื่ม"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">ไม่ดื่ม</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.alcohol"
+                                  type="radio"
+                                  name="alcohol"
+                                  value="ดื่มบางครั้ง"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">ดื่มบางครั้ง</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.alcohol"
+                                  type="radio"
+                                  name="alcohol"
+                                  value="ดื่ม"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">ดื่ม</span>
+                              </label>
                             </div>
                           </div>
 
@@ -374,46 +453,52 @@
                           <div class="flex items-center gap-4">
                             <span class="text-sm text-gray-600 min-w-[70px]">สูบบุหรี่</span>
                             <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.smoking"
-                                type="radio"
-                                name="smoking"
-                                value="ไม่สูบ"
-                                class="w-4 h-4 text-emerald-500"
-                              />
-                              <span class="text-sm text-gray-700">ไม่สูบ</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.smoking"
-                                type="radio"
-                                name="smoking"
-                                value="สูบบางครั้ง"
-                                class="w-4 h-4 text-emerald-500 "
-                              />
-                              <span class="text-sm text-gray-700">สูบบางครั้ง</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                              <input
-                                v-model="vitalsData.smoking"
-                                type="radio"
-                                name="smoking"
-                                value="สูบ"
-                                class="w-4 h-4 text-emerald-500"
-                              />
-                              <span class="text-sm text-gray-700">สูบ</span>
-                            </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.smoking"
+                                  type="radio"
+                                  name="smoking"
+                                  value="ไม่สูบ"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">ไม่สูบ</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.smoking"
+                                  type="radio"
+                                  name="smoking"
+                                  value="สูบบางครั้ง"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">สูบบางครั้ง</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  v-model="vitalsData.smoking"
+                                  type="radio"
+                                  name="smoking"
+                                  value="สูบ"
+                                  class="w-4 h-4 text-emerald-500"
+                                />
+                                <span class="text-sm text-gray-700">สูบ</span>
+                              </label>
                             </div>
                           </div>
 
                           <!-- Custom Fields (Key/Value JSON) -->
                           <div class="space-y-2 pt-2">
                             <div class="flex items-center gap-2 mb-2">
-                              <label class="text-sm font-medium text-gray-700">กำหนดเอง (Key/Value)</label>
+                              <label class="text-sm font-medium text-gray-700"
+                                >กำหนดเอง (Key/Value)</label
+                              >
                             </div>
                             <div class="space-y-2">
-                              <div v-for="(row, i) in customFieldRows" :key="'cf-'+i" class="grid grid-cols-5 gap-2 items-center">
+                              <div
+                                v-for="(row, i) in customFieldRows"
+                                :key="'cf-' + i"
+                                class="grid grid-cols-5 gap-2 items-center"
+                              >
                                 <input
                                   v-model="row.key"
                                   type="text"
@@ -450,34 +535,44 @@
 
                           <!-- Medical Certificate (OPD) -->
                           <div class="space-y-4 border-t border-gray-200 pt-4">
-                            <div class="text-sm font-semibold text-gray-800">การออกใบรับรอง Medical Certificate (OPD)</div>
+                            <div class="text-sm font-semibold text-gray-800">
+                              การออกใบรับรอง Medical Certificate (OPD)
+                            </div>
                             <div class="flex items-center gap-2">
-                              <input v-model="vitalsData.mcNotRest" type="checkbox" class="w-4 h-4 text-emerald-500" />
+                              <input
+                                v-model="vitalsData.mcNotRest"
+                                type="checkbox"
+                                class="w-4 h-4 text-emerald-500"
+                              />
                               <span class="text-sm text-gray-700">ไม่สมควรพัก</span>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                               <div>
-                            <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักตั้งแต่</div>
+                                <div class="text-sm font-medium text-gray-700 mb-1">
+                                  สมควรพักตั้งแต่
+                                </div>
                                 <VueDatePicker
                                   v-model="vitalsData.mcStartDate"
                                   :auto-apply="true"
                                   :enable-time-picker="false"
                                   :format="'dd/MM/yyyy'"
                                   locale="th"
-                              class="w-full"
-                              :disabled="vitalsData.mcNotRest"
+                                  class="w-full"
+                                  :disabled="vitalsData.mcNotRest"
                                 />
                               </div>
                               <div>
-                            <div class="text-sm font-medium text-gray-700 mb-1">สมควรพักถึง</div>
+                                <div class="text-sm font-medium text-gray-700 mb-1">
+                                  สมควรพักถึง
+                                </div>
                                 <VueDatePicker
                                   v-model="vitalsData.mcEndDate"
                                   :auto-apply="true"
                                   :enable-time-picker="false"
                                   :format="'dd/MM/yyyy'"
                                   locale="th"
-                              class="w-full"
-                              :disabled="vitalsData.mcNotRest"
+                                  class="w-full"
+                                  :disabled="vitalsData.mcNotRest"
                                 />
                               </div>
                             </div>
@@ -500,23 +595,34 @@
                                   :value="false"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">ไม่สามารถขึ้นเครื่องบินได้</span>
+                                <span class="text-sm text-gray-700"
+                                  >ไม่สามารถขึ้นเครื่องบินได้</span
+                                >
                               </label>
                             </div>
 
                             <!-- Operator / Department -->
                             <div class="grid grid-cols-2 gap-3">
-                            
                               <!-- Operator -->
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 min-w-[85px]">ผู้ทำรายการ</label>
-                                <Listbox v-model="vitalsData.operatorName" as="div" class="relative w-56">
+                                <label class="text-sm font-medium text-gray-700 min-w-[85px]"
+                                  >ผู้ทำรายการ</label
+                                >
+                                <Listbox
+                                  v-model="vitalsData.operatorName"
+                                  as="div"
+                                  class="relative w-56"
+                                >
                                   <div>
                                     <ListboxButton
                                       class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                     >
-                                      <span class="block truncate">{{ vitalsData.operatorName || '- เลือกผู้ทำรายการ -' }}</span>
-                                      <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                      <span class="block truncate">{{
+                                        vitalsData.operatorName || '- เลือกผู้ทำรายการ -'
+                                      }}</span>
+                                      <span
+                                        class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+                                      >
                                         <ChevronDown class="h-5 w-5 text-gray-400" />
                                       </span>
                                     </ListboxButton>
@@ -539,11 +645,15 @@
                                         <li
                                           :class="[
                                             'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                                            active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                                            active
+                                              ? 'bg-emerald-50 text-gray-900'
+                                              : 'text-gray-700',
                                           ]"
                                         >
                                           <span>{{ vitalsData.operatorName || '-' }}</span>
-                                          <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                                          <span v-if="selected" class="text-emerald-600 text-xs"
+                                            >เลือก</span
+                                          >
                                         </li>
                                       </ListboxOption>
                                     </ListboxOptions>
@@ -554,13 +664,19 @@
 
                             <!-- Department -->
                             <div class="flex items-start justify-between gap-4">
-                              <label class="text-sm font-medium text-gray-700 min-w-[85px] pt-2">แผนก</label>
+                              <label class="text-sm font-medium text-gray-700 min-w-[85px] pt-2"
+                                >แผนก</label
+                              >
                               <div class="flex-1">
                                 <div class="flex flex-wrap gap-3">
-                                  <span v-for="(dep, i) in vitalsData.departments" :key="i" class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                                  <span
+                                    v-for="(dep, i) in vitalsData.departments"
+                                    :key="i"
+                                    class="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium"
+                                  >
                                     {{ dep }}
-                                    <button 
-                                      type="button" 
+                                    <button
+                                      type="button"
                                       class="hover:bg-emerald-100 rounded-full p-0.5 transition-colors"
                                       @click="removeDepartment(i)"
                                     >
@@ -579,7 +695,9 @@
                         <div class="space-y-3">
                           <!-- ระดับความเจ็บปวด (VAS) -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]">ระดับความเจ็บปวด (VAS 0-10)</label>
+                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                              >ระดับความเจ็บปวด (VAS 0-10)</label
+                            >
                             <input
                               v-model="clinicalData.painLevel"
                               @input="updatePainTypeFromVAS"
@@ -594,7 +712,9 @@
 
                           <!-- ลักษณะของอาการปวด -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]">ลักษณะของอาการปวด</label>
+                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                              >ลักษณะของอาการปวด</label
+                            >
                             <input
                               v-model="clinicalData.painType"
                               type="text"
@@ -605,7 +725,9 @@
 
                           <!-- ตำแหน่งของอาการปวด -->
                           <div class="flex flex-col gap-2">
-                            <label class="text-sm font-medium text-gray-700">ตำแหน่งของอาการปวด</label>
+                            <label class="text-sm font-medium text-gray-700"
+                              >ตำแหน่งของอาการปวด</label
+                            >
                             <textarea
                               v-model="clinicalData.painLocation"
                               rows="3"
@@ -625,14 +747,20 @@
                         <div class="space-y-3">
                           <!-- ระดับอาการบวม -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]">ระดับอาการบวม</label>
+                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                              >ระดับอาการบวม</label
+                            >
                             <Listbox v-model="swellingData.level" as="div" class="relative w-80">
                               <div>
                                 <ListboxButton
                                   class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 >
-                                  <span class="block truncate">{{ swellingData.level || 'เลือก' }}</span>
-                                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                  <span class="block truncate">{{
+                                    swellingData.level || 'เลือก'
+                                  }}</span>
+                                  <span
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+                                  >
                                     <ChevronDown class="h-5 w-5 text-gray-400" />
                                   </span>
                                 </ListboxButton>
@@ -657,11 +785,13 @@
                                     <li
                                       :class="[
                                         'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                                       ]"
                                     >
                                       <span>{{ opt }}</span>
-                                      <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                                      <span v-if="selected" class="text-emerald-600 text-xs"
+                                        >เลือก</span
+                                      >
                                     </li>
                                   </ListboxOption>
                                 </ListboxOptions>
@@ -671,14 +801,20 @@
 
                           <!-- ลักษณะของอาการบวม -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]">ลักษณะของอาการบวม</label>
+                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                              >ลักษณะของอาการบวม</label
+                            >
                             <Listbox v-model="swellingData.type" as="div" class="relative w-80">
                               <div>
                                 <ListboxButton
                                   class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 >
-                                  <span class="block truncate">{{ swellingData.type || 'เลือก' }}</span>
-                                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                  <span class="block truncate">{{
+                                    swellingData.type || 'เลือก'
+                                  }}</span>
+                                  <span
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+                                  >
                                     <ChevronDown class="h-5 w-5 text-gray-400" />
                                   </span>
                                 </ListboxButton>
@@ -703,11 +839,13 @@
                                     <li
                                       :class="[
                                         'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
                                       ]"
                                     >
                                       <span>{{ opt }}</span>
-                                      <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                                      <span v-if="selected" class="text-emerald-600 text-xs"
+                                        >เลือก</span
+                                      >
                                     </li>
                                   </ListboxOption>
                                 </ListboxOptions>
@@ -717,7 +855,9 @@
 
                           <!-- ตำแหน่งของอาการบวม -->
                           <div class="flex flex-col gap-2">
-                            <label class="text-sm font-medium text-gray-700">ตำแหน่งของอาการบวม</label>
+                            <label class="text-sm font-medium text-gray-700"
+                              >ตำแหน่งของอาการบวม</label
+                            >
                             <textarea
                               v-model="swellingData.location"
                               rows="3"
@@ -738,7 +878,9 @@
                         <label class="text-xs font-semibold text-gray-900">การวินิจฉัยโรค</label>
                       </div>
                       <div class="flex gap-2 relative" ref="icdDropdownEl">
-                        <SearchIcon class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <SearchIcon
+                          class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                        />
                         <input
                           v-model="diagnosisSearch"
                           @input="onSearchIcd"
@@ -746,11 +888,15 @@
                           class="flex-1 pl-9 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ค้นหา ICD10 อย่างน้อย 3 ตัวอักษร"
                         />
-                        
 
                         <!-- Search dropdown -->
-                        <div v-if="showIcdDropdown" class="absolute top-11 left-0 right-16 z-40 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-auto">
-                          <div v-if="loadingIcd" class="p-3 text-sm text-gray-500">กำลังค้นหา...</div>
+                        <div
+                          v-if="showIcdDropdown"
+                          class="absolute top-11 left-0 right-16 z-40 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-auto"
+                        >
+                          <div v-if="loadingIcd" class="p-3 text-sm text-gray-500">
+                            กำลังค้นหา...
+                          </div>
                           <template v-else>
                             <button
                               v-for="item in icdResults"
@@ -759,14 +905,24 @@
                               @click="!isIcdSelected(item.code) && addDiagnosis(item)"
                               :class="[
                                 'w-full text-left px-3 py-2 text-sm flex items-center justify-between',
-                                isIcdSelected(item.code) ? 'cursor-not-allowed opacity-60' : 'hover:bg-emerald-50'
+                                isIcdSelected(item.code)
+                                  ? 'cursor-not-allowed opacity-60'
+                                  : 'hover:bg-emerald-50',
                               ]"
                             >
                               <span class="font-medium text-gray-900">{{ item.code }}</span>
-                              <span class="flex-1 ml-3 text-gray-700 truncate">{{ item.nameTh }}</span>
-                              <span v-if="isIcdSelected(item.code)" class="ml-3 text-emerald-700 bg-emerald-100 border border-emerald-200 text-xs px-2 py-0.5 rounded-full">เลือกแล้ว</span>
+                              <span class="flex-1 ml-3 text-gray-700 truncate">{{
+                                item.nameTh
+                              }}</span>
+                              <span
+                                v-if="isIcdSelected(item.code)"
+                                class="ml-3 text-emerald-700 bg-emerald-100 border border-emerald-200 text-xs px-2 py-0.5 rounded-full"
+                                >เลือกแล้ว</span
+                              >
                             </button>
-                            <div v-if="!icdResults.length" class="p-3 text-sm text-gray-500">ไม่พบข้อมูล</div>
+                            <div v-if="!icdResults.length" class="p-3 text-sm text-gray-500">
+                              ไม่พบข้อมูล
+                            </div>
                           </template>
                         </div>
                       </div>
@@ -774,13 +930,18 @@
                       <!-- ICD Table -->
                       <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
                         <div class="bg-emerald-50 px-4 py-2 border-b border-gray-200 sticky top-0">
-                          <div class="grid grid-cols-3 gap-4 text-xs font-semibold text-gray-700 tracking-wide">
+                          <div
+                            class="grid grid-cols-3 gap-4 text-xs font-semibold text-gray-700 tracking-wide"
+                          >
                             <div class="uppercase">ICD CODE</div>
                             <div class="uppercase">ชื่อรายการ</div>
                             <div class="uppercase text-right">ตัวเลือก</div>
                           </div>
                         </div>
-                        <div v-if="selectedDiagnoses.length === 0" class="p-4 text-center text-gray-500 text-sm">
+                        <div
+                          v-if="selectedDiagnoses.length === 0"
+                          class="p-4 text-center text-gray-500 text-sm"
+                        >
                           <p>ไม่มีข้อมูล</p>
                           <p class="text-xs text-gray-400 mt-1">พิมพ์เพื่อค้นหาและเลือกจากรายการ</p>
                         </div>
@@ -791,9 +952,16 @@
                             class="px-4 py-2 grid grid-cols-3 gap-4 items-center text-sm hover:bg-gray-50"
                           >
                             <div class="font-semibold text-gray-700">{{ dx.code }}</div>
-                            <div class="text-gray-500 truncate" :title="dx.nameTh">{{ dx.nameTh }}</div>
+                            <div class="text-gray-500 truncate" :title="dx.nameTh">
+                              {{ dx.nameTh }}
+                            </div>
                             <div class="text-right">
-                              <button @click="removeDiagnosis(i)" class="text-red-600 hover:text-red-800">ลบ</button>
+                              <button
+                                @click="removeDiagnosis(i)"
+                                class="text-red-600 hover:text-red-800"
+                              >
+                                ลบ
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -802,10 +970,10 @@
 
                     <!-- CC -->
                     <div>
-                        <div class="flex items-center gap-2 mb-2">
-                          <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                          <label class="text-xs font-semibold text-gray-900">CC:</label>
-                        </div>
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
+                        <label class="text-xs font-semibold text-gray-900">CC:</label>
+                      </div>
                       <textarea
                         v-model="formData.cc"
                         rows="4"
@@ -933,8 +1101,27 @@
 </template>
 
 <script>
-import { Dialog as HeadlessDialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import { UserRound, Stethoscope, AlertTriangle, Info, Plus, ChevronDown, X, Search as SearchIcon } from 'lucide-vue-next'
+import {
+  Dialog as HeadlessDialog,
+  DialogPanel,
+  DialogTitle,
+  TransitionChild,
+  TransitionRoot,
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from '@headlessui/vue'
+import {
+  UserRound,
+  Stethoscope,
+  AlertTriangle,
+  Info,
+  Plus,
+  ChevronDown,
+  X,
+  Search as SearchIcon,
+} from 'lucide-vue-next'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useAuthStore } from '@/stores/auth.js'
@@ -964,39 +1151,40 @@ export default {
     X,
     SearchIcon,
     VueDatePicker,
-    ConfirmClosePopover
+    ConfirmClosePopover,
   },
   props: {
     isOpen: {
       type: Boolean,
-      default: false
+      default: false,
     },
     mode: { type: String, default: 'create' },
     visitId: { type: String, default: null },
     departmentName: {
       type: String,
-      default: ''
+      default: '',
     },
     patientId: { type: [String, Number], default: null },
     registrationId: { type: String, default: null },
     doctorId: { type: [String, Number], default: null },
     departmentId: { type: String, default: null },
-    branchId: { type: [String, Number], default: null }
+    branchId: { type: [String, Number], default: null },
   },
   emits: ['close'],
   data() {
     return {
       showConfirmClose: false,
+      initialSnapshot: null,
       activeMainTab: 'vitals',
       activeSubTab: 'basic',
       mainTabs: [
         { id: 'vitals', name: 'Vitals Sign' },
-        { id: 'chart', name: 'Chart' }
+        { id: 'chart', name: 'Chart' },
       ],
       subTabs: [
         { id: 'basic', name: 'ข้อมูลพื้นฐาน', icon: UserRound },
         { id: 'clinical', name: 'อาการทางคลินิก', icon: Stethoscope },
-        { id: 'swelling', name: 'อาการบวม', icon: AlertTriangle }
+        { id: 'swelling', name: 'อาการบวม', icon: AlertTriangle },
       ],
       diagnosisSearch: '',
       icdResults: [],
@@ -1004,29 +1192,23 @@ export default {
       loadingIcd: false,
       icdDebounceTimer: null,
       selectedDiagnoses: [],
-      painTypes: [
-        'ไม่ปวดเลย',
-        'ปวดเล็กน้อย',
-        'ปวดปานกลาง',
-        'ปวดมาก',
-        'ปวดมากที่สุด'
-      ],
+      painTypes: ['ไม่ปวดเลย', 'ปวดเล็กน้อย', 'ปวดปานกลาง', 'ปวดมาก', 'ปวดมากที่สุด'],
       clinicalData: {
         painLevel: '',
         painType: '',
-        painLocation: ''
+        painLocation: '',
       },
       swellingLevels: [
         '1+: มองเห็นไม่ชัดเจน รอยบุ๋มหายไปเร็ว',
         '2+: รอยบุ๋มหายใน 15 วินาที',
         '3+: รอยบุ๋มคงอยู่นานกว่า 1 นาที',
-        '4+: รอยบุ๋มลึกชัดเจน และอยู่นานประมาณ 2-5 นาที'
+        '4+: รอยบุ๋มลึกชัดเจน และอยู่นานประมาณ 2-5 นาที',
       ],
       swellingTypes: ['Pitting', 'Non-Pitting'],
       swellingData: {
         level: '',
         type: '',
-        location: ''
+        location: '',
       },
       vitalsData: {
         weight: '',
@@ -1054,7 +1236,7 @@ export default {
         mcStartDate: new Date(),
         mcEndDate: new Date(),
         canFly: true,
-        departments: []
+        departments: [],
       },
       newCustomKey: '',
       newCustomValue: '',
@@ -1067,8 +1249,8 @@ export default {
         ga: '',
         pe: '',
         doctorAdvice: '',
-        doctorNote: ''
-      }
+        doctorNote: '',
+      },
     }
   },
   methods: {
@@ -1127,20 +1309,32 @@ export default {
         for (const k of Object.keys(cf)) {
           rows.push({ key: k, value: cf[k] })
         }
-        this.customFieldRows = rows.length ? rows.concat([{ key: '', value: '' }]) : [{ key: '', value: '' }]
+        this.customFieldRows = rows.length
+          ? rows.concat([{ key: '', value: '' }])
+          : [{ key: '', value: '' }]
 
         // diagnoses
-        const dxs = Array.isArray(v.diagnoses) ? v.diagnoses.map(d => ({
-          id: d.icd10Id,
-          code: d.icd10?.code,
-          nameTh: d.icd10?.nameTh,
-          nameEn: d.icd10?.nameEn,
-          groupCode: d.icd10?.groupCode,
-          groupNameTh: d.icd10?.groupNameTh,
-          groupNameEn: d.icd10?.groupNameEn
-        })) : []
+        const dxs = Array.isArray(v.diagnoses)
+          ? v.diagnoses.map((d) => ({
+              id: d.icd10Id,
+              code: d.icd10?.code,
+              nameTh: d.icd10?.nameTh,
+              nameEn: d.icd10?.nameEn,
+              groupCode: d.icd10?.groupCode,
+              groupNameTh: d.icd10?.groupNameTh,
+              groupNameEn: d.icd10?.groupNameEn,
+            }))
+          : []
         this.selectedDiagnoses = dxs
         this.updateDxFromSelected()
+        // set clean snapshot after preload completes
+        this.$nextTick(() => {
+          try {
+            this.initialSnapshot = this.buildSnapshot()
+          } catch {
+            this.initialSnapshot = null
+          }
+        })
       } catch (e) {
         console.error('preload visit failed', e)
       }
@@ -1149,8 +1343,13 @@ export default {
       this.$emit('close')
     },
     handleRequestClose() {
-      this.showConfirmClose = true
+      if (!this.isFormDirty()) {
+        this.resetAndClose()
+      } else {
+        this.showConfirmClose = true
+      }
     },
+
     resetAndClose() {
       // รีเซ็ตค่าฟอร์มหลักๆ แล้วปิด modal
       this.diagnosisSearch = ''
@@ -1163,19 +1362,49 @@ export default {
       this.clinicalData = { painLevel: '', painType: '', painLocation: '' }
       this.swellingData = { level: '', type: '', location: '' }
       this.vitalsData = {
-        weight: '', height: '', bmi: '', temperature: '', bpSys: '', bpDia: '', pulseRate: '',
-        respiratoryRate: '', vas: '', bsa: '', crt: '', o2sat: '', headCircumference: '',
-        waistCircumference: '', chestCircumference: '', alcohol: 'none', smoking: 'none',
-        customFields: {}, operationDate: new Date(), operatorName: '',
-        departmentName: '', mcNotRest: false, mcStartDate: new Date(), mcEndDate: new Date(),
-        canFly: true, departments: []
+        weight: '',
+        height: '',
+        bmi: '',
+        temperature: '',
+        bpSys: '',
+        bpDia: '',
+        pulseRate: '',
+        respiratoryRate: '',
+        vas: '',
+        bsa: '',
+        crt: '',
+        o2sat: '',
+        headCircumference: '',
+        waistCircumference: '',
+        chestCircumference: '',
+        alcohol: 'none',
+        smoking: 'none',
+        customFields: {},
+        operationDate: new Date(),
+        operatorName: '',
+        departmentName: '',
+        mcNotRest: false,
+        mcStartDate: new Date(),
+        mcEndDate: new Date(),
+        canFly: true,
+        departments: [],
       }
       this.newCustomKey = ''
       this.newCustomValue = ''
       this.customFieldRows = [{ key: '', value: '' }]
-      this.formData = { cc: '', hpi: '', pmh: '', dx: '', ga: '', pe: '', doctorAdvice: '', doctorNote: '' }
+      this.formData = {
+        cc: '',
+        hpi: '',
+        pmh: '',
+        dx: '',
+        ga: '',
+        pe: '',
+        doctorAdvice: '',
+        doctorNote: '',
+      }
 
       this.showConfirmClose = false
+      this.initialSnapshot = null
       this.$emit('close')
     },
     handleGlobalClick(evt) {
@@ -1183,6 +1412,29 @@ export default {
       const root = this.$refs.icdDropdownEl
       if (root && !root.contains(evt.target)) {
         this.showIcdDropdown = false
+      }
+    },
+    buildSnapshot() {
+      const d = (v) => (v instanceof Date ? v.toISOString() : v)
+      return JSON.stringify({
+        vitalsData: {
+          ...this.vitalsData,
+          operationDate: d(this.vitalsData.operationDate),
+          mcStartDate: d(this.vitalsData.mcStartDate),
+          mcEndDate: d(this.vitalsData.mcEndDate),
+        },
+        clinicalData: { ...this.clinicalData },
+        swellingData: { ...this.swellingData },
+        selectedDiagnoses: this.selectedDiagnoses,
+        formData: { ...this.formData },
+      })
+    },
+    isFormDirty() {
+      try {
+        const current = this.buildSnapshot()
+        return current !== this.initialSnapshot
+      } catch {
+        return true
       }
     },
     onSearchIcd() {
@@ -1209,11 +1461,11 @@ export default {
       }
     },
     isIcdSelected(code) {
-      return this.selectedDiagnoses.some(dx => dx.code === code)
+      return this.selectedDiagnoses.some((dx) => dx.code === code)
     },
     addDiagnosis(item) {
       if (!item || !item.code) return
-      const exists = this.selectedDiagnoses.some(dx => dx.code === item.code)
+      const exists = this.selectedDiagnoses.some((dx) => dx.code === item.code)
       if (!exists) {
         this.selectedDiagnoses.push({
           id: item.id,
@@ -1222,7 +1474,7 @@ export default {
           nameEn: item.nameEn,
           groupCode: item.groupCode,
           groupNameTh: item.groupNameTh,
-          groupNameEn: item.groupNameEn
+          groupNameEn: item.groupNameEn,
         })
         this.updateDxFromSelected()
       }
@@ -1256,7 +1508,10 @@ export default {
       this.newCustomValue = ''
     },
     removeCustomField(key) {
-      if (this.vitalsData.customFields && Object.prototype.hasOwnProperty.call(this.vitalsData.customFields, key)) {
+      if (
+        this.vitalsData.customFields &&
+        Object.prototype.hasOwnProperty.call(this.vitalsData.customFields, key)
+      ) {
         const copy = { ...this.vitalsData.customFields }
         delete copy[key]
         this.vitalsData.customFields = copy
@@ -1271,7 +1526,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#059669'
+        confirmButtonColor: '#059669',
       })
       if (!isConfirmed) return
       const cf = {}
@@ -1293,12 +1548,13 @@ export default {
         clinical: this.formData,
         pain: this.clinicalData,
         swelling: this.swellingData,
-        diagnoses: this.selectedDiagnoses
+        diagnoses: this.selectedDiagnoses,
       }
       try {
-        const { data } = this.mode === 'edit' && this.visitId
-          ? await visitService.update(this.visitId, payload)
-          : await visitService.create(payload)
+        const { data } =
+          this.mode === 'edit' && this.visitId
+            ? await visitService.update(this.visitId, payload)
+            : await visitService.create(payload)
         if (data?.success) {
           await Swal.fire({
             icon: 'success',
@@ -1307,7 +1563,7 @@ export default {
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 2000
+            timer: 2000,
           })
           this.$emit('close')
         }
@@ -1320,7 +1576,7 @@ export default {
           toast: true,
           position: 'top-end',
           showConfirmButton: false,
-          timer: 2500
+          timer: 2500,
         })
       }
     },
@@ -1378,7 +1634,7 @@ export default {
       else if (v <= 6) this.clinicalData.painType = 'ปวดปานกลาง'
       else if (v <= 8) this.clinicalData.painType = 'ปวดมาก'
       else this.clinicalData.painType = 'ปวดมากที่สุด'
-    }
+    },
   },
   mounted() {
     document.addEventListener('mousedown', this.handleGlobalClick)
@@ -1395,11 +1651,14 @@ export default {
         this.vitalsData.departmentName = val || ''
         if (val) {
           // push once if empty or not same as last
-          if (!this.vitalsData.departments.length || this.vitalsData.departments[this.vitalsData.departments.length - 1] !== val) {
+          if (
+            !this.vitalsData.departments.length ||
+            this.vitalsData.departments[this.vitalsData.departments.length - 1] !== val
+          ) {
             this.vitalsData.departments = [val]
           }
         }
-      }
+      },
     },
     isOpen(val) {
       if (val) {
@@ -1407,7 +1666,15 @@ export default {
         this.vitalsData.operatorName = auth.userName || auth.user?.name || ''
         // preload when edit
         if (this.mode === 'edit' && this.visitId) {
-          this.preloadVisit()
+          this.preloadVisit() // snapshot will be set after preload
+        } else {
+          this.$nextTick(() => {
+            try {
+              this.initialSnapshot = this.buildSnapshot()
+            } catch {
+              this.initialSnapshot = null
+            }
+          })
         }
       }
     },
@@ -1419,8 +1686,7 @@ export default {
         if (!this.vitalsData.mcStartDate) this.vitalsData.mcStartDate = new Date()
         if (!this.vitalsData.mcEndDate) this.vitalsData.mcEndDate = new Date()
       }
-    }
-  }
+    },
+  },
 }
 </script>
-
