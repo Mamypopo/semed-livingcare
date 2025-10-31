@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="modelValue" as="template">
-    <Dialog as="div" class="relative z-50" @close="requestClose">
+    <BranchDialog as="div" class="relative z-50" @close="requestClose">
       <TransitionChild
         as="template"
         enter="ease-out duration-200"
@@ -29,14 +29,14 @@
             >
               <!-- Header (match Auth style: clean, light) -->
               <div
-                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white"
+                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
-                <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold">{{
+                <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">{{
                   isEdit ? 'แก้ไขสาขา' : 'เพิ่มสาขาใหม่'
                 }}</DialogTitle>
                 <button
                   @click="requestClose"
-                  class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors relative"
+                  class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors relative"
                 >
                   <X class="w-5 h-5" />
                   <ConfirmClosePopover
@@ -50,7 +50,7 @@
               <div class="px-6 py-5 space-y-4">
                 <div class="grid grid-cols-1 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">รหัสสาขา</label>
+                    <label class="block text-sm font-medium text-slate-700">รหัสสาขา</label>
                     <input
                       v-model.trim="form.code"
                       type="text"
@@ -61,7 +61,7 @@
                     <p v-if="errors.code" class="text-xs text-red-600 mt-1">{{ errors.code }}</p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">ชื่อสาขา</label>
+                    <label class="block text-sm font-medium text-slate-700">ชื่อสาขา</label>
                     <input
                       v-model.trim="form.name"
                       type="text"
@@ -70,33 +70,34 @@
                     <p v-if="errors.name" class="text-xs text-red-600 mt-1">{{ errors.name }}</p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">ที่อยู่</label>
+                    <label class="block text-sm font-medium text-slate-700">ที่อยู่</label>
                     <textarea
                       v-model.trim="form.address"
                       rows="3"
                       class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     ></textarea>
                   </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700">โทรศัพท์</label>
+                  <div class="grid grid-cols-2 gap-4">
+ <div>
+                    <label class="block text-sm font-medium text-slate-700">โทรศัพท์</label>
                     <input
                       v-model.trim="form.phone"
                       type="text"
                       class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                   </div>
-
-
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">อีเมล</label>
+                    <label class="block text-sm font-medium text-slate-700">อีเมล</label>
                     <input
                       v-model.trim="form.email"
                       type="email"
                       class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                     />
                   </div>
+                    </div>
+                 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">เลขที่หนังสือรับรอง</label>
+                    <label class="block text-sm font-medium text-slate-700">เลขที่หนังสือรับรอง</label>
                     <input
                       v-model.trim="form.licenseNumber"
                       type="text"
@@ -109,8 +110,8 @@
                         type="button"
                         @click="form.isActive = !form.isActive"
                         :aria-pressed="form.isActive"
-                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
-                        :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
+                        :class="form.isActive ? 'bg-emerald-400' : 'bg-gray-300'"
                       >
                         <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                         <span
@@ -118,7 +119,7 @@
                           class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
                         ></span>
                       </button>
-                      <span class="ml-3 text-sm text-gray-700">
+                      <span class="ml-3 text-sm text-slate-700">
                         {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
                       </span>
                     </div>
@@ -128,8 +129,8 @@
                         type="button"
                         @click="form.isMainBranch = !form.isMainBranch"
                         :aria-pressed="form.isMainBranch"
-                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                        :class="form.isMainBranch ? 'bg-emerald-500' : 'bg-gray-300'"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
+                        :class="form.isMainBranch ? 'bg-emerald-400' : 'bg-gray-300'"
                       >
                         <span class="sr-only">สลับสาขาหลัก</span>
                         <span
@@ -137,7 +138,7 @@
                           class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
                         ></span>
                       </button>
-                      <span class="ml-3 text-sm text-gray-700">
+                      <span class="ml-3 text-sm text-slate-700">
                         {{ form.isMainBranch ? 'สาขาหลัก' : 'สาขาย่อย' }}
                       </span>
                     </div>
@@ -146,18 +147,18 @@
               </div>
 
               <div
-                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl"
+                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-slate-200/50 bg-white rounded-b-2xl"
               >
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 transition-all duration-200 shadow-sm hover:shadow"
                   @click="requestClose"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="loading"
                   @click="onSave"
                 >
@@ -168,20 +169,19 @@
           </TransitionChild>
         </div>
       </div>
-    </Dialog>
+    </BranchDialog>
   </TransitionRoot>
 </template>
 
 <script>
-import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
+import { Dialog as HeadlessDialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue'
 import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
-import Swal from 'sweetalert2'
 import { X } from 'lucide-vue-next'
 
 export default {
   name: 'BranchModal',
   components: {
-    Dialog,
+    BranchDialog: HeadlessDialog,
     DialogPanel,
     DialogTitle,
     TransitionRoot,

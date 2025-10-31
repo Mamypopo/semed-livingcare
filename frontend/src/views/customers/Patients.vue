@@ -3,13 +3,13 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">รายชื่อลูกค้า</h1>
-        <p class="text-md text-gray-500">จัดการข้อมูลลูกค้าทั้งหมดในระบบ</p>
+        <h1 class="text-2xl font-bold text-slate-800">รายชื่อลูกค้า</h1>
+        <p class="text-md text-slate-600">จัดการข้อมูลลูกค้าทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="relative">
           <SearchIcon
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
                   />
         <input
           v-model.trim="query"
@@ -26,7 +26,7 @@
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -41,7 +41,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in statusOptions"
@@ -51,12 +51,12 @@
               >
                 <li
                   :class="[
-                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -67,7 +67,7 @@
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+              class="px-4 py-2 text-sm bg-white border hover:bg-slate-50 text-slate-700 border-gray-200 rounded-md flex items-center gap-2"
             >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
@@ -82,7 +82,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-200/50 w-32 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in pageSizeOptions"
@@ -92,12 +92,12 @@
               >
                 <li
                   :class="[
-                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -105,7 +105,7 @@
         </Listbox>
 
         <button
-          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
           @click="openCreate"
         >
           <Plus class="w-4 h-4 inline mr-1" />
@@ -115,55 +115,55 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
               <th
                 @click="toggleSort('hn')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >HN
                   <ChevronUp
                     v-if="sort === 'hn' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
               <th
                 @click="toggleSort('first_name')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >ชื่อ-นามสกุล
                   <ChevronUp
                     v-if="sort === 'first_name' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">เพศ</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สาขา</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">กลุ่มลูกค้า</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">เพศ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สาขา</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">กลุ่มลูกค้า</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
               <th
                 @click="toggleSort('createdAt')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >วันที่สร้าง
                   <ChevronUp
                     v-if="sort === 'createdAt' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -200,29 +200,27 @@
 
             <!-- Rows -->
             <template v-if="!loading">
-              <tr v-for="patient in patients" :key="patient.id" class="hover:bg-gray-50">
-                <td class="px-4 py-2 text-sm text-gray-900 font-medium">
+              <tr v-for="patient in patients" :key="patient.id" class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-2 text-sm text-slate-800 font-medium">
                   {{ patient.hn }}
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-900">
+                <td class="px-4 py-2 text-sm text-slate-800">
                   <div class="flex items-center">
                     <div>
-                      <div class="font-medium">
+                      <div class="font-medium text-slate-800">
                         {{ patient.prefix }} {{ patient.first_name }} {{ patient.last_name }}
                       </div>
-                      <div v-if="patient.nickname" class="text-xs text-gray-500">
+                      <div v-if="patient.nickname" class="text-xs text-slate-500">
                         ({{ patient.nickname }})
                       </div>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700">
+                <td class="px-4 py-2 text-sm text-slate-700">
                   {{ patient.gender }}
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700">
-                  {{ patient.phone_1 || '-' }}
-                </td>
-                <td class="px-4 py-2 text-sm text-gray-700">
+              
+                <td class="px-4 py-2 text-sm text-slate-700">
                   {{ patient.branch?.name || '-' }}
                 </td>
                 <td class="px-4 py-2 text-sm">
@@ -236,7 +234,7 @@
                   >
                     {{ patient.patientGroup.name }}
                   </span>
-                  <span v-else class="text-gray-400">-</span>
+                  <span v-else class="text-slate-400">-</span>
                 </td>
                 <td class="px-4 py-2 text-sm">
                   <span
@@ -245,12 +243,12 @@
                         ? 'bg-emerald-50 text-emerald-700'
                         : 'bg-gray-100 text-gray-600'
                     "
-                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    class="px-2 py-1 rounded-md text-xs font-medium"
                   >
                     {{ patient.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                   </span>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                   {{ formatDate(patient.createdAt) }}
                 </td>
                 <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
@@ -317,7 +315,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && patients.length === 0">
-              <td colspan="9" class="px-4 py-10 text-center text-gray-500 text-sm">
+              <td colspan="9" class="px-4 py-10 text-center text-slate-500 text-sm">
                 ไม่พบข้อมูลลูกค้า
               </td>
             </tr>
@@ -327,20 +325,20 @@
 
       <!-- Footer: pagination -->
       <div
-        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+        class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
       >
-        <div class="text-gray-600">
+        <div class="text-slate-600">
           แสดง
-          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ from }}</span>
           -
-          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ to }}</span>
           จากทั้งหมด
-          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ meta.total }}</span>
           รายการ
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page <= 1 || loading"
             @click="go(meta.page - 1)"
           >
@@ -348,12 +346,12 @@
             ก่อนหน้า
           </button>
           <span
-            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
           >
-            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+            หน้า <span class="text-slate-800 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page >= totalPages || loading"
             @click="go(meta.page + 1)"
           >

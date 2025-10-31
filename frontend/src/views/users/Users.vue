@@ -3,29 +3,26 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <p class="text-md text-gray-500">จัดการข้อมูลผู้ใช้ทั้งหมดในระบบ</p>
+        <p class="text-md text-slate-600">จัดการข้อมูลผู้ใช้ทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="relative">
           <SearchIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
           />
-        <input
-          v-model.trim="query"
-          @input="onFilterInput"
-          type="text"
-          placeholder="ค้นหา ชื่อ/อีเมล..."
-          class="px-3 py-2 pl-10 pr-4 text-sm  border border-gray-200 rounded-lg shadow-sm 
-       bg-white text-gray-700 placeholder-gray-400 
-       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-        />
+          <input
+            v-model.trim="query"
+            @input="onFilterInput"
+            type="text"
+            placeholder="ค้นหา ชื่อ/อีเมล..."
+            class="px-3 py-2 pl-10 pr-4 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+          />
         </div>
         <!-- Role dropdown -->
         <Listbox v-model="roleOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ roleOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -40,7 +37,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in roleOptions"
@@ -51,11 +48,11 @@
                 <li
                   :class="[
                     'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -66,7 +63,7 @@
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -81,7 +78,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in statusOptions"
@@ -92,11 +89,11 @@
                 <li
                   :class="[
                     'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -108,13 +105,13 @@
           <div>
             <ListboxButton
               @click="onBranchDropdownOpen"
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <div class="flex items-center gap-2">
                 <span>{{ branchOption.label }}</span>
                 <span
                   v-if="branchOption.code"
-                  class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium"
+                  class="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-md font-medium"
                 >
                   {{ branchOption.code }}
                 </span>
@@ -131,19 +128,16 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-64 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-64 focus:outline-none"
             >
               <!-- Search input -->
-              <div class="px-3 py-2 border-b border-gray-100">
+              <div class="px-3 py-2 border-b border-gray-200/50">
                 <input
                   v-model="branchSearchQuery"
                   @input="onBranchSearchInput"
                   type="text"
                   placeholder="ค้นหาสาขา..."
-                  class="w-full px-2 py-1 text-sm  border border-gray-200 rounded-lg shadow-sm 
-       bg-white text-gray-700 placeholder-gray-400 
-       focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80
-       focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                  class="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                 />
               </div>
 
@@ -158,19 +152,19 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                      active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                     ]"
                   >
                     <div class="flex items-center gap-2">
                       <span>{{ opt.label }}</span>
                       <span
                         v-if="opt.code"
-                        class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium"
+                        class="px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-md font-medium"
                       >
                         {{ opt.code }}
                       </span>
                     </div>
-                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                    <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
 
@@ -190,7 +184,7 @@
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+              class="px-4 py-2 text-sm bg-white border hover:bg-slate-50 text-slate-700 border-gray-200 rounded-md flex items-center gap-2"
             >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
@@ -205,7 +199,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-200/50 w-32 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in pageSizeOptions"
@@ -216,11 +210,11 @@
                 <li
                   :class="[
                     'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -228,7 +222,7 @@
         </Listbox>
 
         <button
-          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
           @click="openCreate"
         >
           เพิ่มผู้ใช้
@@ -237,42 +231,42 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
               <th
                 @click="toggleSort('name')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >ชื่อ
                   <ChevronUp
                     v-if="sort === 'name' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">อีเมล</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">บทบาท</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สาขา</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">อีเมล</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">บทบาท</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สาขา</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
               <th
                 @click="toggleSort('createdAt')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >วันที่สร้าง
                   <ChevronUp
                     v-if="sort === 'createdAt' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -305,29 +299,29 @@
 
             <!-- Rows -->
             <template v-if="!loading">
-              <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-                <td class="px-4 py-2 text-sm text-gray-900 font-medium">{{ user.name }}</td>
-                <td class="px-4 py-2 text-sm text-gray-700">{{ user.email }}</td>
+              <tr v-for="user in users" :key="user.id" class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-2 text-sm text-slate-800 font-medium">{{ user.name }}</td>
+                <td class="px-4 py-2 text-sm text-slate-700">{{ user.email }}</td>
                 <td class="px-4 py-2 text-sm">
                   <span
                     :class="getRoleBadgeClass(user.role)"
-                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    class="px-2 py-1 rounded-md text-xs font-medium"
                   >
                     {{ getRoleLabel(user.role) }}
                   </span>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700">{{ user.branch?.name || '-' }}</td>
+                <td class="px-4 py-2 text-sm text-slate-700">{{ user.branch?.name || '-' }}</td>
                 <td class="px-4 py-2 text-sm">
                   <span
                     :class="
                       user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
                     "
-                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    class="px-2 py-1 rounded-md text-xs font-medium"
                   >
                     {{ user.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                   </span>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                   {{ formatDate(user.createdAt) }}
                 </td>
                 <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
@@ -361,7 +355,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && users.length === 0">
-              <td colspan="7" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="7" class="px-4 py-10 text-center text-slate-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
@@ -369,20 +363,20 @@
 
       <!-- Footer: pagination -->
       <div
-        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+        class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
       >
-        <div class="text-gray-600">
+        <div class="text-slate-600">
           แสดง
-          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ from }}</span>
           -
-          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ to }}</span>
           จากทั้งหมด
-          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ meta.total }}</span>
           รายการ
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page <= 1 || loading"
             @click="go(meta.page - 1)"
           >
@@ -390,12 +384,12 @@
             ก่อนหน้า
           </button>
           <span
-            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
           >
-            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+            หน้า <span class="text-slate-800 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page >= totalPages || loading"
             @click="go(meta.page + 1)"
           >
@@ -428,7 +422,7 @@ import {
   Pencil,
   ToggleLeft,
   ToggleRight,
-  SearchIcon
+  SearchIcon,
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import UserModal from '@/views/users/components/modals/UserModal.vue'
@@ -450,7 +444,7 @@ export default {
     ListboxOptions,
     ListboxOption,
     UserModal,
-    SearchIcon
+    SearchIcon,
   },
   setup() {
     const authStore = useAuthStore()
@@ -466,14 +460,14 @@ export default {
         { label: 'บทบาททั้งหมด', value: '' },
         { label: 'ผู้ดูแลระบบ', value: 'ADMIN' },
         { label: 'พนักงาน', value: 'STAFF' },
-        { label: 'ผู้เยี่ยมชม', value: 'GUEST' }
+        { label: 'ผู้เยี่ยมชม', value: 'GUEST' },
       ],
       roleOption: { label: 'บทบาททั้งหมด', value: '' },
       // Status options
       statusOptions: [
         { label: 'สถานะทั้งหมด', value: '' },
         { label: 'ใช้งาน', value: true },
-        { label: 'ปิดใช้งาน', value: false }
+        { label: 'ปิดใช้งาน', value: false },
       ],
       statusOption: { label: 'สถานะทั้งหมด', value: '' },
       // Branch options
@@ -485,7 +479,7 @@ export default {
       pageSizeOptions: [
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
-        { label: '50 ต่อหน้า', value: 50 }
+        { label: '50 ต่อหน้า', value: 50 },
       ],
       pageSizeOption: { label: '10 ต่อหน้า', value: 10 },
       meta: { page: 1, totalPages: 1, total: 0 },
@@ -496,7 +490,7 @@ export default {
       order: 'desc',
       modalOpen: false,
       modalLoading: false,
-      editingUser: null
+      editingUser: null,
     }
   },
   computed: {
@@ -532,16 +526,16 @@ export default {
         isActive: this.isActive === '' ? undefined : this.isActive,
         branchId: this.branchId === '' ? undefined : this.branchId,
         sort: this.sort,
-        order: this.order
+        order: this.order,
       }
-    }
+    },
   },
   methods: {
     async reload() {
       this.loading = true
       try {
         const params = this.userParams
-        
+
         const { data, meta } = await userService.getAll(params)
         this.users = data
         this.meta = meta
@@ -596,14 +590,14 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
+        reverseButtons: true,
       })
       if (!confirm.isConfirmed) return
 
       this.modalLoading = true
       try {
         if (isEdit) {
-          const res = await userService.update(data.id, data)
+          await userService.update(data.id, data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
@@ -612,12 +606,12 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           })
           // Reload data to get latest information
           await this.reload()
         } else {
-          const res = await userService.create(data)
+          await userService.create(data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
@@ -626,7 +620,7 @@ export default {
             timer: 1600,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           })
           // Reload data to get latest information
           await this.reload()
@@ -636,7 +630,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้'
+          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
         })
       }
     },
@@ -649,7 +643,7 @@ export default {
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
+        reverseButtons: true,
       })
       if (!res.isConfirmed) return
 
@@ -661,7 +655,7 @@ export default {
           timer: 1200,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
         })
         // Reload data to get latest information
         await this.reload()
@@ -669,7 +663,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'อัปเดตสถานะไม่สำเร็จ',
-          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง'
+          text: e?.response?.data?.message || e.message || 'กรุณาลองใหม่อีกครั้ง',
         })
       }
     },
@@ -678,7 +672,7 @@ export default {
         ADMIN: 'ผู้ดูแลระบบ',
         STAFF: 'พนักงาน',
         GUEST: 'ผู้เยี่ยมชม',
-        DOCTOR: 'แพทย์'
+        DOCTOR: 'แพทย์',
       }
       return labels[role] || role
     },
@@ -687,7 +681,7 @@ export default {
         ADMIN: 'bg-purple-50 text-purple-700',
         STAFF: 'bg-blue-50 text-blue-700',
         GUEST: 'bg-gray-50 text-gray-700',
-        DOCTOR: 'bg-emerald-50 text-emerald-700'
+        DOCTOR: 'bg-emerald-50 text-emerald-700',
       }
       return classes[role] || 'bg-gray-50 text-gray-700'
     },
@@ -700,11 +694,11 @@ export default {
         const branches = await branchService.getAllForDropdown('', 20)
         this.branchOptions = [
           { label: 'ทุกสาขา', value: '' },
-          ...branches.map(branch => ({
+          ...branches.map((branch) => ({
             label: branch.name,
             code: branch.code,
-            value: branch.id
-          }))
+            value: branch.id,
+          })),
         ]
         this.filteredBranchOptions = this.branchOptions
       } catch (error) {
@@ -723,11 +717,11 @@ export default {
           const branches = await branchService.getAllForDropdown(this.branchSearchQuery, 20)
           this.filteredBranchOptions = [
             { label: 'ทุกสาขา', value: '' },
-            ...branches.map(branch => ({
+            ...branches.map((branch) => ({
               label: branch.name,
               code: branch.code,
-              value: branch.id
-            }))
+              value: branch.id,
+            })),
           ]
         } catch (error) {
           console.error('Error searching branches:', error)
@@ -738,7 +732,7 @@ export default {
       if (this.branchOptions.length === 1) {
         await this.loadBranches()
       }
-    }
+    },
   },
   mounted() {
     this.reload()
@@ -760,14 +754,14 @@ export default {
         }
       },
       deep: true,
-      immediate: false
+      immediate: false,
     },
     searchQuery(newQuery, oldQuery) {
       if (newQuery !== oldQuery) {
         // This will trigger userParams watcher automatically
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

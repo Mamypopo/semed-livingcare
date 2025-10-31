@@ -100,6 +100,26 @@ class="w-full bg-gradient-to-r from-emerald-400 to-teal-400 text-white font-semi
 class="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
 ```
 
+### Modal Actions (Consistency)
+- ใช้รูปแบบปุ่มเดียวกัน แตกต่างกันแค่โทนสี เพื่อความสอดคล้อง
+  - **Confirm/Primary (เช่น เพิ่มแผนก)**:
+    ```html
+    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
+    ```
+  - **Cancel/Secondary (เช่น ยกเลิก)**:
+    ```html
+    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 transition-all duration-200 shadow-sm hover:shadow"
+    ```
+
+### Modal Header/Footer
+- Header: `border-slate-200/50`, Title `text-slate-800`
+- Footer: `bg-slate-50`
+
+### Toggle (Active status)
+- เปิด: `bg-emerald-400`
+- ปิด: `bg-gray-300`
+- โฟกัส: `focus:ring-emerald-300 focus:ring-2 focus:ring-offset-2`
+
 ### Link Colors
 - **Default**: `text-emerald-400`
 - **Hover**: `hover:text-emerald-500`

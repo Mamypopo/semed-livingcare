@@ -3,12 +3,12 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <p class="text-md text-gray-500">จัดการข้อมูลสาขาทั้งหมดในระบบ</p>
+        <p class="text-md text-slate-600">จัดการข้อมูลสาขาทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="relative">
           <SearchIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
           />
           <input
             v-model.trim="query"
@@ -23,7 +23,7 @@
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -38,7 +38,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in statusOptions"
@@ -48,12 +48,12 @@
               >
                 <li
                   :class="[
-                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -64,7 +64,7 @@
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+              class="px-4 py-2 text-sm bg-white border hover:bg-slate-50 text-slate-700 border-gray-200 rounded-md flex items-center gap-2"
             >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
@@ -79,7 +79,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-200/50 w-32 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in pageSizeOptions"
@@ -89,12 +89,12 @@
               >
                 <li
                   :class="[
-                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50'
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -102,7 +102,7 @@
         </Listbox>
 
         <button
-          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
           @click="openCreate"
         >
           เพิ่มสาขา
@@ -111,48 +111,49 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">รหัส</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">รหัส</th>
               <th
                 @click="toggleSort('name')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >ชื่อสาขา
                   <ChevronUp
                     v-if="sort === 'name' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ที่อยู่</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">โทร</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">ประเภท</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">ที่อยู่</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">โทร</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">ประเภท</th>
               <th
                 @click="toggleSort('createdAt')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >วันที่สร้าง
                   <ChevronUp
                     v-if="sort === 'createdAt' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <!-- Loading skeleton -->
-            <tr v-if="loading" v-for="n in 6" :key="'skeleton-' + n">
+            <template v-if="loading">
+              <tr v-for="n in 6" :key="'skeleton-' + n">
               <td class="px-4 py-3">
                 <div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div>
               </td>
@@ -174,22 +175,23 @@
               <td class="px-4 py-3 text-right">
                 <div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div>
               </td>
-            </tr>
+              </tr>
+            </template>
 
             <!-- Rows -->
-            <tr v-for="b in branches" :key="b.id" class="hover:bg-gray-50" v-show="!loading">
-              <td class="px-4 py-2 text-sm text-gray-700">{{ b.code }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900 font-medium">{{ b.name }}</td>
-              <td class="px-4 py-2 text-sm text-gray-700 truncate max-w-[28ch]">
+            <tr v-for="b in branches" :key="b.id" class="hover:bg-slate-50 transition-colors" v-show="!loading">
+              <td class="px-4 py-2 text-sm text-slate-700">{{ b.code }}</td>
+              <td class="px-4 py-2 text-sm text-slate-800 font-medium">{{ b.name }}</td>
+              <td class="px-4 py-2 text-sm text-slate-700 truncate max-w-[28ch]">
                 {{ b.address || '-' }}
               </td>
-              <td class="px-4 py-2 text-sm text-gray-700">{{ b.phone || '-' }}</td>
+              <td class="px-4 py-2 text-sm text-slate-700">{{ b.phone || '-' }}</td>
               <td class="px-4 py-2 text-sm">
                 <span
                   :class="
                     b.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
                   "
-                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  class="px-2 py-1 rounded-md text-xs font-medium"
                 >
                   {{ b.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                 </span>
@@ -197,14 +199,14 @@
               <td class="px-4 py-2 text-sm">
                 <span
                   :class="
-                    b.isMainBranch ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'
+                    b.isMainBranch ? 'bg-purple-50 text-purple-700' : 'bg-amber-50 text-amber-700'
                   "
-                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  class="px-2 py-1 rounded-md text-xs font-medium"
                 >
                   {{ b.isMainBranch ? 'สาขาหลัก' : 'สาขาย่อย' }}
                 </span>
               </td>
-              <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+              <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                 {{ formatDate(b.createdAt) }}
               </td>
               <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
@@ -237,7 +239,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && branches.length === 0">
-              <td colspan="8" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="8" class="px-4 py-10 text-center text-slate-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
@@ -245,20 +247,20 @@
 
       <!-- Footer: pagination -->
       <div
-        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+        class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
       >
-        <div class="text-gray-600">
+        <div class="text-slate-600">
           แสดง
-          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ from }}</span>
           -
-          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ to }}</span>
           จากทั้งหมด
-          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ meta.total }}</span>
           รายการ
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page <= 1 || loading"
             @click="go(meta.page - 1)"
           >
@@ -266,12 +268,12 @@
             ก่อนหน้า
           </button>
           <span
-            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
           >
-            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+            หน้า <span class="text-slate-800 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page >= totalPages || loading"
             @click="go(meta.page + 1)"
           >
@@ -300,7 +302,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Pencil,
-  Trash2,
   ToggleLeft,
   ToggleRight,
   SearchIcon
@@ -311,14 +312,13 @@ import Swal from 'sweetalert2'
 import { useAuthStore } from '@/stores/auth'
 
 export default {
-  name: 'Branches',
+  name: 'BranchesManagement',
   components: {
     ChevronDown,
     ChevronUp,
     ChevronLeft,
     ChevronRight,
     Pencil,
-    Trash2,
     ToggleLeft,
     ToggleRight,
     Listbox,
@@ -436,7 +436,7 @@ export default {
       try {
         const code = await branchService.getLatestCode()
         this.editingBranch = { id: null, code, name: '', address: '', phone: '', email: '', licenseNumber: '', isActive: true, isMainBranch: false }
-      } catch (e) {
+      } catch {
         this.editingBranch = {
           id: null,
           code: '',
@@ -532,10 +532,9 @@ export default {
         // อัปเดตในตารางทันที
         const newVal = updated.branch || updated
         const idx = this.branches.findIndex(x => x.id === b.id)
-        if (idx !== -1)
-          this.$set
-            ? this.$set(this.branches, idx, { ...b, ...newVal })
-            : (this.branches[idx] = { ...b, ...newVal })
+        if (idx !== -1) {
+          this.branches[idx] = { ...b, ...newVal }
+        }
         Swal.fire({
           icon: 'success',
           title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว',

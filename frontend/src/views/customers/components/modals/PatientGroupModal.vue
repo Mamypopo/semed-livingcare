@@ -29,14 +29,14 @@
             >
               <!-- Header -->
               <div
-                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white"
+                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
-                <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold">{{
+                <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">{{
                   isEdit ? 'แก้ไขกลุ่มลูกค้า' : 'เพิ่มกลุ่มลูกค้าใหม่'
                 }}</DialogTitle>
                 <button
                   @click="requestClose"
-                  class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors relative"
+                  class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors relative"
                 >
                   <X class="w-5 h-5" />
                   <ConfirmClosePopover
@@ -52,7 +52,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Name -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700"
+                    <label class="block text-sm font-medium text-slate-700"
                       >ชื่อกลุ่มลูกค้า <span class="text-red-500">*</span></label
                     >
                     <input
@@ -66,11 +66,11 @@
 
                   <!-- Discount Type -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">ประเภทส่วนลด</label>
+                    <label class="block text-sm font-medium text-slate-700">ประเภทส่วนลด</label>
                     <Listbox v-model="form.discount_type" as="div" class="relative">
                       <div>
                         <ListboxButton
-                          class="mt-1 w-full px-3 py-2 text-left border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                          class="mt-1 relative w-full px-3 py-2 text-left bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md"
                         >
                           <span class="block truncate">{{
                             getDiscountTypeLabel(form.discount_type)
@@ -78,7 +78,7 @@
                           <span
                             class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                           >
-                            <ChevronDown class="w-4 h-4 text-gray-400" />
+                            <ChevronDown class="w-4 h-4 text-slate-400" />
                           </span>
                         </ListboxButton>
                       </div>
@@ -91,7 +91,7 @@
                         leave-to-class="transform opacity-0 scale-95"
                       >
                         <ListboxOptions
-                          class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none"
+                          class="absolute z-50 mt-2 w-full bg-white rounded-xl border border-gray-200/50 p-2 shadow-xl focus:outline-none"
                         >
                           <ListboxOption
                             v-for="discountType in discountTypeOptions"
@@ -101,8 +101,8 @@
                           >
                             <li
                               :class="[
-                                active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
-                                'cursor-pointer select-none relative py-2 pl-3 pr-9',
+                                'cursor-pointer select-none relative py-2 pl-3 pr-9 rounded-lg transition-colors',
+                                active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                               ]"
                             >
                               <span
@@ -116,11 +116,11 @@
                               <span
                                 v-if="selected"
                                 :class="[
-                                  active ? 'text-emerald-600' : 'text-emerald-600',
                                   'absolute inset-y-0 right-0 flex items-center pr-4',
+                                  'text-emerald-500 text-xs',
                                 ]"
                               >
-                                <CheckIcon class="w-4 h-4" />
+                                เลือก
                               </span>
                             </li>
                           </ListboxOption>
@@ -147,7 +147,7 @@
 
                   <!-- Discount Amount -->
                   <div v-if="form.discount_type">
-                    <label class="block text-sm font-medium text-gray-700">จำนวนส่วนลด</label>
+                    <label class="block text-sm font-medium text-slate-700">จำนวนส่วนลด</label>
                     <div class="relative mt-1">
                       <input
                         v-model.number="form.discount_amount"
@@ -160,7 +160,7 @@
                       <div
                         class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
                       >
-                        <span class="text-gray-500 text-sm">{{
+                        <span class="text-slate-500 text-sm">{{
                           form.discount_type === 'percent' ? '%' : 'บาท'
                         }}</span>
                       </div>
@@ -173,7 +173,7 @@
 
                 <!-- Third Row: Note (Full Width) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
+                  <label class="block text-sm font-medium text-slate-700">หมายเหตุ</label>
                   <textarea
                     v-model.trim="form.note"
                     rows="3"
@@ -190,8 +190,8 @@
                       type="button"
                       @click="form.isActive = !form.isActive"
                       :aria-pressed="form.isActive"
-                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
-                      :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
+                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
+                      :class="form.isActive ? 'bg-emerald-400' : 'bg-gray-300'"
                     >
                       <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                       <span
@@ -200,7 +200,7 @@
                       ></span>
                     </button>
                     <span
-                      class="ml-3 text-sm text-gray-700"
+                      class="ml-3 text-sm text-slate-700"
                     
                     >
                       {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
@@ -210,18 +210,18 @@
               </div>
 
               <div
-                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl"
+                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-slate-200/50 bg-white rounded-b-2xl"
               >
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 transition-all duration-200 shadow-sm hover:shadow"
                   @click="requestClose"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="loading"
                   @click="onSubmit"
                 >
@@ -248,7 +248,7 @@ import {
   ListboxOptions,
   ListboxOption,
 } from '@headlessui/vue'
-import { X, ChevronDown, CheckIcon } from 'lucide-vue-next'
+import { X, ChevronDown } from 'lucide-vue-next'
 import ColorPicker from '@/components/ColorPicker.vue'
 import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 
@@ -266,7 +266,6 @@ export default {
     ListboxOption,
     X,
     ChevronDown,
-    CheckIcon,
     ColorPicker,
     ConfirmClosePopover,
   },
@@ -328,7 +327,7 @@ export default {
     },
     initialData: {
       immediate: true,
-      handler(v) {
+      handler() {
         this.resetForm()
       },
     },

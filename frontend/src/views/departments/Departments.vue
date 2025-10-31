@@ -3,12 +3,12 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <p class="text-md text-gray-500">จัดการข้อมูลแผนกทั้งหมดในระบบ</p>
+        <p class="text-md text-slate-600">จัดการข้อมูลแผนกทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="relative">
           <SearchIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
           />
           <input
             v-model.trim="query"
@@ -22,7 +22,7 @@
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -37,7 +37,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in statusOptions"
@@ -47,12 +47,12 @@
               >
                 <li
                   :class="[
-                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -63,7 +63,7 @@
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+              class="px-4 py-2 text-sm bg-white border hover:bg-slate-50 text-slate-700 border-gray-200 rounded-md flex items-center gap-2"
             >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
@@ -78,7 +78,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-200/50 w-32 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in pageSizeOptions"
@@ -88,12 +88,12 @@
               >
                 <li
                   :class="[
-                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -103,7 +103,7 @@
         <!-- Add button -->
         <button
           @click="openCreateModal"
-          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
         >
           เพิ่มแผนก
         </button>
@@ -112,45 +112,45 @@
 
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">
                 ชื่อแผนก
               </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">วันที่สร้าง</th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">วันที่สร้าง</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr v-if="loading" class="animate-pulse">
-              <td colspan="4" class="px-4 py-3 text-center text-gray-500">
+              <td colspan="4" class="px-4 py-3 text-center text-slate-500">
                 <div class="flex items-center justify-center">
-                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
+                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                   <span class="ml-2">กำลังโหลด...</span>
                 </div>
               </td>
             </tr>
             <tr v-else-if="departments.length === 0">
-              <td colspan="4" class="px-4 py-10 text-center text-gray-500 text-sm">
+              <td colspan="4" class="px-4 py-10 text-center text-slate-500 text-sm">
                 <div class="flex flex-col items-center">
-                  <Building class="w-12 h-12 text-gray-300 mb-4" />
-                  <p class="text-lg font-medium text-gray-900 mb-2">ไม่มีข้อมูลแผนก</p>
-                  <p class="text-sm text-gray-500">เริ่มต้นด้วยการเพิ่มแผนกใหม่</p>
+                  <Building class="w-12 h-12 text-slate-300 mb-4" />
+                  <p class="text-lg font-medium text-slate-800 mb-2">ไม่มีข้อมูลแผนก</p>
+                  <p class="text-sm text-slate-600">เริ่มต้นด้วยการเพิ่มแผนกใหม่</p>
                 </div>
               </td>
             </tr>
-            <tr v-else v-for="department in departments" :key="department.id" class="hover:bg-gray-50">
-              <td class="px-4 py-2 text-sm text-gray-900 font-medium">
+            <tr v-else v-for="department in departments" :key="department.id" class="hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-2 text-sm text-slate-800 font-medium">
                 <div class="flex items-center">
-                  <div class="p-2 bg-emerald-100 rounded-lg mr-3">
-                    <Building class="w-5 h-5 text-emerald-600" />
+                  <div class="p-2 bg-emerald-50 rounded-lg mr-3 border border-emerald-100">
+                    <Building class="w-5 h-5 text-emerald-400" />
                   </div>
                   <div>
-                    <div class="text-sm font-medium text-gray-900">{{ department.name }}</div>
+                    <div class="text-sm font-medium text-slate-800">{{ department.name }}</div>
                   </div>
                 </div>
               </td>
@@ -161,12 +161,12 @@
                       ? 'bg-emerald-50 text-emerald-700'
                       : 'bg-gray-100 text-gray-600'
                   "
-                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  class="px-2 py-1 rounded-md text-xs font-medium"
                 >
                   {{ department.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                 </span>
               </td>
-              <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+              <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                 {{ formatDate(department.createdAt) }}
               </td>
               <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
@@ -204,20 +204,20 @@
     <!-- Footer: pagination -->
     <div
       v-if="!loading && departments.length > 0"
-      class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+      class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
     >
-      <div class="text-gray-600">
+      <div class="text-slate-600">
         แสดง
-        <span class="mx-1 text-gray-900 font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
         -
-        <span class="mx-1 text-gray-900 font-medium">{{ Math.min(currentPage * pageSize, total) }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ Math.min(currentPage * pageSize, total) }}</span>
         จากทั้งหมด
-        <span class="mx-1 text-gray-900 font-medium">{{ total }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ total }}</span>
         รายการ
       </div>
       <div class="flex items-center gap-2">
         <button
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="currentPage <= 1 || loading"
           @click="goToPage(currentPage - 1)"
         >
@@ -225,12 +225,12 @@
           ก่อนหน้า
         </button>
         <span
-          class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+          class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
         >
-          หน้า <span class="text-gray-900 font-medium">{{ currentPage }}</span> / {{ totalPages }}
+          หน้า <span class="text-slate-800 font-medium">{{ currentPage }}</span> / {{ totalPages }}
         </span>
         <button
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="currentPage >= totalPages || loading"
           @click="goToPage(currentPage + 1)"
         >
@@ -408,7 +408,7 @@ export default {
       this.modalLoading = true
       try {
         if (isEdit) {
-          const res = await departmentService.update(data.id, data)
+          await departmentService.update(data.id, data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
@@ -421,7 +421,7 @@ export default {
           })
           await this.loadDepartments()
         } else {
-          const res = await departmentService.create(data)
+          await departmentService.create(data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({

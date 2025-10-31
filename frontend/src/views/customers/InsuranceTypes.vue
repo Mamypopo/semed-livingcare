@@ -3,22 +3,27 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <p class="text-md text-gray-500">จัดการข้อมูลประเภทประกันทั้งหมดในระบบ</p>
+        <p class="text-md text-slate-600">จัดการข้อมูลประเภทประกันทั้งหมดในระบบ</p>
       </div>
       <div class="flex items-center gap-2">
-        <input
-          v-model.trim="query"
-          @input="onFilterInput"
-          type="text"
-          placeholder="ค้นหา รหัส/ชื่อ/หมายเหตุ..."
-          class="px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-56 hover:border-emerald-300 focus:outline-none"
-        />
+        <div class="relative">
+          <SearchIcon
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
+          />
+          <input
+            v-model.trim="query"
+            @input="onFilterInput"
+            type="text"
+            placeholder="ค้นหา รหัส/ชื่อ/หมายเหตุ..."
+            class="w-56 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+          />
+        </div>
 
         <!-- Status dropdown -->
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
             >
               <span>{{ statusOption.label }}</span>
               <ChevronDown class="w-4 h-4 opacity-60" />
@@ -33,7 +38,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-48 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in statusOptions"
@@ -43,12 +48,12 @@
               >
                 <li
                   :class="[
-                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -59,7 +64,7 @@
         <Listbox v-model="pageSizeOption" as="div" class="relative">
           <div>
             <ListboxButton
-              class="px-4 py-2 text-sm bg-white border hover:bg-gray-50 text-gray-700 border-gray-200 rounded-md flex items-center gap-2"
+              class="px-4 py-2 text-sm bg-white border hover:bg-slate-50 text-slate-700 border-gray-200 rounded-md flex items-center gap-2"
             >
               <span>{{ pageSizeOption.label }}</span>
               <ChevronDown class="w-3.5 h-3.5 opacity-60" />
@@ -74,7 +79,7 @@
             leave-to-class="transform opacity-0 scale-95"
           >
             <ListboxOptions
-              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-100 w-32 focus:outline-none"
+              class="absolute right-0 mt-2 z-50 p-1.5 shadow-xl bg-white rounded-lg border border-gray-200/50 w-32 focus:outline-none"
             >
               <ListboxOption
                 v-for="opt in pageSizeOptions"
@@ -84,12 +89,12 @@
               >
                 <li
                   :class="[
-                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between',
-                    active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700'
+                    'px-2 py-1.5 text-sm rounded cursor-pointer flex items-center justify-between transition-colors',
+                    active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                   ]"
                 >
                   <span>{{ opt.label }}</span>
-                  <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                  <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                 </li>
               </ListboxOption>
             </ListboxOptions>
@@ -97,7 +102,7 @@
         </Listbox>
 
         <button
-          class="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
           @click="openCreate"
         >
           เพิ่มประเภทประกัน
@@ -106,52 +111,52 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
               <th
                 @click="toggleSort('code')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >รหัส
                   <ChevronUp
                     v-if="sort === 'code' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
               <th
                 @click="toggleSort('name')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >ชื่อ
                   <ChevronUp
                     v-if="sort === 'name' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">สถานะ</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
               <th
                 @click="toggleSort('createdAt')"
-                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-gray-600"
+                class="px-4 py-2 text-left text-xs font-semibold cursor-pointer select-none text-slate-600"
               >
                 <span class="inline-flex items-center"
                   >วันที่สร้าง
                   <ChevronUp
                     v-if="sort === 'createdAt' && order === 'asc'"
-                    class="w-3.5 h-3.5 ml-1 text-emerald-600"
+                    class="w-3.5 h-3.5 ml-1 text-emerald-400"
                   />
-                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-600" />
+                  <ChevronDown v-else class="w-3.5 h-3.5 ml-1 text-emerald-400" />
                 </span>
               </th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600">จัดการ</th>
+              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -181,17 +186,17 @@
               <tr
                 v-for="insuranceType in insuranceTypes"
                 :key="insuranceType.id"
-                class="hover:bg-gray-50"
+                class="hover:bg-slate-50 transition-colors"
               >
-                <td class="px-4 py-2 text-sm text-gray-900 font-medium">
-                  <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+                <td class="px-4 py-2 text-sm text-slate-800 font-medium">
+                  <span class="px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-md font-medium">
                     {{ insuranceType.code }}
                   </span>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-900 font-medium">
+                <td class="px-4 py-2 text-sm text-slate-800 font-medium">
                   <div>
                     <div>{{ insuranceType.name }}</div>
-                    <div v-if="insuranceType.note" class="text-xs text-gray-500">
+                    <div v-if="insuranceType.note" class="text-xs text-slate-500">
                       {{ insuranceType.note }}
                     </div>
                   </div>
@@ -203,12 +208,12 @@
                         ? 'bg-emerald-50 text-emerald-700'
                         : 'bg-gray-100 text-gray-600'
                     "
-                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    class="px-2 py-1 rounded-md text-xs font-medium"
                   >
                     {{ insuranceType.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                   </span>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                   {{ formatDate(insuranceType.createdAt) }}
                 </td>
                 <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
@@ -240,7 +245,7 @@
 
             <!-- Empty state -->
             <tr v-if="!loading && insuranceTypes.length === 0">
-              <td colspan="6" class="px-4 py-10 text-center text-gray-500 text-sm">ไม่พบข้อมูล</td>
+              <td colspan="6" class="px-4 py-10 text-center text-slate-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
           </tbody>
         </table>
@@ -248,20 +253,20 @@
 
       <!-- Footer: pagination -->
       <div
-        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
+        class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
       >
-        <div class="text-gray-600">
+        <div class="text-slate-600">
           แสดง
-          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ from }}</span>
           -
-          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ to }}</span>
           จากทั้งหมด
-          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+          <span class="mx-1 text-slate-800 font-medium">{{ meta.total }}</span>
           รายการ
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page <= 1 || loading"
             @click="go(meta.page - 1)"
           >
@@ -269,12 +274,12 @@
             ก่อนหน้า
           </button>
           <span
-            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
           >
-            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+            หน้า <span class="text-slate-800 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page >= totalPages || loading"
             @click="go(meta.page + 1)"
           >
@@ -306,13 +311,14 @@ import {
   ChevronRight,
   Pencil,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Search as SearchIcon
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import Swal from 'sweetalert2'
 
 export default {
-  name: 'InsuranceTypes',
+  name: 'InsuranceTypesManagement',
   components: {
     ChevronDown,
     ChevronUp,
@@ -321,6 +327,7 @@ export default {
     Pencil,
     ToggleLeft,
     ToggleRight,
+    SearchIcon,
     Listbox,
     ListboxButton,
     ListboxOptions,
@@ -457,7 +464,7 @@ export default {
       this.modalLoading = true
       try {
         if (isEdit) {
-          const res = await insuranceTypeService.update(data.id, data)
+          await insuranceTypeService.update(data.id, data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
@@ -471,7 +478,7 @@ export default {
           // Reload data to get latest information
           await this.reload()
         } else {
-          const res = await insuranceTypeService.create(data)
+          await insuranceTypeService.create(data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({

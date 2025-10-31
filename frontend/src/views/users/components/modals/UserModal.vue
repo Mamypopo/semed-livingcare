@@ -29,14 +29,14 @@
             >
               <!-- Header -->
               <div
-                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white"
+                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
-                <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold">{{
+                <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">{{
                   isEdit ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้ใหม่'
                 }}</DialogTitle>
                 <button
                   @click="requestClose"
-                  class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors relative"
+                  class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors relative"
                 >
                   <X class="w-5 h-5" />
                   <ConfirmClosePopover
@@ -101,14 +101,14 @@
                     <label class="block text-sm font-medium text-gray-700">บทบาท <span class="text-red-500">*</span></label>
                     <Listbox v-model="form.role" as="div" class="relative">
                       <div>
-                        <ListboxButton
+                    <ListboxButton
                           class="mt-1 w-full px-3 py-2 text-left bg-white border border-gray-200 rounded-lg shadow-sm  text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         >
                           <span class="block truncate">{{ getRoleLabel(form.role) }}</span>
                           <span
                             class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                           >
-                            <ChevronDown class="w-4 h-4 text-gray-400" />
+                            <ChevronDown class="w-4 h-4 text-slate-400" />
                           </span>
                         </ListboxButton>
                       </div>
@@ -121,7 +121,7 @@
                         leave-to-class="transform opacity-0 scale-95"
                       >
                         <ListboxOptions
-                          class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none"
+                          class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-200/60 overflow-auto focus:outline-none"
                         >
                           <ListboxOption
                             v-for="role in roleOptions"
@@ -131,7 +131,7 @@
                           >
                             <li
                               :class="[
-                                active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
+                                active ? 'bg-emerald-50 text-emerald-700' : 'text-slate-800',
                                 'cursor-pointer select-none relative py-2 pl-3 pr-9'
                               ]"
                             >
@@ -172,7 +172,7 @@
                             <span class="block truncate">{{ getBranchName(form.branchId) }}</span>
                             <span
                               v-if="getBranchCode(form.branchId)"
-                              class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium"
+                              class="px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-md font-medium"
                             >
                               {{ getBranchCode(form.branchId) }}
                             </span>
@@ -180,7 +180,7 @@
                           <span
                             class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                           >
-                            <ChevronDown class="w-4 h-4 text-gray-400" />
+                            <ChevronDown class="w-4 h-4 text-slate-400" />
                           </span>
                         </ListboxButton>
                       </div>
@@ -193,10 +193,10 @@
                         leave-to-class="transform opacity-0 scale-95"
                       >
                         <ListboxOptions
-                          class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none"
+                          class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-gray-200/60 overflow-auto focus:outline-none"
                         >
                           <!-- Search input -->
-                          <div class="px-3 py-2 border-b border-gray-200">
+                          <div class="px-3 py-2 border-b border-gray-200/60">
                             <input
                               v-model="branchSearchQuery"
                               @input="onBranchSearchInput"
@@ -210,7 +210,7 @@
                           <ListboxOption :value="null" v-slot="{ active, selected }">
                             <li
                               :class="[
-                                active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-900',
+                                active ? 'bg-emerald-50 text-emerald-700' : 'text-slate-800',
                                 'cursor-pointer select-none relative py-2 pl-3 pr-9'
                               ]"
                             >
@@ -256,7 +256,7 @@
                                   {{ branch.name }}
                                 </span>
                                 <span
-                                  class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium"
+                                  class="px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-md font-medium"
                                 >
                                   {{ branch.code }}
                                 </span>
@@ -292,8 +292,8 @@
                         type="button"
                         @click="form.isActive = !form.isActive"
                         :aria-pressed="form.isActive"
-                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2"
-                        :class="form.isActive ? 'bg-lime-500' : 'bg-gray-300'"
+                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
+                        :class="form.isActive ? 'bg-emerald-400' : 'bg-gray-300'"
                       >
                         <span class="sr-only">สลับเปิด/ปิดการใช้งาน</span>
                         <span
@@ -302,7 +302,7 @@
                         ></span>
                       </button>
                       <span
-                        class="ml-3 text-sm text-gray-700"
+                        class="ml-3 text-sm text-slate-700"
                       >
                         {{ form.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
                       </span>
@@ -312,18 +312,18 @@
               </div>
 
               <div
-                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl"
+                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-slate-200/50 bg-white rounded-b-2xl"
               >
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 transition-all duration-200 shadow-sm hover:shadow"
                   @click="requestClose"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="loading"
                   @click="onSave"
                 >
@@ -368,14 +368,14 @@
             >
               <!-- Header -->
               <div
-                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-gray-100 bg-white"
+                class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
-                <DialogTitle as="h3" class="text-gray-900 text-lg font-semibold"
+                <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold"
                   >เปลี่ยนรหัสผ่าน</DialogTitle
                 >
                 <button
                   @click="closeChangePasswordModal"
-                  class="text-gray-400 hover:text-red-500 bg-gray-50 rounded-md p-1 transition-colors"
+                  class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors"
                 >
                   <X class="w-5 h-5" />
                 </button>
@@ -388,7 +388,7 @@
                     ref="newPasswordInput"
                     v-model.trim="newPassword"
                     type="password"
-                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                  class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 hover:border-emerald-400 focus:outline-none"
                     autofocus
                   />
                   <p v-if="passwordError" class="text-xs text-red-600 mt-1">{{ passwordError }}</p>
@@ -400,7 +400,7 @@
                   <input
                     v-model.trim="confirmPassword"
                     type="password"
-                    class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-emerald-300 focus:outline-none"
+                  class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 hover:border-emerald-400 focus:outline-none"
                   />
                   <p v-if="confirmPasswordError" class="text-xs text-red-600 mt-1">
                     {{ confirmPasswordError }}
@@ -409,18 +409,18 @@
               </div>
 
               <div
-                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-gray-100 bg-white rounded-b-2xl"
+                class="px-6 pb-6 pt-2 flex justify-end gap-2 border-t border-slate-200/50 bg-white rounded-b-2xl"
               >
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 transition-all duration-200 shadow-sm hover:shadow"
                   @click="closeChangePasswordModal"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="button"
-                  class="px-4 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm"
+                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="passwordLoading"
                   @click="handleChangePassword"
                 >
