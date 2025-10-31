@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-slate-50">
     <!-- Sidebar -->
     <Sidebar
       v-if="showSidebar"
@@ -13,21 +13,21 @@
     <!-- Main Content -->
     <div :class="[showSidebar ? (sidebarCollapsed ? 'md:pl-16 lg:pl-16' : 'lg:pl-64') : '']">
       <!-- Top Navigation -->
-      <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header class="bg-white shadow-sm border-b border-slate-200/50 sticky top-0 z-40">
         <div class="px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
             <!-- Mobile menu button -->
             <button
               v-if="showSidebar"
               @click="toggleSidebar"
-              class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              class="md:hidden p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors duration-200"
             >
               <MenuIcon class="w-5 h-5" />
             </button>
 
             <!-- Page Title -->
             <div class="flex-1 lg:flex-none">
-              <h1 class="text-xl font-semibold text-gray-900">
+              <h1 class="text-xl font-semibold text-slate-800">
                 {{ $route.path === '/main/lobby' ? 'SEMed Livingcare' : (authStore.currentBranch?.name || pageTitle) }}
               </h1>
             </div>
@@ -55,11 +55,11 @@
                 <!-- Search Results Dropdown -->
                 <div
                   v-if="showSearchResults && (searchQuery || searchResults.length > 0)"
-                  class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
+                  class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200/50 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
                 >
                   <div
                     v-if="searchResults.length === 0 && searchQuery"
-                    class="p-4 text-center text-gray-500"
+                    class="p-4 text-center text-slate-500"
                   >
                     ไม่พบผลลัพธ์
                   </div>
@@ -73,10 +73,10 @@
                         ]"
                       >
                         <div class="flex items-center space-x-3">
-                          <component :is="result.icon" class="w-4 h-4 text-gray-500" />
+                          <component :is="result.icon" class="w-4 h-4 text-slate-500" />
                           <div>
-                            <div class="font-medium text-gray-900">{{ result.title }}</div>
-                            <div class="text-sm text-gray-500">{{ result.description }}</div>
+                            <div class="font-medium text-slate-800">{{ result.title }}</div>
+                            <div class="text-sm text-slate-500">{{ result.description }}</div>
                           </div>
                         </div>
                       </button>
@@ -89,7 +89,7 @@
               <button
                 v-if="$route.path !== '/main/lobby'"
                 @click="toggleMobileSearch"
-                class="sm:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                class="sm:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all duration-200"
                 v-tooltip="'ค้นหา'"
               >
                 <SearchIcon class="w-5 h-5" />
@@ -99,20 +99,20 @@
               <HMenu as="div" class="relative inline-block text-left" v-slot="{ open }">
                 <div>
                   <MenuButton
-                    class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                    class="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 transition-all duration-200 cursor-pointer"
                   >
                     <div
-                      class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md"
+                      class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-400/20"
                     >
                       <span class="text-white text-sm font-semibold">{{ userInitial }}</span>
                     </div>
                     <div class="hidden sm:block text-left">
-                      <p class="text-sm font-semibold text-gray-900">{{ authStore.userName }}</p>
-                      <p class="text-xs text-emerald-600 font-medium">{{ authStore.userRole }}</p>
+                      <p class="text-sm font-semibold text-slate-800">{{ authStore.userName }}</p>
+                      <p class="text-xs text-emerald-400 font-medium">{{ authStore.userRole }}</p>
                     </div>
                     <ChevronDown
-                      :class="[
-                        'w-4 h-4 text-gray-400 transition-transform duration-200',
+                        :class="[
+                        'w-4 h-4 text-slate-400 transition-transform duration-200',
                         open ? 'rotate-180' : ''
                       ]"
                     />
@@ -128,13 +128,13 @@
                   leave-to-class="transform opacity-0 scale-95"
                 >
                   <MenuItems
-                    class="absolute right-0 mt-3 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-56 focus:outline-none"
+                    class="absolute right-0 mt-3 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-56 focus:outline-none"
                   >
                     <div class="px-1 py-1">
                       <MenuItem v-slot="{ active }">
                         <a
                           :class="[
-                            'flex text-gray-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer',
+                            'flex text-slate-700 items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer',
                             active ? 'bg-emerald-50' : ''
                           ]"
                         >
@@ -213,8 +213,8 @@
       <div class="flex items-start justify-center pt-16 px-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md" @click.stop>
           <div class="p-4">
-            <div class="flex items-center space-x-3 mb-4">
-              <SearchIcon class="w-5 h-5 text-gray-400" />
+              <div class="flex items-center space-x-3 mb-4">
+              <SearchIcon class="w-5 h-5 text-slate-400" />
               <input
                 ref="mobileSearchInput"
                 v-model="searchQuery"
@@ -228,7 +228,7 @@
               />
               <button
                 @click="closeMobileSearch"
-                class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors duration-200"
               >
                 <X class="w-5 h-5" />
               </button>
@@ -241,7 +241,7 @@
             >
               <div
                 v-if="searchResults.length === 0 && searchQuery"
-                class="p-4 text-center text-gray-500"
+                class="p-4 text-center text-slate-500"
               >
                 ไม่พบผลลัพธ์
               </div>
@@ -250,15 +250,15 @@
                   <button
                     @click="selectSearchResult(result)"
                     :class="[
-                      'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors',
+                      'w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors',
                       selectedSearchIndex === index ? 'bg-emerald-50' : ''
                     ]"
                   >
                     <div class="flex items-center space-x-3">
-                      <component :is="result.icon" class="w-4 h-4 text-gray-500" />
+                      <component :is="result.icon" class="w-4 h-4 text-slate-500" />
                       <div>
-                        <div class="font-medium text-gray-900">{{ result.title }}</div>
-                        <div class="text-sm text-gray-500">{{ result.description }}</div>
+                        <div class="font-medium text-slate-800">{{ result.title }}</div>
+                        <div class="text-sm text-slate-500">{{ result.description }}</div>
                       </div>
                     </div>
                   </button>

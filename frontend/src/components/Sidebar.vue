@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out',
+      'fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200/50 shadow-lg transform transition-all duration-300 ease-in-out flex flex-col',
       sidebarOpen ? 'translate-x-0' : '-translate-x-full',
       // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
       'w-64',
@@ -11,19 +11,19 @@
   >
     <!-- Sidebar Header -->
     <div
-      class="flex items-center justify-between h-16 px-4 border-b border-slate-200/60 backdrop-blur-sm"
+      class="flex items-center justify-between h-16 px-4 border-b border-slate-200/50 bg-gradient-to-r from-slate-50/50 to-white"
     >
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 overflow-hidden object-contain drop-shadow-lg">
+      <div class="flex items-center space-x-3 flex-1 min-w-0">
+        <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
           <img
             src="/src/assets/image/Logosemed.png"
             alt="SEMed Logo"
-            class="w-full h-full object-cover mix-blend-multiply"
+            class="w-8 h-8 object-contain"
           />
         </div>
-        <div v-if="!isCollapsed" class="flex flex-col transition-opacity duration-300">
-          <span class="text-lg font-bold bg-gray-700 bg-clip-text text-transparent">SEMed</span>
-          <span class="text-xs text-slate-500 font-medium">v0.0.1</span>
+        <div v-if="!isCollapsed" class="flex flex-col transition-opacity duration-300 min-w-0">
+          <span class="text-lg font-bold text-slate-800 truncate">SEMed</span>
+          <span class="text-xs text-slate-500 font-medium">Livingcare</span>
         </div>
       </div>
 
@@ -31,154 +31,179 @@
       <button
         v-if="!isCollapsed"
         @click="$emit('toggle-collapse')"
-        class="hidden md:block p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100/80 transition-all duration-200"
+        class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all duration-200 flex-shrink-0"
         v-tooltip.right="'ย่อเมนู'"
       >
-        <ChevronLeft class="w-5 h-5" />
+        <ChevronLeft class="w-4 h-4" />
       </button>
 
       <!-- Close Button (Mobile only) -->
       <button
         @click="$emit('toggle-sidebar')"
-        class="md:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100/80 transition-all duration-200"
+        class="md:hidden flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all duration-200 flex-shrink-0"
       >
         <X class="w-5 h-5" />
       </button>
     </div>
 
     <!-- Expand Button (Tablet and Desktop - when collapsed) -->
-    <div v-if="isCollapsed" class="flex justify-center py-2">
+    <div v-if="isCollapsed" class="flex justify-center py-3 border-b border-slate-200/50">
       <button
         @click="$emit('toggle-collapse')"
-        class="hidden md:block p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100/80 transition-all duration-200"
+        class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all duration-200"
         v-tooltip.right="'ขยายเมนู'"
       >
         <ChevronRight class="w-4 h-4" />
       </button>
     </div>
 
-    <!-- Sidebar Navigation -->
-    <nav class="mt-6 px-3">
-      <div class="space-y-1">
-        <template v-for="(item, index) in navigation" :key="item.name">
-          <!-- Menu Item with Submenu -->
-          <div v-if="item.submenu" class="space-y-1">
-            <!-- Main Menu Item -->
-            <button
-              @click="toggleSubmenu(index)"
+    <!-- Sidebar Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Sidebar Navigation -->
+      <nav class="flex-1 overflow-y-auto px-3 py-4">
+        <div class="space-y-1.5">
+          <template v-for="(item, index) in navigation" :key="item.name">
+            <!-- Menu Item with Submenu -->
+            <div v-if="item.submenu" class="space-y-1">
+              <!-- Main Menu Item -->
+              <button
+                @click="toggleSubmenu(index)"
+                :class="[
+                  'group relative flex items-center w-full px-3 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200',
+                  // Active state with accent bar
+                  isAnySubmenuActive(index)
+                    ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-400',
+                  // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
+                  isCollapsed ? 'md:justify-center lg:justify-center' : 'md:justify-start lg:justify-start'
+                ]"
+                v-tooltip:right="isCollapsed ? item.name : ''"
+              >
+                <!-- Active indicator bar -->
+                <div
+                  v-if="isAnySubmenuActive(index)"
+                  class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-r-full"
+                ></div>
+                
+                <component
+                  :is="item.icon"
+                  :class="[
+                    'h-5 w-5 transition-colors duration-200 flex-shrink-0',
+                    isAnySubmenuActive(index) ? 'text-emerald-700' : 'text-slate-500 group-hover:text-emerald-400',
+                    isCollapsed ? 'md:mr-0 lg:mr-0' : 'mr-3'
+                  ]"
+                />
+                <span v-if="!isCollapsed" class="transition-opacity duration-300 flex-1 text-left">{{
+                  item.name
+                }}</span>
+                <ChevronDown
+                  v-if="!isCollapsed"
+                  :class="[
+                    'w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0',
+                    openSubmenu === index ? 'rotate-180' : ''
+                  ]"
+                />
+              </button>
+
+              <!-- Submenu with slide animation -->
+              <transition
+                enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0 max-h-0"
+                enter-to-class="opacity-100 max-h-96"
+                leave-active-class="transition-all duration-200 ease-in"
+                leave-from-class="opacity-100 max-h-96"
+                leave-to-class="opacity-0 max-h-0"
+              >
+                <div
+                  v-if="!isCollapsed && openSubmenu === index"
+                  class="ml-8 pl-4 border-l-2 border-emerald-200/50 space-y-1 overflow-hidden"
+                >
+                  <router-link
+                    v-for="subItem in item.submenu"
+                    :key="subItem.name"
+                    :to="subItem.href"
+                    :class="[
+                      'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                      $route.path === subItem.href
+                        ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 font-semibold shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-50  hover:text-emerald-400'
+                    ]"
+                  >
+                    <span>{{ subItem.name }}</span>
+                  </router-link>
+                </div>
+              </transition>
+            </div>
+
+            <!-- Menu Item without Submenu -->
+            <router-link
+              v-else
+              :to="item.href"
               :class="[
-                'group flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
-                // Highlight main menu when any submenu is active
-                isAnySubmenuActive(index)
-                  ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 shadow-sm'
-                  : 'text-slate-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:text-slate-800 hover:shadow-sm',
+                'group relative flex items-center px-3 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200',
+                $route.path === item.href
+                  ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-50  hover:text-emerald-400',
                 // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
-                'md:justify-center lg:justify-start',
-                isCollapsed
-                  ? 'md:justify-center lg:justify-center'
-                  : 'md:justify-start lg:justify-start'
+                isCollapsed ? 'md:justify-center lg:justify-center' : 'md:justify-start lg:justify-start'
               ]"
               v-tooltip:right="isCollapsed ? item.name : ''"
             >
+              <!-- Active indicator bar -->
+              <div
+                v-if="$route.path === item.href"
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-r-full"
+              ></div>
+              
               <component
                 :is="item.icon"
-                :class="['h-5 w-5', isCollapsed ? 'md:mr-0 lg:mr-0' : 'mr-3']"
-              />
-              <span v-if="!isCollapsed" class="transition-opacity duration-300 flex-1 text-left">{{
-                item.name
-              }}</span>
-              <ChevronDown
-                v-if="!isCollapsed"
                 :class="[
-                  'w-4 h-4 transition-transform duration-200',
-                  openSubmenu === index ? 'rotate-180' : ''
+                  'h-5 w-5 transition-colors duration-200 flex-shrink-0',
+                  $route.path === item.href ? 'text-emerald-700' : 'text-slate-500 group-hover:text-emerald-400',
+                  isCollapsed ? 'md:mr-0 lg:mr-0' : 'mr-3'
                 ]"
               />
-            </button>
+              <span v-if="!isCollapsed" class="transition-opacity duration-300">{{ item.name }}</span>
+            </router-link>
+          </template>
+        </div>
+      </nav>
 
-            <!-- Submenu -->
-            <div
-              v-if="!isCollapsed && openSubmenu === index"
-              class="ml-4 pl-3 border-l border-slate-200/60 space-y-1"
-            >
-              <router-link
-                v-for="subItem in item.submenu"
-                :key="subItem.name"
-                :to="subItem.href"
-                :class="[
-                  'group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
-                  $route.path === subItem.href
-                    ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 shadow-sm'
-                    : 'text-slate-600 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 hover:text-slate-800'
-                ]"
-              >
-                <span>{{ subItem.name }}</span>
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Menu Item without Submenu -->
-          <router-link
-            v-else
-            :to="item.href"
-            :class="[
-              'group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200',
-              $route.path === item.href
-                ? 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 shadow-sm'
-                : 'text-slate-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:text-slate-800 hover:shadow-sm',
-              // Mobile: แสดงแบบเต็มเสมอ, Tablet+: ใช้ isCollapsed
-              'md:justify-center lg:justify-start',
-              isCollapsed
-                ? 'md:justify-center lg:justify-center'
-                : 'md:justify-start lg:justify-start'
-            ]"
-            v-tooltip:right="isCollapsed ? item.name : ''"
-          >
-            <component
-              :is="item.icon"
-              :class="['h-5 w-5', isCollapsed ? 'md:mr-0 lg:mr-0' : 'mr-3']"
-            />
-            <span v-if="!isCollapsed" class="transition-opacity duration-300">{{ item.name }}</span>
-          </router-link>
-        </template>
-      </div>
-
-      <!-- Branch Info - Mobile: แสดงแบบเต็มเสมอ -->
-      <div class="mt-8 px-3">
-        <!-- Full Branch Info (Mobile) -->
+      <!-- Branch Info Section -->
+      <div class="px-3 pb-4 pt-4 border-t border-slate-200/50 bg-slate-50/30">
+        <!-- Full Branch Info -->
         <div
-          class="md:hidden bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200/50 shadow-sm"
+          v-if="!isCollapsed"
+          class="bg-white rounded-xl p-4 border border-slate-200/50 shadow-sm"
         >
-          <h3 class="text-sm font-medium text-slate-800 mb-2">สาขาปัจจุบัน</h3>
-          <div class="flex items-center space-x-2">
-            <Building2 class="w-4 h-4 text-emerald-500" />
-            <span class="text-sm text-slate-700">{{
+          <h3 class="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">สาขาปัจจุบัน</h3>
+          <div class="flex items-center space-x-2 mb-1">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-400/20 flex-shrink-0">
+              <Building2 class="w-4 h-4 text-white" />
+            </div>
+            <span class="text-sm font-semibold text-slate-800 truncate flex-1">{{
               currentBranch?.name || 'ยังไม่ได้เลือกสาขา'
             }}</span>
           </div>
-          <div class="mt-2 text-xs text-slate-500">
-            {{ currentBranch?.code || '' }}
+          <div v-if="currentBranch?.code" class="mt-2 text-xs text-slate-500 font-medium">
+            {{ currentBranch.code }}
           </div>
         </div>
-
-        <!-- Collapsed Branch Info (Tablet+) -->
-        <!-- <div v-if="isCollapsed" class="hidden md:block bg-gray-50 rounded-lg p-3 flex justify-center">
-          <Building2 class="w-5 h-5 text-emerald-600" v-tooltip="currentBranch?.name || 'ยังไม่ได้เลือกสาขา'" />
-        </div> -->
-
-        <!-- Full Branch Info (Tablet+ when expanded) -->
-        <!-- <div v-else class="hidden md:block bg-gray-50 rounded-lg p-4">
-          <h3 class="text-sm font-medium text-gray-900 mb-2">สาขาปัจจุบัน</h3>
-          <div class="flex items-center space-x-2">
-            <Building2 class="w-4 h-4 text-emerald-600" />
-            <span class="text-sm text-gray-700">{{ currentBranch?.name || 'ยังไม่ได้เลือกสาขา' }}</span>
+        
+        <!-- Collapsed Branch Info (Tablet+ when collapsed) -->
+        <div
+          v-else
+          class="hidden md:flex items-center justify-center"
+        >
+          <div
+            class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-400/20"
+            v-tooltip.right="currentBranch?.name || 'ยังไม่ได้เลือกสาขา'"
+          >
+            <Building2 class="w-5 h-5 text-white" />
           </div>
-          <div class="mt-2 text-xs text-gray-500">
-            {{ currentBranch?.code || '' }}
-          </div>
-        </div> -->
+        </div>
       </div>
-    </nav>
+    </div>
   </aside>
 </template>
 

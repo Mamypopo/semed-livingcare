@@ -26,11 +26,6 @@ export const getAllDepartments = async (req, res) => {
     };
 
     const { departments, total } = await departmentService.getAllDepartments(filters);
-
-    console.log('Department filters:', filters);
-    console.log('Department count:', total);
-    console.log('Departments found:', departments.length);
-
     res.status(200).json({
       success: true,
       data: departments,
