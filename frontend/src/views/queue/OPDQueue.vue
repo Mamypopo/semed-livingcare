@@ -3,21 +3,21 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">คิวตรวจ OPD</h1>
+        <h1 class="text-2xl font-bold text-slate-800">คิวตรวจ OPD</h1>
       </div>
     </div>
 
     <!-- Create Queue Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
         <!-- Patient Search -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">เลือกผู้ป่วย</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">เลือกผู้ป่วย</label>
           <div class="relative">
             <div class="relative">
               <SearchIcon
                 v-if="!isSearchingPatients"
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
               />
               <div v-else class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4">
                 <div
@@ -45,7 +45,7 @@
                   'patient-search-input w-full px-3 py-2 text-sm border rounded-lg shadow-sm pl-10 pr-10 transition-colors duration-200 focus:outline-none',
                   selectedPatient
                     ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                    : 'border-gray-200 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 hover:border-emerald-400',
+                    : 'border-gray-200 bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 hover:border-emerald-400',
                 ]"
                 :readonly="!!selectedPatient"
               />
@@ -70,12 +70,12 @@
               leave-to="transform opacity-0 scale-95"
             >
               <div
-                class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg focus:outline-none"
+                class="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200/50 rounded-md bg-white shadow-lg focus:outline-none"
               >
                 <!-- Loading State -->
                 <div
                   v-if="isSearchingPatients"
-                  class="px-3 py-2 text-sm text-gray-500 text-center flex items-center justify-center gap-2"
+                  class="px-3 py-2 text-sm text-slate-500 text-center flex items-center justify-center gap-2"
                 >
                   <div
                     class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-emerald-500"
@@ -85,10 +85,10 @@
                 <!-- Empty State -->
                 <div
                   v-else-if="filteredPatients.length === 0 && patientSearchQuery !== ''"
-                  class="px-3 py-2 text-sm text-gray-500 text-center"
+                  class="px-3 py-2 text-sm text-slate-500 text-center"
                 >
                   <div class="flex flex-col items-center gap-2">
-                    <UserRound class="w-8 h-8 text-gray-300" />
+                    <UserRound class="w-8 h-8 text-slate-300" />
                     <div>ไม่พบผู้ป่วยที่ค้นหา</div>
                     <div class="text-xs text-gray-400">ลองค้นหาด้วย HN หรือชื่อ</div>
                   </div>
@@ -99,7 +99,7 @@
                   class="px-3 py-2 text-sm text-gray-500 text-center"
                 >
                   <div class="flex flex-col items-center gap-2">
-                    <SearchIcon class="w-8 h-8 text-gray-300" />
+                    <SearchIcon class="w-8 h-8 text-slate-300" />
                     <div>เริ่มพิมพ์เพื่อค้นหาผู้ป่วย</div>
                   </div>
                 </div>
@@ -108,11 +108,11 @@
                   v-for="patient in filteredPatients"
                   :key="patient.id"
                   @click="selectPatient(patient)"
-                  class="relative cursor-pointer select-none py-3 px-3 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-900 text-gray-900"
+                  class="relative cursor-pointer select-none py-3 px-3 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-900 text-slate-900"
                 >
                   <div class="flex items-center gap-3">
                     <div
-                      class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0"
+                      class="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0"
                     >
                       <UserRound class="w-4 h-4 text-white" />
                     </div>
@@ -123,14 +123,14 @@
                           `${patient.hn} - ${patient.prefix || ''} ${patient.first_name} ${patient.last_name}`
                         "
                       >
-                        <span class="font-semibold text-gray-900">{{ patient.hn }}</span>
-                        <span class="text-gray-600">
+                        <span class="font-semibold text-slate-900">{{ patient.hn }}</span>
+                        <span class="text-slate-600">
                           - {{ patient.prefix || '' }} {{ patient.first_name }}
                           {{ patient.last_name }}</span
                         >
                       </div>
                       <div
-                        class="text-xs text-gray-500 truncate mt-1"
+                        class="text-xs text-slate-500 truncate mt-1"
                         v-tooltip:top="patient.national_id"
                       >
                         บัตรประชาชน: {{ patient.national_id }}
@@ -145,15 +145,15 @@
 
         <!-- Doctor Dropdown -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">แพทย์</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">แพทย์</label>
           <Listbox v-model="selectedDoctor" as="div" class="relative">
             <div>
               <ListboxButton
-                class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               >
                 <span class="block truncate">{{ selectedDoctor?.name || '- เลือกแพทย์ -' }}</span>
                 <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown class="h-5 w-5 text-gray-400" />
+                  <ChevronDown class="h-5 w-5 text-slate-400" />
                 </span>
               </ListboxButton>
             </div>
@@ -166,7 +166,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-full focus:outline-none"
               >
                 <!-- Debug info -->
                 <div v-if="doctors.length === 0" class="px-3 py-2 text-sm text-gray-500">
@@ -181,11 +181,11 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                      active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                     ]"
                   >
                     <span class="block truncate">{{ doctor.name }}</span>
-                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                    <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>
@@ -195,17 +195,17 @@
 
         <!-- Department Dropdown -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">แผนก</label>
           <Listbox v-model="selectedDepartment" as="div" class="relative">
             <div>
               <ListboxButton
-                class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                class="relative w-full text-sm cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               >
                 <span class="block truncate">{{
                   selectedDepartment?.name || '- เลือกแผนก -'
                 }}</span>
                 <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown class="h-5 w-5 text-gray-400" />
+                  <ChevronDown class="h-5 w-5 text-slate-400" />
                 </span>
               </ListboxButton>
             </div>
@@ -218,7 +218,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-full focus:outline-none"
               >
                 <ListboxOption
                   v-for="department in departments"
@@ -229,11 +229,11 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                      active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                     ]"
                   >
                     <span class="block truncate">{{ department.name }}</span>
-                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                    <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>
@@ -243,7 +243,7 @@
 
         <!-- Date Picker -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">วันที่</label>
           <VueDatePicker
             v-model="selectedDate"
             :format="'dd/MM/yyyy'"
@@ -257,7 +257,7 @@
         <!-- Add Button -->
         <div class="flex items-end">
           <button
-            class="w-full px-3 py-2 text-sm bg-purple-400 text-white rounded-md hover:bg-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full px-3 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="!selectedPatient || !selectedDoctor || !selectedDepartment"
             @click="openCreateQueue"
           >
@@ -269,36 +269,36 @@
     </div>
 
     <!-- Search and Filter Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
       <div class="flex justify-end gap-4">
         <!-- General Search -->
         <div class="w-80">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ค้นหา</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">ค้นหา</label>
           <div class="relative">
             <SearchIcon
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
             />
             <input
               v-model.trim="searchQuery"
               @input="onSearchInput"
               type="text"
               placeholder="ค้นหาชื่อลูกค้า / เลขบัตรประชาชน"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
             />
           </div>
         </div>
 
         <!-- Page Size -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">แสดง</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">แสดง</label>
           <Listbox v-model="pageSizeOption" as="div" class="relative">
             <div>
               <ListboxButton
-                class="relative text-sm w-full min-w-36 cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                class="relative text-sm w-full min-w-36 cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
               >
                 <span class="block truncate">{{ pageSizeOption?.label || '- เลือกจำนวน -' }}</span>
                 <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown class="h-5 w-5 text-gray-400" />
+                  <ChevronDown class="h-5 w-5 text-slate-400" />
                 </span>
               </ListboxButton>
             </div>
@@ -311,7 +311,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-36 focus:outline-none"
               >
                 <ListboxOption
                   v-for="opt in pageSizeOptions"
@@ -322,11 +322,11 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                      active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                     ]"
                   >
                     <span>{{ opt.label }}</span>
-                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                    <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>
@@ -336,14 +336,14 @@
 
         <!-- Status Dropdown -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1">สถานะ</label>
           <Listbox v-model="selectedStatus" as="div" class="relative">
             <div>
               <ListboxButton
-                class="px-3 py-2 text-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
+              class="px-3 py-2 text-sm bg-white hover:bg-slate-50 text-slate-700 border border-gray-200 rounded-md min-w-40 flex items-center justify-between w-full"
               >
                 <span>{{ selectedStatus?.label || '- เลือกสถานะ -' }}</span>
-                <ChevronDown class="w-5 h-5 text-gray-400" />
+                <ChevronDown class="w-5 h-5 text-slate-400" />
               </ListboxButton>
             </div>
             <transition
@@ -355,7 +355,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <ListboxOptions
-                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-48 focus:outline-none"
+                class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-40 focus:outline-none"
               >
                 <ListboxOption
                   v-for="status in statusOptions"
@@ -366,11 +366,11 @@
                   <li
                     :class="[
                       'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                      active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                      active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
                     ]"
                   >
                     <span>{{ status.label }}</span>
-                    <span v-if="selected" class="text-emerald-600 text-xs">เลือก</span>
+                    <span v-if="selected" class="text-emerald-500 text-xs">เลือก</span>
                   </li>
                 </ListboxOption>
               </ListboxOptions>
@@ -381,18 +381,18 @@
     </div>
 
     <!-- Queue Table Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50">
       <!-- <div class="overflow-x-auto"> -->
       <div>
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">เลขที่</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">แผนก</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">แพทย์</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">ชื่อลูกค้า</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">สถานะ</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600">ตัวเลือก</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">เลขที่</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">แผนก</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">แพทย์</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">ชื่อลูกค้า</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">สถานะ</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-600">ตัวเลือก</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -422,7 +422,7 @@
 
             <!-- Queue Rows -->
             <template v-if="!loading">
-              <tr v-for="queue in queues" :key="queue.id" class="hover:bg-gray-50">
+              <tr v-for="queue in queues" :key="queue.id" class="hover:bg-slate-50">
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
                     <div
@@ -448,31 +448,31 @@
                 </td>
                 <td class="px-4 py-3">
                   <div>
-                    <div class="text-sm text-gray-900">{{ queue.department?.name || '-' }}</div>
-                    <div class="text-xs text-gray-500">
+                    <div class="text-sm text-slate-900">{{ queue.department?.name || '-' }}</div>
+                    <div class="text-xs text-slate-500">
                       {{ formatDateTime(queue.createdAt) }}
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="text-sm text-gray-900">
+                  <div class="text-sm text-slate-900">
                     {{ queue.registration?.doctor?.name || '-' }}
                   </div>
                 </td>
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     <div
-                      class="w-8 h-8 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center"
+                      class="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center"
                     >
                       <UserRound class="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <div class="text-sm font-medium text-gray-900">
+                      <div class="text-sm font-medium text-slate-900">
                         {{ queue.registration?.patient?.prefix || '' }}
                         {{ queue.registration?.patient?.first_name || '' }}
                         {{ queue.registration?.patient?.last_name || '' }}
                       </div>
-                      <div class="text-xs text-gray-500">
+                      <div class="text-xs text-slate-500">
                         {{ queue.registration?.patient?.hn || '-' }}
                       </div>
                     </div>
@@ -482,7 +482,7 @@
                   <div class="flex items-center gap-2">
                     <button
                       :class="[
-                        'px-3 py-1 text-xs font-medium rounded-full',
+                        'px-3 py-1 text-xs font-medium rounded-md',
                         queue.status === 'CANCELLED'
                           ? 'bg-red-100 text-red-800'
                           : queue.status === 'COMPLETED'
@@ -533,21 +533,21 @@
       </div>
 
       <!-- Footer: pagination -->
-      <div
-        class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100 text-sm"
-      >
-        <div class="text-gray-600">
+    <div
+      class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
+    >
+      <div class="text-slate-600">
           แสดง
-          <span class="mx-1 text-gray-900 font-medium">{{ from }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ from }}</span>
           -
-          <span class="mx-1 text-gray-900 font-medium">{{ to }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ to }}</span>
           จากทั้งหมด
-          <span class="mx-1 text-gray-900 font-medium">{{ meta.total }}</span>
+        <span class="mx-1 text-slate-800 font-medium">{{ meta.total }}</span>
           รายการ
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page <= 1 || loading"
             @click="go(meta.page - 1)"
           >
@@ -555,12 +555,12 @@
             ก่อนหน้า
           </button>
           <span
-            class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700"
+          class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-slate-700"
           >
-            หน้า <span class="text-gray-900 font-medium">{{ meta.page }}</span> / {{ totalPages }}
+          หน้า <span class="text-slate-800 font-medium">{{ meta.page }}</span> / {{ totalPages }}
           </span>
           <button
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 rounded-md bg-white text-slate-700 hover:bg-slate-50 hover:border-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="meta.page >= totalPages || loading"
             @click="go(meta.page + 1)"
           >
@@ -579,10 +579,9 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  SearchIcon,
+  Search as SearchIcon,
   UserRound,
   X,
-  Check,
   Navigation,
 } from 'lucide-vue-next'
 import {
@@ -616,7 +615,7 @@ export default {
     SearchIcon,
     UserRound,
     X,
-    Check,
+    
     Navigation,
     Listbox,
     ListboxButton,

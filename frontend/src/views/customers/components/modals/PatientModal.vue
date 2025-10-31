@@ -30,8 +30,8 @@
               class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl w-[80vw] h-[80vh] min-h-[600px] flex flex-col z-50"
             >
               <!-- Header -->
-              <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">
+              <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200/50">
+                <h3 class="text-lg font-semibold text-slate-800">
                   {{ isEdit ? 'แก้ไขข้อมูลลูกค้า' : 'เพิ่มลูกค้า' }}
                 </h3>
                 <div class="flex items-center space-x-3">
@@ -39,7 +39,7 @@
                     type="button"
                     @click="handleCardRead"
                     :disabled="loading"
-                    class="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-4 py-2 text-sm font-medium bg-violet-50 border border-violet-200 rounded-md text-violet-700 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-violet-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {{ isCardReaderActive ? 'หยุดอ่านบัตร' : 'อ่านข้อมูลบัตร' }}
                   </button>
@@ -48,14 +48,14 @@
                     type="submit"
                     form="patient-form"
                     :disabled="loading"
-                    class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {{ loading ? 'กำลังบันทึก...' : 'บันทึก' }}
                   </button>
                   <button
                     type="button"
                     @click="requestClose"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-300"
                   >
                     ยกเลิก
                   </button>
@@ -64,7 +64,7 @@
 
 
               <!-- Tab Navigation -->
-              <div class="border-b border-gray-200">
+              <div class="border-b border-slate-200/50">
                 <nav class="-mb-px flex space-x-8 px-6">
                   <button
                     v-for="tab in tabs"
@@ -73,7 +73,7 @@
                     :class="[
                       activeTab === tab.id
                         ? 'border-emerald-500 text-emerald-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                        : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300',
                       'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
                     ]"
                   >

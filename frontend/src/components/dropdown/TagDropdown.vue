@@ -5,7 +5,7 @@
       <span
         v-for="tag in selectedTags"
         :key="tag.id"
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium"
         :style="{ backgroundColor: tag.color + '20', color: tag.color }"
       >
         {{ tag.name }}
