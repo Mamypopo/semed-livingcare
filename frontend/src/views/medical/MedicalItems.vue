@@ -260,10 +260,10 @@
                       v-if="item.examType === 'PACKAGE'"
                       @click="openComponentsModal(item)"
                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-violet-200 text-violet-700 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                      title="จัดการส่วนประกอบ"
+                      title="ดูข้อมูล"
                     >
                       <Package class="w-3.5 h-3.5" />
-                      จัดการส่วนประกอบ
+                      ดูข้อมูล
                     </button>
                     <button
                       @click="openEditModal(item)"

@@ -23,14 +23,14 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="w-full max-w-5xl transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all"
+              class="w-[90vw] max-w-6xl transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all"
             >
               <!-- Header -->
               <div
                 class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
                 <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">
-                  จัดการรายการตรวจของแพ็คเกจ
+                  รายระเอียดแพ็คเกจ
                 </DialogTitle>
                 <div class="flex items-center gap-2">
                   <button
@@ -125,7 +125,7 @@
                 <!-- Components Table with Search -->
                 <div class="border border-slate-200 rounded-lg ">
                   <div class="bg-emerald-50 px-4 py-3 border-b border-slate-200">
-                    <h3 class="text-sm font-semibold text-slate-800">รายการตรวจที่เป็นส่วนประกอบ</h3>
+                    <h3 class="text-sm font-semibold text-slate-800">รายการตรวจ</h3>
                   </div>
                   <div >
                     <table class="min-w-full divide-y divide-gray-200">
@@ -266,7 +266,7 @@
                                   </button>
                                 </div>
                                 <div
-                                  v-if="row.showDropdown && !row.loading && row.searchQuery.trim().length >= 4 && row.searchResults.length === 0"
+                                  v-if="row.showDropdown && !row.loading && row.searchQuery.trim().length >= searchMinLength && row.searchResults.length === 0"
                                   class="absolute z-50 mt-1 w-full bg-white rounded-lg border border-gray-200 shadow-xl p-3 text-sm text-slate-500 text-center"
                                 >
                                   ไม่พบรายการตรวจ
@@ -278,10 +278,10 @@
                                   กำลังค้นหา...
                                 </div>
                                 <div
-                                  v-if="row.showDropdown && row.searchQuery.trim().length > 0 && row.searchQuery.trim().length < 4"
+                                  v-if="row.showDropdown && row.searchQuery.trim().length > 0 && row.searchQuery.trim().length < searchMinLength"
                                   class="absolute z-50 mt-1 w-full bg-white rounded-lg border border-gray-200 shadow-xl p-3 text-sm text-slate-400 text-center"
                                 >
-                                  กรุณาพิมพ์อย่างน้อย 4 ตัวอักษร
+                                  กรุณาพิมพ์อย่างน้อย {{ searchMinLength }} ตัวอักษร
                                 </div>
                               </div>
                             </td>
@@ -316,7 +316,7 @@
                               </div>
                               <div v-else class="flex items-center justify-end">
                                 <button
-                                  v-if="rowIndex === searchRows.length - 1"
+                                  v-if="rowIndex === searchRows.length - 1 && !row.searchQuery.trim()"
                                   @click="addRow"
                                   class="w-7 h-7 flex items-center justify-center bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
                                   title="เพิ่มแถว"
@@ -408,11 +408,15 @@ export default {
       searchRows: [],
       searchInputRefs: [],
       searchTimers: {},
-      deletedComponentIds: [], // เก็บรายการที่ถูกลบ (ยังไม่ได้บันทึก)
+      deletedComponentIds: [],
       components: [],
       loadingComponents: false,
       addingComponent: false,
-      removingComponent: false,
+      isAddingRow: false,
+      // Constants
+      SEARCH_MIN_LENGTH: 4,
+      SEARCH_DEBOUNCE_DELAY: 300,
+      BLUR_DELAY: 200,
     }
   },
   computed: {
@@ -446,8 +450,10 @@ export default {
       return this.components.filter((c) => !c.isPending && !String(c.id).startsWith('temp-'))
     },
     visibleComponents() {
-      // แสดง components ทั้งหมด (รวม pending และ saved) แต่ไม่แสดงที่ถูกลบแล้ว
       return this.components.filter((c) => !this.deletedComponentIds.includes(c.id))
+    },
+    searchMinLength() {
+      return this.SEARCH_MIN_LENGTH
     },
   },
   watch: {
@@ -475,7 +481,6 @@ export default {
       }
     },
     parentItemId(newId) {
-      // เมื่อ parentItemId เปลี่ยน (หรือถูก set เมื่อ modal เปิด) ให้ load ข้อมูล
       if (newId && this.modelValue) {
         this.loadParentItem()
         this.loadComponents()
@@ -515,12 +520,12 @@ export default {
       }
     },
     addRow() {
-      // ป้องกันการเพิ่มแถวซ้ำ (กำลังเพิ่มอยู่แล้ว)
+      // ป้องกันการเพิ่มแถวซ้ำ 
       if (this.isAddingRow) {
         return
       }
       
-      // ป้องกันการเพิ่มแถวซ้ำ (มีแถวว่างอยู่แล้ว)
+      // ป้องกันการเพิ่มแถวซ้ำ 
       const hasEmptyRow = this.searchRows.some((r) => !r.selectedItem && !r.searchQuery.trim())
       if (hasEmptyRow) {
         return
@@ -544,27 +549,19 @@ export default {
       const row = this.searchRows[index]
       if (!row) return
 
-      // ไม่เคลียร์ selectedItem เมื่อแก้ไข input
-      // เพื่อให้ผู้ใช้สามารถแก้ไข input เพื่อค้นหาใหม่ได้
-      // แต่ถ้ากดปุ่ม + ให้ใช้ selectedItem ที่เลือกไว้เดิม
-
       // Clear previous timer
       if (this.searchTimers[index]) {
         clearTimeout(this.searchTimers[index])
       }
 
-      // Show dropdown if has query (เพื่อให้ผู้ใช้สามารถเลือกใหม่ได้)
       if (row.searchQuery.trim()) {
         row.showDropdown = true
       }
 
-      // Debounce search - ค้นหาเสมอถ้าไม่มี selectedItem หรือค่าใน input ไม่ตรงกับ selectedItem
-      if (!row.selectedItem || row.searchQuery.trim() !== (row.selectedItem.code && row.selectedItem.name 
-        ? `${row.selectedItem.code} - ${row.selectedItem.name}` 
-        : (row.selectedItem.code || row.selectedItem.name || ''))) {
+      if (!row.selectedItem || row.searchQuery.trim() !== this.getDisplayText(row.selectedItem)) {
         this.searchTimers[index] = setTimeout(() => {
           this.performRowSearch(index)
-        }, 300)
+        }, this.SEARCH_DEBOUNCE_DELAY)
       }
     },
     async performRowSearch(index) {
@@ -575,8 +572,7 @@ export default {
         return
       }
 
-      // ต้องพิมพ์อย่างน้อย 4 ตัวอักษรถึงจะค้นหา
-      if (row.searchQuery.trim().length < 4) {
+      if (row.searchQuery.trim().length < this.SEARCH_MIN_LENGTH) {
         row.searchResults = []
         row.loading = false
         return
@@ -605,47 +601,36 @@ export default {
       }
 
       row.selectedItem = item
-      // แสดง code - name ใน input เพื่อให้ขนาด modal ไม่เปลี่ยนแปลง (เหมือน APSX)
-      // และยังสามารถแก้ไขเพื่อค้นหารายการอื่นได้
-      const displayText = item.code && item.name ? `${item.code} - ${item.name}` : (item.code || item.name || '')
-      row.searchQuery = displayText
+      row.searchQuery = this.getDisplayText(item)
       row.showDropdown = false
-      // ไม่เคลียร์ searchResults เพื่อให้เมื่อ focus input อีกครั้งสามารถเลือกใหม่ได้ทันที
-      // row.searchResults = []
-      
-      // อย่าเพิ่มแถวอัตโนมัติ - ให้ผู้ใช้กดปุ่ม + เอง
     },
     showSearchDropdown(index) {
       const row = this.searchRows[index]
       if (row && row.searchQuery.trim()) {
         row.showDropdown = true
-        // ถ้าไม่มี searchResults และยังไม่ได้ loading ให้ค้นหา
-        // เพื่อให้ผู้ใช้สามารถเปลี่ยนใจเลือกรายการอื่นได้
         if (row.searchResults.length === 0 && !row.loading) {
           this.performRowSearch(index)
         }
       }
     },
     handleSearchBlur(index) {
-      // Delay to allow click on dropdown item
       setTimeout(() => {
         const row = this.searchRows[index]
         if (row) {
           row.showDropdown = false
         }
-      }, 200)
+      }, this.BLUR_DELAY)
+    },
+    getDisplayText(item) {
+      if (!item) return ''
+      return item.code && item.name ? `${item.code} - ${item.name}` : (item.code || item.name || '')
     },
     isComponentAdded(itemId) {
-      // ตรวจสอบเฉพาะใน components ที่ยังไม่ถูกลบ (รายการที่เพิ่มเข้าแพ็คเกจแล้ว)
-      // ไม่ตรวจสอบ selectedRows เพราะมันยังไม่ได้เพิ่มเข้าแพ็คเกจ
-      // ไม่ตรวจสอบ deletedComponentIds เพราะมันถูกลบไปแล้ว
       const visibleComponents = this.components.filter((c) => !this.deletedComponentIds.includes(c.id))
       const inComponents = visibleComponents.some((c) => c.childItemId === itemId)
       return inComponents
     },
     isSelectedInSearchRows(itemId) {
-      // ตรวจสอบว่ารายการถูกเลือกใน searchRows แล้วหรือยัง
-      // ใช้สำหรับกรองผลการค้นหา (ไม่ให้เลือกรายการเดียวกันซ้ำ)
       const inSelectedRows = this.searchRows.some((row) => row.selectedItem && row.selectedItem.id === itemId)
       return inSelectedRows
     },
@@ -687,13 +672,9 @@ export default {
         return
       }
 
-      // ไม่เรียก API แต่แค่เพิ่มเข้า components ใน local state
-      // รอกดปุ่มบันทึกทั้งหมดถึงจะเรียก API
+
       const quantity = row.quantity || 1
 
-      // เพิ่มเข้า components ใน local state
-      // สร้าง temporary component object (ยังไม่มี id จริง เพราะยังไม่ได้บันทึก)
-      // ใช้ข้อมูลจาก selectedItem ที่เลือกไว้เสมอ แม้ว่าผู้ใช้จะแก้ไข input แล้ว
       const selectedItemData = row.selectedItem
       
       const tempComponent = {
@@ -708,16 +689,6 @@ export default {
       }
 
       this.components.push(tempComponent)
-
-      // แสดงข้อความสำเร็จ
-      Swal.fire({
-        icon: 'success',
-        title: 'เพิ่มรายการสำเร็จ',
-        text: `${tempComponent.childItem?.code || ''} - ${tempComponent.childItem?.name || ''} ถูกเพิ่มแล้ว (รอบันทึก)`,
-        toast: true,
-        position: 'top-end',
-        timer: 2000,
-      })
 
       // เคลียร์แถวค้นหาเพื่อค้นหาใหม่
       this.searchRows[rowIndex] = {
@@ -735,20 +706,17 @@ export default {
         this.addRow()
       }
 
-      // อย่าเพิ่มแถวอัตโนมัติ - ให้ผู้ใช้กดปุ่ม + เอง
     },
     async saveAll() {
       if (!this.parentItemId) {
         return
       }
 
-      // Collect all pending components (รายการที่กด + แล้ว แต่ยังไม่ได้บันทึก)
       const pendingItems = this.pendingComponents.map((c) => ({
         childItemId: c.childItemId,
         quantity: c.quantity || 1,
       }))
 
-      // Collect all deleted component ids (รายการที่ถูกลบ แต่ยังไม่ได้บันทึก)
       const deletedIds = [...this.deletedComponentIds]
 
       // ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
@@ -764,7 +732,6 @@ export default {
         return
       }
 
-      // สร้างข้อความสรุป
       let confirmMessage = ''
       if (pendingItems.length > 0 && deletedIds.length > 0) {
         confirmMessage = `ต้องการบันทึกรายการตรวจ ${pendingItems.length} รายการ และลบ ${deletedIds.length} รายการหรือไม่`
@@ -789,17 +756,17 @@ export default {
       try {
         this.addingComponent = true
 
-        // เรียก API ลบรายการก่อน (ถ้ามี)
+        // เรียก API ลบรายการก่อน 
         if (deletedIds.length > 0) {
           await medicalItemService.removeComponents(this.parentItemId, deletedIds)
         }
 
-        // เรียก API เพิ่มรายการ (ถ้ามี)
+        // เรียก API เพิ่มรายการ
         if (pendingItems.length > 0) {
           await medicalItemService.addComponents(this.parentItemId, pendingItems)
         }
 
-        // Reload components เพื่อดึงข้อมูลล่าสุด
+        // ดึงข้อมูลล่าสุด
         await this.loadComponents()
 
         // Clear all search rows with selected items
@@ -834,6 +801,9 @@ export default {
           showConfirmButton: false,
           toast: true,
           position: 'top-end',
+        }).then(() => {
+          // ปิด modal หลังจากแสดง success message
+          this.requestClose()
         })
       } catch (error) {
         Swal.fire({
@@ -849,7 +819,7 @@ export default {
       }
     },
     removePendingComponent(componentId) {
-      // ลบ pending component จาก local state (ยังไม่ได้บันทึก)
+      // ลบ pending component จาก local state 
       const index = this.components.findIndex((c) => c.id === componentId && c.isPending)
       if (index !== -1) {
         this.components.splice(index, 1)
@@ -864,7 +834,7 @@ export default {
         return
       }
 
-      // เพิ่ม componentId เข้า deletedComponentIds (ยังไม่ได้บันทึก)
+      // เพิ่ม componentId เข้า deletedComponentIds 
       if (!this.deletedComponentIds.includes(componentId)) {
         this.deletedComponentIds.push(componentId)
       }
