@@ -41,6 +41,7 @@
                     ปิด
                   </button>
                   <button
+                    v-if="isPackageType"
                     type="button"
                     :disabled="addingComponent || !hasSelectedItems"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -149,7 +150,7 @@
                           <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                             ราคา IPD
                           </th>
-                          <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide w-12">
+                          <th v-if="isPackageType" class="px-4 py-2 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide w-12">
                             จัดการ
                           </th>
                         </tr>
@@ -158,7 +159,7 @@
                         <!-- Loading Skeleton -->
                         <template v-if="loadingComponents">
                           <tr v-for="n in 3" :key="'skeleton-' + n">
-                            <td colspan="7" class="px-4 py-3">
+                            <td :colspan="isPackageType ? 7 : 6" class="px-4 py-3">
                               <div class="h-4 w-full bg-gray-100 animate-pulse rounded"></div>
                             </td>
                           </tr>
@@ -193,7 +194,7 @@
                             <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
                               {{ formatPrice(component.childItem?.priceIpd) }}
                             </td>
-                            <td class="px-4 py-2 text-right">
+                            <td v-if="isPackageType" class="px-4 py-2 text-right">
                               <button
                                 v-if="!component.isPending && !deletedComponentIds.includes(component.id)"
                                 @click="markComponentForDeletion(component.id)"
@@ -221,8 +222,9 @@
                             </td>
                           </tr>
 
-                          <!-- Search Rows -->
-                          <tr v-for="(row, rowIndex) in searchRows" :key="'search-' + rowIndex" class="hover:bg-slate-50">
+                          <!-- Search Rows (Only for PACKAGE type) -->
+                          <template v-if="isPackageType">
+                            <tr v-for="(row, rowIndex) in searchRows" :key="'search-' + rowIndex" class="hover:bg-slate-50">
                             <td class="px-4 py-2 text-center text-sm text-slate-400">
                               -
                             </td>
@@ -325,12 +327,13 @@
                                 </button>
                               </div>
                             </td>
-                          </tr>
+                            </tr>
+                          </template>
 
                           <!-- Empty State -->
-                          <tr v-if="visibleComponents.length === 0 && searchRows.length === 0">
-                            <td colspan="7" class="px-4 py-10 text-center text-slate-500 text-sm">
-                              คลิกปุ่ม + เพื่อเพิ่มรายการตรวจ
+                          <tr v-if="visibleComponents.length === 0 && !isPackageType">
+                            <td colspan="6" class="px-4 py-10 text-center text-slate-500 text-sm">
+                              ไม่พบรายการตรวจ
                             </td>
                           </tr>
                         </template>
@@ -399,6 +402,7 @@ export default {
   props: {
     modelValue: { type: Boolean, required: true },
     parentItemId: { type: String, default: null },
+    examType: { type: String, default: null },
   },
   emits: ['update:modelValue', 'updated'],
   data() {
@@ -455,13 +459,20 @@ export default {
     searchMinLength() {
       return this.SEARCH_MIN_LENGTH
     },
+    isPackageType() {
+      return this.examType === 'PACKAGE'
+    },
   },
   watch: {
     modelValue(newValue) {
       if (newValue) {
-        // Modal เปิด - มี input ค้นหาเริ่มต้น 1 แถว
-        this.searchRows = [{ searchQuery: '', selectedItem: null, quantity: 1, searchResults: [], showDropdown: false, loading: false }]
-        this.deletedComponentIds = [] // รีเซ็ตรายการที่ถูกลบ
+        // Modal เปิด - มี input ค้นหาเริ่มต้น 1 แถว (เฉพาะ PACKAGE type)
+        if (this.isPackageType) {
+          this.searchRows = [{ searchQuery: '', selectedItem: null, quantity: 1, searchResults: [], showDropdown: false, loading: false }]
+        } else {
+          this.searchRows = []
+        }
+        this.deletedComponentIds = []
         
         // Load ข้อมูลเมื่อ modal เปิด - รอให้ parentItemId ถูก set ก่อน
         this.$nextTick(() => {
@@ -507,6 +518,12 @@ export default {
     async loadComponents() {
       if (!this.parentItemId) {
         this.components = []
+        return
+      }
+      // สำหรับ non-PACKAGE types ไม่มี components ให้โหลด
+      if (!this.isPackageType) {
+        this.components = []
+        this.loadingComponents = false
         return
       }
       try {

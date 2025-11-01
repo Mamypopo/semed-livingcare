@@ -257,7 +257,6 @@
                 <td class="px-4 py-3 text-sm text-right whitespace-nowrap">
                   <div class="flex items-center justify-end gap-2">
                     <button
-                      v-if="item.examType === 'PACKAGE'"
                       @click="openComponentsModal(item)"
                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-violet-200 text-violet-700 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
                       title="ดูข้อมูล"
@@ -353,6 +352,7 @@
       v-if="selectedPackageId"
       v-model="showComponentsModal"
       :parent-item-id="selectedPackageId"
+      :exam-type="selectedItemExamType"
       @updated="onComponentsUpdated"
     />
   </div>
@@ -419,6 +419,7 @@ export default {
       searchTimer: null,
       showComponentsModal: false,
       selectedPackageId: null,
+      selectedItemExamType: null,
 
       // Filter options
       examTypeOption: { label: 'ทั้งหมด', value: '' },
@@ -605,9 +606,10 @@ export default {
       return n.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     openComponentsModal(item) {
-      if (!item || !item.id || item.examType !== 'PACKAGE') return
-      // Set selectedPackageId ก่อน แล้วค่อยเปิด modal เพื่อให้ component render และรับ prop ก่อน
+      if (!item || !item.id) return
+      // Set selectedPackageId และ examType ก่อน แล้วค่อยเปิด modal เพื่อให้ component render และรับ prop ก่อน
       this.selectedPackageId = item.id
+      this.selectedItemExamType = item.examType
       this.$nextTick(() => {
         this.showComponentsModal = true
       })
