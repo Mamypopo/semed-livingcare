@@ -147,7 +147,8 @@ export const medicalItemController = {
     try {
       const searchQuery = req.query.search || ''
       const limit = parseInt(req.query.limit) || 20
-      const items = await medicalItemService.searchForVisit(searchQuery, limit)
+      const visitId = req.query.visitId || null 
+      const items = await medicalItemService.searchForVisit(searchQuery, limit, visitId)
       res.json({ success: true, data: items })
     } catch (err) {
       next(err)

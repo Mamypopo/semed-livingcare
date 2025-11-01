@@ -305,8 +305,12 @@ export const medicalItemService = {
 
   /**
    * ค้นหารายการตรวจสำหรับ Visit (รวมทั้ง SINGLE items และ PACKAGE)
+   * กรองรายการที่เพิ่มไปแล้วใน Visit ออก
+   * @param {string} searchQuery - คำค้นหา
+   * @param {number} limit - จำนวนสูงสุดที่ต้องการ
+   * @param {string} visitId - Visit ID เพื่อกรองรายการที่เพิ่มไปแล้ว (optional)
    */
-  async searchForVisit(searchQuery, limit = 20) {
+  async searchForVisit(searchQuery, limit = 20, visitId = null) {
     const where = {
       isActive: true
       // รวมทั้ง single items และ PACKAGE เพื่อให้สามารถเพิ่มเข้า Visit ได้
@@ -320,7 +324,8 @@ export const medicalItemService = {
       ]
     }
 
-    const items = await prisma.medicalItem.findMany({
+    // ดึงรายการตรวจทั้งหมดที่ตรงกับ search
+    let items = await prisma.medicalItem.findMany({
       where,
       select: {
         id: true,
@@ -332,10 +337,81 @@ export const medicalItemService = {
         priceIpd: true
       },
       orderBy: { code: 'asc' },
-      take: limit
+      take: limit * 2 // ดึงมากกว่าเพื่อกรองที่ backend
     })
 
-    return items
+    // ถ้ามี visitId ให้กรองรายการที่เพิ่มไปแล้วออก
+    if (visitId) {
+      // ดึงรายการตรวจที่เพิ่มไปแล้วใน Visit นี้
+      const existingVisitItems = await prisma.visitItem.findMany({
+        where: {
+          visitId: String(visitId)
+        },
+        select: {
+          medicalItemId: true
+        }
+      })
+
+      const existingItemIds = new Set(existingVisitItems.map(item => item.medicalItemId))
+
+      // หา PACKAGE ที่มี components
+      const packageItems = items.filter(item => item.examType === 'PACKAGE')
+      const packageIds = packageItems.map(item => item.id)
+
+      // ดึง components ของ PACKAGE ทั้งหมดที่พบ
+      let packagesWithComponents = []
+      if (packageIds.length > 0) {
+        const components = await prisma.medicalItemComponent.findMany({
+          where: {
+            parentItemId: { in: packageIds }
+          },
+          select: {
+            parentItemId: true,
+            childItemId: true
+          }
+        })
+
+        // จัดกลุ่ม components ตาม parentItemId
+        const componentsByPackage = {}
+        components.forEach(comp => {
+          if (!componentsByPackage[comp.parentItemId]) {
+            componentsByPackage[comp.parentItemId] = []
+          }
+          componentsByPackage[comp.parentItemId].push(comp.childItemId)
+        })
+
+        packagesWithComponents = Object.entries(componentsByPackage).map(([parentId, childIds]) => ({
+          packageId: parentId,
+          componentIds: childIds
+        }))
+      }
+
+      // กรองรายการที่เพิ่มไปแล้วออก
+      items = items.filter(item => {
+        // สำหรับ single items - ถ้าเพิ่มไปแล้วให้ซ่อน
+        if (item.examType !== 'PACKAGE') {
+          return !existingItemIds.has(item.id)
+        }
+
+        // สำหรับ PACKAGE - ตรวจสอบว่า components ทั้งหมดถูกเพิ่มไปแล้วหรือยัง
+        const packageComponents = packagesWithComponents.find(p => p.packageId === item.id)
+        if (!packageComponents || packageComponents.componentIds.length === 0) {
+          // PACKAGE ที่ไม่มี components ให้แสดงไว้ก่อน (จะได้ error ตอนเพิ่ม)
+          return true
+        }
+
+        // ตรวจสอบว่า components ทั้งหมดถูกเพิ่มไปแล้วหรือยัง
+        const allComponentsAdded = packageComponents.componentIds.every(
+          childId => existingItemIds.has(childId)
+        )
+
+        // ถ้า components ทั้งหมดถูกเพิ่มไปแล้วให้ซ่อน PACKAGE
+        return !allComponentsAdded
+      })
+    }
+
+    // ตัดให้เหลือตาม limit
+    return items.slice(0, limit)
   },
 
   /**

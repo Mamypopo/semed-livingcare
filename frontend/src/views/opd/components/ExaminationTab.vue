@@ -1,39 +1,95 @@
 <template>
   <div class="p-6">
-    <div class="rounded-xl border border-gray-100 bg-white ">
+    <div class="rounded-xl border border-gray-100 bg-white">
       <table class="min-w-full">
         <thead class="bg-emerald-50 sticky top-0 z-10">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-16">#</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32">รหัส</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">รายการ</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-24">จำนวน</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-24">หน่วย</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32">ราคา/หน่วย</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32">ส่วนลด/หน่วย</th>
-            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wide w-32">ยอดรวม</th>
-            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wide w-24">ตัวเลือก</th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-16"
+            >
+              #
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32"
+            >
+              รหัส
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide"
+            >
+              รายการ
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-24"
+            >
+              จำนวน
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-24"
+            >
+              หน่วย
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32"
+            >
+              ราคา/หน่วย
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide w-32"
+            >
+              ส่วนลด/หน่วย
+            </th>
+            <th
+              class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wide w-32"
+            >
+              ยอดรวม
+            </th>
+            <th
+              class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wide w-24"
+            >
+              ตัวเลือก
+            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-100">
           <!-- Loading State -->
           <template v-if="loading">
-            <tr v-for="n in 5" :key="'skeleton-'+n">
-              <td class="px-4 py-3"><div class="h-4 w-8 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-full bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div></td>
-              <td class="px-4 py-3"><div class="h-4 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div></td>
-              <td class="px-4 py-3"><div class="h-8 w-16 bg-gray-100 animate-pulse rounded mx-auto"></div></td>
+            <tr v-for="n in 5" :key="'skeleton-' + n">
+              <td class="px-4 py-3">
+                <div class="h-4 w-8 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-full bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-16 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-4 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="h-8 w-16 bg-gray-100 animate-pulse rounded mx-auto"></div>
+              </td>
             </tr>
           </template>
           <!-- Visit Items -->
           <tr v-else v-for="(item, index) in visitItems" :key="item.id" class="hover:bg-gray-50">
             <td class="px-4 py-3 text-sm text-gray-700 text-center">{{ index + 1 }}</td>
-            <td class="px-4 py-3 text-sm font-medium text-gray-700">{{ item.medicalItem?.code || '-' }}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-700">
+              {{ item.medicalItem?.code || '-' }}
+            </td>
             <td class="px-4 py-3 text-sm text-gray-700">
               <div class="flex items-center gap-2">
                 <span>{{ item.medicalItem?.name || '-' }}</span>
@@ -48,8 +104,8 @@
             <td class="px-4 py-3">
               <input
                 v-model.number="item.quantity"
-                @input="debouncedUpdate(item)"
                 @blur="updateItem(item)"
+                @keyup.enter="updateItem(item)"
                 type="number"
                 min="1"
                 class="w-full px-2 py-1 text-sm border border-gray-200 rounded text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 focus:outline-none"
@@ -59,8 +115,8 @@
             <td class="px-4 py-3">
               <input
                 v-model.number="item.price"
-                @input="debouncedUpdate(item)"
                 @blur="updateItem(item)"
+                @keyup.enter="updateItem(item)"
                 type="number"
                 step="0.01"
                 min="0"
@@ -71,8 +127,8 @@
               <div class="relative inline-flex items-center">
                 <input
                   v-model.number="item.discount"
-                  @input="debouncedUpdate(item)"
                   @blur="updateItem(item)"
+                  @keyup.enter="updateItem(item)"
                   type="number"
                   step="0.01"
                   min="0"
@@ -80,7 +136,12 @@
                   class="w-36 px-2 py-1 pr-16 text-sm border border-gray-200 rounded text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 focus:outline-none"
                   :placeholder="item.discountType === 'PERCENTAGE' ? '0-100' : '0.00'"
                 />
-                <Listbox v-model="item.discountType" @update:model-value="updateItem(item)" as="div" class="absolute right-2">
+                <Listbox
+                  v-model="item.discountType"
+                  @update:model-value="updateItem(item)"
+                  as="div"
+                  class="absolute right-2"
+                >
                   <ListboxButton
                     class="px-2 py-1 text-xs bg-white hover:bg-slate-50 text-slate-700 border-0 rounded focus:outline-none flex items-center gap-1"
                   >
@@ -107,7 +168,9 @@
                         <li
                           :class="[
                             'px-2 py-1.5 text-xs rounded cursor-pointer flex items-center justify-between transition-colors',
-                            active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700 hover:bg-slate-50',
+                            active
+                              ? 'bg-emerald-50 text-slate-800'
+                              : 'text-slate-700 hover:bg-slate-50',
                           ]"
                         >
                           <span>{{ option.label }}</span>
@@ -138,7 +201,9 @@
             <td class="px-4 py-3 text-sm text-gray-400 text-center">-</td>
             <td class="px-4 py-3" colspan="2">
               <div class="relative">
-                <SearchIcon class="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <SearchIcon
+                  class="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
+                />
                 <input
                   v-model.trim="searchQuery"
                   @input="onSearchInput"
@@ -211,7 +276,6 @@ import Swal from 'sweetalert2'
 const SEARCH_MIN_LENGTH = 3
 const SEARCH_DEBOUNCE_DELAY = 300
 const BLUR_DELAY = 200
-const UPDATE_DEBOUNCE_DELAY = 800
 
 export default {
   name: 'ExaminationTab',
@@ -228,8 +292,8 @@ export default {
   props: {
     visitId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['updated'],
   data() {
@@ -243,7 +307,6 @@ export default {
       addingItem: false,
       searchTimer: null,
       blurTimer: null,
-      updateTimers: {}, 
       discountTypeOptions: [
         { value: 'AMOUNT', label: 'บาท' },
         { value: 'PERCENTAGE', label: '%' },
@@ -257,8 +320,8 @@ export default {
         if (newVisitId) {
           this.loadVisitItems()
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     async loadVisitItems() {
@@ -268,9 +331,9 @@ export default {
       try {
         const items = await visitItemService.list(this.visitId)
         // กำหนด discountType default เป็น AMOUNT สำหรับรายการที่ไม่มี
-        this.visitItems = items.map(item => ({
+        this.visitItems = items.map((item) => ({
           ...item,
-          discountType: item.discountType || 'AMOUNT'
+          discountType: item.discountType || 'AMOUNT',
         }))
       } catch (error) {
         console.error('Error loading visit items:', error)
@@ -280,7 +343,7 @@ export default {
           text: 'ไม่สามารถโหลดรายการตรวจได้',
           toast: true,
           position: 'top-end',
-          timer: 3000
+          timer: 3000,
         })
         this.visitItems = []
       } finally {
@@ -304,7 +367,10 @@ export default {
       }
 
       // ค้นหาใหม่เฉพาะเมื่อไม่มี selectedItem หรือ text ไม่ตรงกับ selectedItem (ลด API calls)
-      if (!this.selectedItem || this.searchQuery.trim() !== this.getDisplayText(this.selectedItem)) {
+      if (
+        !this.selectedItem ||
+        this.searchQuery.trim() !== this.getDisplayText(this.selectedItem)
+      ) {
         this.searchTimer = setTimeout(() => {
           this.performSearch()
         }, SEARCH_DEBOUNCE_DELAY)
@@ -322,9 +388,13 @@ export default {
       }
 
       try {
-        const items = await medicalItemService.searchForVisit(this.searchQuery.trim(), 20)
-        const addedItemIds = new Set(this.visitItems.map(item => item.medicalItemId))
-        this.searchResults = items.filter(item => !addedItemIds.has(item.id))
+        // ส่ง visitId ไปให้ backend กรองรายการที่เพิ่มไปแล้ว
+        const items = await medicalItemService.searchForVisit(
+          this.searchQuery.trim(),
+          20,
+          this.visitId,
+        )
+        this.searchResults = items
         // ไม่ clear selectedItem แม้ไม่เจอในผลลัพธ์ - ผู้ใช้อาจแก้ text แต่ยังต้องการเพิ่ม item ที่เลือกไว้
       } catch (error) {
         console.error('Error searching items:', error)
@@ -367,7 +437,7 @@ export default {
             medicalItemId: this.selectedItem.id,
             quantity: defaultQuantity,
             discount: defaultDiscount,
-            discountType: defaultDiscountType
+            discountType: defaultDiscountType,
           })
         } else {
           await visitItemService.create(this.visitId, {
@@ -375,7 +445,7 @@ export default {
             quantity: defaultQuantity,
             price: undefined, // ใช้ราคาจาก MedicalItem
             discount: defaultDiscount,
-            discountType: defaultDiscountType
+            discountType: defaultDiscountType,
           })
         }
 
@@ -393,51 +463,40 @@ export default {
           timer: 1500,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
         })
       } catch (error) {
         console.error('Error adding item:', error)
+        
+        // ตรวจสอบว่าเป็น error เกี่ยวกับแพคเกจว่างหรือไม่
+        const errorMessage = error?.response?.data?.message || error.message || 'เกิดข้อผิดพลาด'
+        const isPackageEmptyError = errorMessage.includes('ไม่มีรายการย่อย') || 
+                                   errorMessage.includes('แพ็คเกจนี้ไม่มีรายการย่อย')
+
         Swal.fire({
-          icon: 'error',
-          title: 'เพิ่มไม่สำเร็จ',
-          text: error?.response?.data?.message || error.message || 'เกิดข้อผิดพลาด',
+          icon: isPackageEmptyError ? 'warning' : 'error',
+          title: isPackageEmptyError ? 'ไม่สามารถเพิ่มแพคเกจได้' : 'เพิ่มไม่สำเร็จ',
+          text: errorMessage,
+          showConfirmButton: false,
+          timerProgressBar: true,
           toast: true,
           position: 'top-end',
-          timer: 3000
+          timer: 3000,
         })
       } finally {
         this.addingItem = false
       }
     },
 
-    debouncedUpdate(item) {
-      // Clear timer เก่าก่อน (ถ้ามี)
-      if (this.updateTimers[item.id]) {
-        clearTimeout(this.updateTimers[item.id])
-      }
-
-      // ตั้ง timer ใหม่สำหรับ debounce
-      this.updateTimers[item.id] = setTimeout(() => {
-        this.updateItem(item)
-        delete this.updateTimers[item.id]
-      }, UPDATE_DEBOUNCE_DELAY)
-    },
-
     async updateItem(item) {
       if (!item?.id) return
-
-      // Clear timer ถ้ามี (ป้องกันการเรียกซ้ำ)
-      if (this.updateTimers[item.id]) {
-        clearTimeout(this.updateTimers[item.id])
-        delete this.updateTimers[item.id]
-      }
 
       try {
         await visitItemService.update(item.id, {
           quantity: item.quantity || 1,
           price: item.price || null,
           discount: item.discount || 0,
-          discountType: item.discountType || 'AMOUNT'
+          discountType: item.discountType || 'AMOUNT',
         })
 
         // Reload items เพื่อแสดงข้อมูลล่าสุด
@@ -451,7 +510,7 @@ export default {
           text: error?.response?.data?.message || error.message || 'เกิดข้อผิดพลาด',
           toast: true,
           position: 'top-end',
-          timer: 3000
+          timer: 3000,
         })
       }
     },
@@ -467,7 +526,7 @@ export default {
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#6b7280'
+        cancelButtonColor: '#6b7280',
       })
 
       if (!result.isConfirmed) return
@@ -484,7 +543,7 @@ export default {
           timer: 1500,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
         })
       } catch (error) {
         console.error('Error removing item:', error)
@@ -494,7 +553,7 @@ export default {
           text: error?.response?.data?.message || error.message || 'เกิดข้อผิดพลาด',
           toast: true,
           position: 'top-end',
-          timer: 3000
+          timer: 3000,
         })
       }
     },
@@ -504,7 +563,7 @@ export default {
       const discount = Number(item.discount) || 0
       const quantity = Number(item.quantity) || 1
       const discountType = item.discountType || 'AMOUNT'
-      
+
       let discountAmount = 0
       if (discountType === 'PERCENTAGE') {
         // ส่วนลดเป็นเปอร์เซ็นต์
@@ -513,7 +572,7 @@ export default {
         // ส่วนลดเป็นจำนวนเงิน
         discountAmount = discount
       }
-      
+
       return (price - discountAmount) * quantity
     },
 
@@ -522,9 +581,9 @@ export default {
       if (Number.isNaN(n)) return '0.00'
       return n.toLocaleString('th-TH', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
       })
-    }
+    },
   },
   beforeUnmount() {
     if (this.searchTimer) {
@@ -533,15 +592,8 @@ export default {
     if (this.blurTimer) {
       clearTimeout(this.blurTimer)
     }
-    // Clear update timers ทั้งหมด
-    Object.values(this.updateTimers).forEach(timer => {
-      if (timer) clearTimeout(timer)
-    })
-    this.updateTimers = {}
-  }
+  },
 }
 </script>
 
-<style scoped>
-</style>
-
+<style scoped></style>

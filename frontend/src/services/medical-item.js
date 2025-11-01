@@ -28,9 +28,14 @@ export default {
   },
   /**
    * ค้นหารายการตรวจสำหรับ Visit (รวมทั้ง SINGLE items และ PACKAGE)
+   * กรองรายการที่เพิ่มไปแล้วใน Visit ออก
    */
-  async searchForVisit(search = '', limit = 20) {
-    const { data } = await apiClient.get('/medical-items/search-for-visit', { search, limit })
+  async searchForVisit(search = '', limit = 20, visitId = null) {
+    const params = { search, limit }
+    if (visitId) {
+      params.visitId = visitId
+    }
+    const { data } = await apiClient.get('/medical-items/search-for-visit', params)
     return data?.data || []
   },
   /**
