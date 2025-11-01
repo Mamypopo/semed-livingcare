@@ -569,6 +569,11 @@ model Icd10 {
   nameEn           String?            // ชื่อสามัญ (ชื่อรหัสย่อย) [Eng]
   groupNameTh      String?            // ชื่อกลุ่มรหัสโรค [TH]
   groupNameEn      String?            // ชื่อกลุ่มรหัสโรค [Eng]
+  
+  // หมวดหมู่
+  categoryId       Int?
+  category         ItemCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -579,6 +584,7 @@ model Icd10 {
   @@index([code])
   @@index([groupCode])
   @@index([isActive])
+  @@index([categoryId])
 }
 
 // ==========================================
@@ -629,4 +635,113 @@ model VisitLog {
   @@index([action])
   @@index([createdAt])
   @@index([hn])
+}
+
+// ==========================================
+// Master: ItemCategory - หมวดหมู่กลางของรายการตรวจ/บริการ
+// ==========================================
+enum ItemCategoryType {
+  DRUG_SUPPLY      // ยา/อุปกรณ์
+  COURSE           // คอร์ส/โปรแกรม
+  LAB_XRAY         // การตรวจ/Lab/X-Ray รวมไว้ด้วยกันกรณีใช้งานง่าย
+  DIAGNOSIS        // รายการวินิจฉัย/รหัสวินิจฉัย
+  ADVICE_REFERENCE // คำแนะนำ/คำอ้างอิง
+  EXPENSE          // ค่าใช้จ่ายอื่นๆ
+}
+
+model ItemCategory {
+  id           Int               @id @default(autoincrement())
+  name         String
+  categoryType ItemCategoryType
+  isActive     Boolean           @default(true)
+
+  // Audit
+  createdBy    String?
+  updatedBy    String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  // Relations
+  items        MedicalItem[]
+  icd10s       Icd10[]
+
+  @@index([categoryType])
+  @@index([isActive])
+}
+
+// ==========================================
+// Master: MedicalItem - รายการตรวจ/บริการ (ไม่แยกสาขา)
+// ==========================================
+enum MedicalExamType {
+  GENERAL
+  LAB
+  XRAY
+  PACKAGE
+}
+
+model MedicalItem {
+  id          String           @id @default(cuid())
+  code        String           @unique              // SEM1, SEM2, ... (ออกโดยตัวนับกลาง)
+  name        String
+
+  examType    MedicalExamType  // ใช้ตรวจเงื่อนไข PACKAGE/ทั่วไปตาม UI
+
+  // หมวดหมู่
+  categoryId  Int?
+  category    ItemCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // ข้อมูลอ้างอิง/ราคา
+  nhsoCode    String?
+  genericName String?
+  unit        String?
+  priceOpd    Decimal?         @db.Decimal(10, 2)
+  priceIpd    Decimal?         @db.Decimal(10, 2)
+
+  isActive    Boolean          @default(true)
+
+  // Audit
+  createdBy   String?
+  updatedBy   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Package relations
+  packageComponents MedicalItemComponent[] @relation("PackageComponentsParent")
+  asComponentOf     MedicalItemComponent[] @relation("PackageComponentsChild")
+
+  @@index([examType])
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+// ==========================================
+// Mapping: MedicalItemComponent - องค์ประกอบของแพ็กเกจ
+// ==========================================
+model MedicalItemComponent {
+  id           Int         @id @default(autoincrement())
+
+  parentItemId String
+  parentItem   MedicalItem @relation("PackageComponentsParent", fields: [parentItemId], references: [id], onDelete: Cascade)
+
+  childItemId  String
+  childItem    MedicalItem @relation("PackageComponentsChild", fields: [childItemId], references: [id], onDelete: Restrict)
+
+  quantity     Int         // ฟรอนต์ส่ง 1 เสมอ ณ ตอนนี้
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([parentItemId, childItemId])
+  @@index([parentItemId])
+  @@index([childItemId])
+}
+
+// ==========================================
+// Counter: ItemCodeCounter - ตัวนับรหัส SEMn
+// ==========================================
+model ItemCodeCounter {
+  id       Int      @id @default(autoincrement())
+  current  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

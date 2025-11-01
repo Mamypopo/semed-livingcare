@@ -28,30 +28,30 @@
               class="w-full max-w-[90vw] h-[90vh] transform rounded-2xl bg-white shadow-xl transition-all flex flex-col"
             >
               <!-- Header -->
-              <div class="bg-white px-6 py-4 rounded-t-2xl border-b border-gray-100 flex-shrink-0">
+              <div class="bg-white px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 flex-shrink-0">
                 <div class="flex items-center justify-between">
-                  <DialogTitle class="text-lg font-semibold text-gray-900">
+                  <DialogTitle class="text-lg font-semibold text-slate-800">
                     {{ mode === 'edit' ? 'แก้ไขการซักประวัติ' : 'เพิ่มการซักประวัติ' }}
                   </DialogTitle>
-                  <div class="grid grid-cols-2 gap-3">
-                    <button
-                      @click="saveData"
-                      class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors"
-                    >
-                      บันทึก
-                    </button>
+                  <div class="flex items-center gap-2">
                     <button
                       @click="handleRequestClose"
-                      class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors"
+                      class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 transition-all duration-200 shadow-sm hover:shadow"
                     >
                       ยกเลิก
+                    </button>
+                    <button
+                      @click="saveData"
+                      class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300"
+                    >
+                      บันทึก
                     </button>
                   </div>
                 </div>
               </div>
 
               <!-- Tabs -->
-              <div class="border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <div class="border-b border-slate-200/50 bg-slate-50 flex-shrink-0">
                 <nav class="flex space-x-8 px-6" aria-label="Tabs">
                   <button
                     v-for="tab in mainTabs"
@@ -59,9 +59,9 @@
                     @click="activeMainTab = tab.id"
                     :class="[
                       activeMainTab === tab.id
-                        ? 'border-emerald-500 text-emerald-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                        ? 'border-emerald-500 text-emerald-600 bg-emerald-50'
+                        : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300',
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors',
                     ]"
                   >
                     {{ tab.name }}
@@ -76,7 +76,7 @@
                   <!-- Left Panel (40% / 2 columns) -->
                   <div class="col-span-2 space-y-6 border border-gray-200 rounded-lg p-4">
                     <!-- Sub-tabs -->
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-1">
+                    <div class="bg-slate-100 border border-slate-200 rounded-lg p-1">
                       <nav class="flex gap-1" aria-label="Sub-tabs">
                         <button
                           v-for="subTab in subTabs"
@@ -85,7 +85,7 @@
                           :class="[
                             activeSubTab === subTab.id
                               ? 'bg-white text-emerald-600 shadow-sm border border-emerald-200'
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50',
+                              : 'text-slate-600 hover:text-slate-800 hover:bg-white/50',
                             'whitespace-nowrap py-2 px-3 font-medium text-xs flex items-center gap-1.5 rounded-md transition-all',
                           ]"
                         >
@@ -103,14 +103,14 @@
                         <div>
                           <div class="flex items-center gap-2 mb-3">
                             <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                            <label class="text-sm font-semibold text-gray-900">ข้อมูลพื้นฐาน</label>
+                            <label class="text-sm font-semibold text-slate-800">ข้อมูลพื้นฐาน</label>
                           </div>
                           <div class="space-y-3">
                             <!-- Grid Row 1 -->
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   WT
                                   <Info
@@ -123,13 +123,13 @@
                                   @input="calculate"
                                   type="number"
                                   step="0.1"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   PR
                                   <Info
@@ -140,7 +140,7 @@
                                 <input
                                   v-model="vitalsData.pulseRate"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -150,7 +150,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   HT
                                   <Info
@@ -163,13 +163,13 @@
                                   @input="calculate"
                                   type="number"
                                   step="0.1"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   RR
                                   <Info
@@ -180,7 +180,7 @@
                                 <input
                                   v-model="vitalsData.respiratoryRate"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -190,7 +190,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   BMI
                                   <Info
@@ -210,7 +210,7 @@
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   BSA
                                   <Info
@@ -232,7 +232,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   TEMP
                                   <Info
@@ -243,13 +243,13 @@
                                 <input
                                   v-model="vitalsData.temperature"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   CRT
                                   <Info
@@ -260,7 +260,7 @@
                                 <input
                                   v-model="vitalsData.crt"
                                   type="text"
-                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -270,7 +270,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   BP SYS
                                   <Info
@@ -281,13 +281,13 @@
                                 <input
                                   v-model="vitalsData.bpSys"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   BP DIA
                                   <Info
@@ -298,7 +298,7 @@
                                 <input
                                   v-model="vitalsData.bpDia"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -308,7 +308,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   VAS
                                   <Info
@@ -319,13 +319,13 @@
                                 <input
                                   v-model="vitalsData.vas"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   O2sat
                                   <Info
@@ -336,7 +336,7 @@
                                 <input
                                   v-model="vitalsData.o2sat"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -346,7 +346,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   HC (cm)
                                   <Info
@@ -357,13 +357,13 @@
                                 <input
                                   v-model="vitalsData.headCircumference"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   CHC (cm)
                                   <Info
@@ -374,7 +374,7 @@
                                 <input
                                   v-model="vitalsData.chestCircumference"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -384,7 +384,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <div class="flex items-center justify-between gap-2">
                                 <label
-                                  class="text-sm font-medium text-gray-700 flex items-center gap-1 min-w-[85px]"
+                                  class="text-sm font-medium text-slate-700 flex items-center gap-1 min-w-[85px]"
                                 >
                                   WC (cm)
                                   <Info
@@ -395,7 +395,7 @@
                                 <input
                                   v-model="vitalsData.waistCircumference"
                                   type="number"
-                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="w-36 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                   placeholder="0"
                                 />
                               </div>
@@ -404,17 +404,17 @@
                           </div>
                         </div>
                         <!-- Alcohol & Smoking & Custom -->
-                        <div class="space-y-4 border-t border-gray-200 pt-4">
+                        <div class="space-y-4 border-t border-slate-200 pt-4">
                           <div class="flex items-center gap-2 mb-2">
                             <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                            <label class="text-sm font-semibold text-gray-800"
+                            <label class="text-sm font-semibold text-slate-800"
                               >ตรวจการดื่มสุรา/สูบบุหรี่</label
                             >
                           </div>
 
                           <!-- Alcohol -->
                           <div class="flex items-center gap-4">
-                            <span class="text-sm text-gray-600 min-w-[70px]">ดื่มสุรา</span>
+                            <span class="text-sm text-slate-600 min-w-[70px]">ดื่มสุรา</span>
                             <div class="flex gap-4">
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -424,7 +424,7 @@
                                   value="ไม่ดื่ม"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">ไม่ดื่ม</span>
+                                <span class="text-sm text-slate-700">ไม่ดื่ม</span>
                               </label>
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -434,7 +434,7 @@
                                   value="ดื่มบางครั้ง"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">ดื่มบางครั้ง</span>
+                                <span class="text-sm text-slate-700">ดื่มบางครั้ง</span>
                               </label>
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -444,14 +444,14 @@
                                   value="ดื่ม"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">ดื่ม</span>
+                                <span class="text-sm text-slate-700">ดื่ม</span>
                               </label>
                             </div>
                           </div>
 
                           <!-- Smoking -->
                           <div class="flex items-center gap-4">
-                            <span class="text-sm text-gray-600 min-w-[70px]">สูบบุหรี่</span>
+                            <span class="text-sm text-slate-600 min-w-[70px]">สูบบุหรี่</span>
                             <div class="flex gap-4">
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -461,7 +461,7 @@
                                   value="ไม่สูบ"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">ไม่สูบ</span>
+                                <span class="text-sm text-slate-700">ไม่สูบ</span>
                               </label>
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -471,7 +471,7 @@
                                   value="สูบบางครั้ง"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">สูบบางครั้ง</span>
+                                <span class="text-sm text-slate-700">สูบบางครั้ง</span>
                               </label>
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -481,7 +481,7 @@
                                   value="สูบ"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">สูบ</span>
+                                <span class="text-sm text-slate-700">สูบ</span>
                               </label>
                             </div>
                           </div>
@@ -489,8 +489,8 @@
                           <!-- Custom Fields (Key/Value JSON) -->
                           <div class="space-y-2 pt-2">
                             <div class="flex items-center gap-2 mb-2">
-                              <label class="text-sm font-medium text-gray-700"
-                                >กำหนดเอง (Key/Value)</label
+                              <label class="text-sm font-medium text-slate-700"
+                                >กำหนดเอง</label
                               >
                             </div>
                             <div class="space-y-2">
@@ -503,13 +503,13 @@
                                   v-model="row.key"
                                   type="text"
                                   placeholder="หัวข้อ เช่น สูบกัญชา"
-                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 />
                                 <input
                                   v-model="row.value"
                                   type="text"
                                   placeholder="ค่า เช่น นานครั้ง"
-                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="col-span-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 />
                                 <div class="col-span-1 flex items-center justify-end gap-2">
                                   <button
@@ -534,8 +534,8 @@
                           </div>
 
                           <!-- Medical Certificate (OPD) -->
-                          <div class="space-y-4 border-t border-gray-200 pt-4">
-                            <div class="text-sm font-semibold text-gray-800">
+                          <div class="space-y-4 border-t border-slate-200 pt-4">
+                            <div class="text-sm font-semibold text-slate-800">
                               การออกใบรับรอง Medical Certificate (OPD)
                             </div>
                             <div class="flex items-center gap-2">
@@ -544,11 +544,11 @@
                                 type="checkbox"
                                 class="w-4 h-4 text-emerald-500"
                               />
-                              <span class="text-sm text-gray-700">ไม่สมควรพัก</span>
+                              <span class="text-sm text-slate-700">ไม่สมควรพัก</span>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                               <div>
-                                <div class="text-sm font-medium text-gray-700 mb-1">
+                                <div class="text-sm font-medium text-slate-700 mb-1">
                                   สมควรพักตั้งแต่
                                 </div>
                                 <VueDatePicker
@@ -562,7 +562,7 @@
                                 />
                               </div>
                               <div>
-                                <div class="text-sm font-medium text-gray-700 mb-1">
+                                <div class="text-sm font-medium text-slate-700 mb-1">
                                   สมควรพักถึง
                                 </div>
                                 <VueDatePicker
@@ -585,7 +585,7 @@
                                   :value="true"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700">สามารถขึ้นเครื่องบินได้</span>
+                                <span class="text-sm text-slate-700">สามารถขึ้นเครื่องบินได้</span>
                               </label>
                               <label class="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -595,7 +595,7 @@
                                   :value="false"
                                   class="w-4 h-4 text-emerald-500"
                                 />
-                                <span class="text-sm text-gray-700"
+                                <span class="text-sm text-slate-700"
                                   >ไม่สามารถขึ้นเครื่องบินได้</span
                                 >
                               </label>
@@ -605,7 +605,7 @@
                             <div class="grid grid-cols-2 gap-3">
                               <!-- Operator -->
                               <div class="flex items-center justify-between gap-2">
-                                <label class="text-sm font-medium text-gray-700 min-w-[85px]"
+                                <label class="text-sm font-medium text-slate-700 min-w-[85px]"
                                   >ผู้ทำรายการ</label
                                 >
                                 <Listbox
@@ -615,7 +615,7 @@
                                 >
                                   <div>
                                     <ListboxButton
-                                      class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                      class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                     >
                                       <span class="block truncate">{{
                                         vitalsData.operatorName || '- เลือกผู้ทำรายการ -'
@@ -623,7 +623,7 @@
                                       <span
                                         class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                                       >
-                                        <ChevronDown class="h-5 w-5 text-gray-400" />
+                                        <ChevronDown class="h-5 w-5 text-slate-400" />
                                       </span>
                                     </ListboxButton>
                                   </div>
@@ -636,7 +636,7 @@
                                     leave-to-class="transform opacity-0 scale-95"
                                   >
                                     <ListboxOptions
-                                      class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
+                                      class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-full focus:outline-none"
                                     >
                                       <ListboxOption
                                         :value="vitalsData.operatorName"
@@ -646,12 +646,12 @@
                                           :class="[
                                             'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
                                             active
-                                              ? 'bg-emerald-50 text-gray-900'
-                                              : 'text-gray-700',
+                                              ? 'bg-emerald-50 text-slate-800'
+                                              : 'text-slate-700',
                                           ]"
                                         >
                                           <span>{{ vitalsData.operatorName || '-' }}</span>
-                                          <span v-if="selected" class="text-emerald-600 text-xs"
+                                          <span v-if="selected" class="text-emerald-500 text-xs"
                                             >เลือก</span
                                           >
                                         </li>
@@ -664,7 +664,7 @@
 
                             <!-- Department -->
                             <div class="flex items-start justify-between gap-4">
-                              <label class="text-sm font-medium text-gray-700 min-w-[85px] pt-2"
+                              <label class="text-sm font-medium text-slate-700 min-w-[85px] pt-2"
                                 >แผนก</label
                               >
                               <div class="flex-1">
@@ -695,7 +695,7 @@
                         <div class="space-y-3">
                           <!-- ระดับความเจ็บปวด (VAS) -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                            <label class="text-sm font-medium text-slate-700 min-w-[140px]"
                               >ระดับความเจ็บปวด (VAS 0-10)</label
                             >
                             <input
@@ -705,33 +705,33 @@
                               min="0"
                               max="10"
                               step="0.1"
-                              class="w-32 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                              class="w-32 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                               placeholder="0"
                             />
                           </div>
 
                           <!-- ลักษณะของอาการปวด -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                            <label class="text-sm font-medium text-slate-700 min-w-[140px]"
                               >ลักษณะของอาการปวด</label
                             >
                             <input
                               v-model="clinicalData.painType"
                               type="text"
                               readonly
-                              class="w-64 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-700 focus:outline-none"
+                              class="w-64 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-gray-50 text-slate-700 focus:outline-none"
                             />
                           </div>
 
                           <!-- ตำแหน่งของอาการปวด -->
                           <div class="flex flex-col gap-2">
-                            <label class="text-sm font-medium text-gray-700"
+                            <label class="text-sm font-medium text-slate-700"
                               >ตำแหน่งของอาการปวด</label
                             >
                             <textarea
                               v-model="clinicalData.painLocation"
                               rows="3"
-                              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             ></textarea>
                           </div>
                         </div>
@@ -741,19 +741,19 @@
                       <div v-if="activeSubTab === 'swelling'" class="space-y-4">
                         <div class="flex items-center gap-2 mb-1">
                           <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                          <label class="text-sm font-semibold text-gray-900">อาการบวม</label>
+                          <label class="text-sm font-semibold text-slate-800">อาการบวม</label>
                         </div>
 
                         <div class="space-y-3">
                           <!-- ระดับอาการบวม -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                            <label class="text-sm font-medium text-slate-700 min-w-[140px]"
                               >ระดับอาการบวม</label
                             >
                             <Listbox v-model="swellingData.level" as="div" class="relative w-80">
                               <div>
                                 <ListboxButton
-                                  class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 >
                                   <span class="block truncate">{{
                                     swellingData.level || 'เลือก'
@@ -761,7 +761,7 @@
                                   <span
                                     class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                                   >
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
+                                    <ChevronDown class="h-5 w-5 text-slate-400" />
                                   </span>
                                 </ListboxButton>
                               </div>
@@ -774,7 +774,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                               >
                                 <ListboxOptions
-                                  class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
+                                  class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-full focus:outline-none"
                                 >
                                   <ListboxOption
                                     v-for="opt in swellingLevels"
@@ -785,11 +785,11 @@
                                     <li
                                       :class="[
                                         'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                                        active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                                       ]"
                                     >
                                       <span>{{ opt }}</span>
-                                      <span v-if="selected" class="text-emerald-600 text-xs"
+                                      <span v-if="selected" class="text-emerald-500 text-xs"
                                         >เลือก</span
                                       >
                                     </li>
@@ -801,13 +801,13 @@
 
                           <!-- ลักษณะของอาการบวม -->
                           <div class="flex items-center justify-between gap-2">
-                            <label class="text-sm font-medium text-gray-700 min-w-[140px]"
+                            <label class="text-sm font-medium text-slate-700 min-w-[140px]"
                               >ลักษณะของอาการบวม</label
                             >
                             <Listbox v-model="swellingData.type" as="div" class="relative w-80">
                               <div>
                                 <ListboxButton
-                                  class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                                  class="relative text-sm w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-sm border border-gray-200 text-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                                 >
                                   <span class="block truncate">{{
                                     swellingData.type || 'เลือก'
@@ -815,7 +815,7 @@
                                   <span
                                     class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                                   >
-                                    <ChevronDown class="h-5 w-5 text-gray-400" />
+                                    <ChevronDown class="h-5 w-5 text-slate-400" />
                                   </span>
                                 </ListboxButton>
                               </div>
@@ -828,7 +828,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                               >
                                 <ListboxOptions
-                                  class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-100 w-full focus:outline-none"
+                                  class="absolute right-0 mt-2 z-50 p-2 shadow-xl bg-white rounded-xl border border-gray-200/50 w-full focus:outline-none"
                                 >
                                   <ListboxOption
                                     v-for="opt in swellingTypes"
@@ -839,11 +839,11 @@
                                     <li
                                       :class="[
                                         'px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between',
-                                        active ? 'bg-emerald-50 text-gray-900' : 'text-gray-700',
+                                        active ? 'bg-emerald-50 text-slate-800' : 'text-slate-700',
                                       ]"
                                     >
                                       <span>{{ opt }}</span>
-                                      <span v-if="selected" class="text-emerald-600 text-xs"
+                                      <span v-if="selected" class="text-emerald-500 text-xs"
                                         >เลือก</span
                                       >
                                     </li>
@@ -855,13 +855,13 @@
 
                           <!-- ตำแหน่งของอาการบวม -->
                           <div class="flex flex-col gap-2">
-                            <label class="text-sm font-medium text-gray-700"
+                            <label class="text-sm font-medium text-slate-700"
                               >ตำแหน่งของอาการบวม</label
                             >
                             <textarea
                               v-model="swellingData.location"
                               rows="3"
-                              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                             ></textarea>
                           </div>
                         </div>
@@ -875,17 +875,17 @@
                     <div>
                       <div class="flex items-center gap-2 mb-3">
                         <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">การวินิจฉัยโรค</label>
+                        <label class="text-xs font-semibold text-slate-800">การวินิจฉัยโรค</label>
                       </div>
                       <div class="flex gap-2 relative" ref="icdDropdownEl">
                         <SearchIcon
-                          class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                          class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
                         />
                         <input
                           v-model="diagnosisSearch"
                           @input="onSearchIcd"
                           type="text"
-                          class="flex-1 pl-9 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                          class="flex-1 pl-9 pr-4 py-2 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                           placeholder="ค้นหา ICD10 อย่างน้อย 3 ตัวอักษร"
                         />
 
@@ -894,7 +894,7 @@
                           v-if="showIcdDropdown"
                           class="absolute top-11 left-0 right-16 z-40 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-auto"
                         >
-                          <div v-if="loadingIcd" class="p-3 text-sm text-gray-500">
+                          <div v-if="loadingIcd" class="p-3 text-sm text-slate-500">
                             กำลังค้นหา...
                           </div>
                           <template v-else>
@@ -910,8 +910,8 @@
                                   : 'hover:bg-emerald-50',
                               ]"
                             >
-                              <span class="font-medium text-gray-900">{{ item.code }}</span>
-                              <span class="flex-1 ml-3 text-gray-700 truncate">{{
+                              <span class="font-medium text-slate-800">{{ item.code }}</span>
+                              <span class="flex-1 ml-3 text-slate-700 truncate">{{
                                 item.nameTh
                               }}</span>
                               <span
@@ -920,7 +920,7 @@
                                 >เลือกแล้ว</span
                               >
                             </button>
-                            <div v-if="!icdResults.length" class="p-3 text-sm text-gray-500">
+                            <div v-if="!icdResults.length" class="p-3 text-sm text-slate-500">
                               ไม่พบข้อมูล
                             </div>
                           </template>
@@ -928,10 +928,10 @@
                       </div>
 
                       <!-- ICD Table -->
-                      <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
-                        <div class="bg-emerald-50 px-4 py-2 border-b border-gray-200 sticky top-0">
+                      <div class="mt-3 border border-slate-200 rounded-lg overflow-hidden">
+                        <div class="bg-slate-50 px-4 py-2 border-b border-slate-200 sticky top-0">
                           <div
-                            class="grid grid-cols-3 gap-4 text-xs font-semibold text-gray-700 tracking-wide"
+                            class="grid grid-cols-3 gap-4 text-xs font-semibold text-slate-600 tracking-wide"
                           >
                             <div class="uppercase">ICD CODE</div>
                             <div class="uppercase">ชื่อรายการ</div>
@@ -940,19 +940,19 @@
                         </div>
                         <div
                           v-if="selectedDiagnoses.length === 0"
-                          class="p-4 text-center text-gray-500 text-sm"
+                          class="p-4 text-center text-slate-500 text-sm"
                         >
                           <p>ไม่มีข้อมูล</p>
-                          <p class="text-xs text-gray-400 mt-1">พิมพ์เพื่อค้นหาและเลือกจากรายการ</p>
+                          <p class="text-xs text-slate-400 mt-1">พิมพ์เพื่อค้นหาและเลือกจากรายการ</p>
                         </div>
-                        <div v-else class="divide-y divide-gray-100">
+                        <div v-else class="divide-y divide-slate-100">
                           <div
                             v-for="(dx, i) in selectedDiagnoses"
                             :key="dx.code + '-' + i"
-                            class="px-4 py-2 grid grid-cols-3 gap-4 items-center text-sm hover:bg-gray-50"
+                            class="px-4 py-2 grid grid-cols-3 gap-4 items-center text-sm hover:bg-slate-50"
                           >
-                            <div class="font-semibold text-gray-700">{{ dx.code }}</div>
-                            <div class="text-gray-500 truncate" :title="dx.nameTh">
+                            <div class="font-semibold text-slate-800">{{ dx.code }}</div>
+                            <div class="text-slate-700 truncate" :title="dx.nameTh">
                               {{ dx.nameTh }}
                             </div>
                             <div class="text-right">
@@ -972,12 +972,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">CC:</label>
+                        <label class="text-xs font-semibold text-slate-800">CC:</label>
                       </div>
                       <textarea
                         v-model="formData.cc"
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="CC: อาการสำคัญที่มาพบแพทย์ เช่น เจ็บหน้าอก, ปวดหัว"
                       ></textarea>
                     </div>
@@ -986,12 +986,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">HPI:</label>
+                        <label class="text-xs font-semibold text-slate-800">HPI:</label>
                       </div>
                       <textarea
                         v-model="formData.hpi"
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="HPI: ประวัติอาการป่วยปัจจุบัน"
                       ></textarea>
                     </div>
@@ -1000,12 +1000,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">PMH:</label>
+                        <label class="text-xs font-semibold text-slate-800">PMH:</label>
                       </div>
                       <textarea
                         v-model="formData.pmh"
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="PMH: ประวัติการรักษาในอดีต"
                       ></textarea>
                     </div>
@@ -1014,12 +1014,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">DX:</label>
+                        <label class="text-xs font-semibold text-slate-800">DX:</label>
                       </div>
                       <textarea
                         v-model="formData.dx"
                         rows="3"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="DX: การวินิจฉัยโรค"
                       ></textarea>
                     </div>
@@ -1028,12 +1028,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">GA:</label>
+                        <label class="text-xs font-semibold text-slate-800">GA:</label>
                       </div>
                       <textarea
                         v-model="formData.ga"
                         rows="3"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="GA: ลักษณะทั่วไป"
                       ></textarea>
                     </div>
@@ -1042,12 +1042,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">PE:</label>
+                        <label class="text-xs font-semibold text-slate-800">PE:</label>
                       </div>
                       <textarea
                         v-model="formData.pe"
                         rows="3"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="PE: การตรวจร่างกาย"
                       ></textarea>
                     </div>
@@ -1056,12 +1056,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-orange-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">คำแนะนำแพทย์:</label>
+                        <label class="text-xs font-semibold text-slate-800">คำแนะนำแพทย์:</label>
                       </div>
                       <textarea
                         v-model="formData.doctorAdvice"
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="คำแนะนำแพทย์"
                       ></textarea>
                     </div>
@@ -1070,12 +1070,12 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1 h-5 bg-cyan-500 rounded-full"></div>
-                        <label class="text-xs font-semibold text-gray-900">Doctor Note:</label>
+                        <label class="text-xs font-semibold text-slate-800">Doctor Note:</label>
                       </div>
                       <textarea
                         v-model="formData.doctorNote"
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm bg-white text-slate-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
                         placeholder="Doctor Note"
                       ></textarea>
                     </div>

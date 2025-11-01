@@ -13,6 +13,35 @@ async function seedIcd10() {
   try {
     console.log('🚀 Starting ICD-10 seed...')
     
+    // ลบข้อมูล ICD10 เก่าทั้งหมดก่อน (ถ้าต้องการ)
+    console.log('🗑️  Deleting all existing ICD10 records...')
+    const deleteResult = await prisma.icd10.deleteMany({})
+    console.log(`✅ Deleted ${deleteResult.count} existing ICD10 records`)
+    
+    // ค้นหาหรือสร้าง default category สำหรับ DIAGNOSIS
+    let defaultCategoryId = null
+    try {
+      const defaultCategory = await prisma.itemCategory.findFirst({
+        where: {
+          categoryType: 'DIAGNOSIS',
+          isActive: true
+        },
+        orderBy: {
+          createdAt: 'asc' // เลือกตัวแรกที่สร้าง (หรือ id: 'asc' ก็ได้)
+        }
+      })
+      
+      if (defaultCategory) {
+        defaultCategoryId = defaultCategory.id
+        console.log(`📋 Using default category: ${defaultCategory.name} (ID: ${defaultCategoryId})`)
+      } else {
+        console.log('⚠️  No DIAGNOSIS category found. ICD10 records will be created without category.')
+        console.log('💡 Tip: Create a DIAGNOSIS category first in the ItemCategories page')
+      }
+    } catch (error) {
+      console.log('⚠️  Error finding default category:', error.message)
+    }
+    
     // อ่านไฟล์ Excel
     const filePath = path.join(__dirname, 'ICD_FULL_107985.xlsx')
     console.log(`📖 Reading file: ${filePath}`)
@@ -55,6 +84,7 @@ async function seedIcd10() {
             nameEn: nameEn,
             groupNameTh: groupNameTh,
             groupNameEn: groupNameEn,
+            categoryId: defaultCategoryId, // ใช้ default category
             isActive: true
           },
           create: {
@@ -64,6 +94,7 @@ async function seedIcd10() {
             nameEn: nameEn,
             groupNameTh: groupNameTh,
             groupNameEn: groupNameEn,
+            categoryId: defaultCategoryId, // ใช้ default category
             isActive: true
           }
         })

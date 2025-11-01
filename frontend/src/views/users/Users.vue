@@ -314,7 +314,7 @@
                 <td class="px-4 py-2 text-sm">
                   <span
                     :class="
-                      user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                      user.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
                     "
                     class="px-2 py-1 rounded-md text-xs font-medium"
                   >
@@ -678,12 +678,12 @@ export default {
     },
     getRoleBadgeClass(role) {
       const classes = {
-        ADMIN: 'bg-purple-50 text-purple-700',
-        STAFF: 'bg-blue-50 text-blue-700',
-        GUEST: 'bg-gray-50 text-gray-700',
-        DOCTOR: 'bg-emerald-50 text-emerald-700',
+        ADMIN: 'bg-purple-50 text-purple-700 border border-purple-200',
+        STAFF: 'bg-blue-50 text-blue-700 border border-blue-200',
+        GUEST: 'bg-gray-50 text-gray-700 border border-gray-200',
+        DOCTOR: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
       }
-      return classes[role] || 'bg-gray-50 text-gray-700'
+      return classes[role] || 'bg-gray-50 text-gray-700 border border-gray-200'
     },
     handlePasswordChanged() {
       // Password was changed successfully

@@ -1,38 +1,38 @@
 <template>
   <div class="space-y-6">
     <!-- Header with Queue Info -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Queue & Department Info -->
         <div>
-          <div class="text-sm text-gray-600 mb-1">คิวตรวจเลขที่</div>
-          <div class="text-lg font-semibold text-gray-700">
+          <div class="text-sm text-slate-600 mb-1">คิวตรวจเลขที่</div>
+          <div class="text-lg font-semibold text-slate-800">
              {{ queueData?.registration?.opdNumber ||  '-' }}
           </div>
-          <div class="text-sm text-gray-600 mt-2">
+          <div class="text-sm text-slate-600 mt-2">
             แผนก: {{ queueData?.department?.name || '-' }}
           </div>
         </div>
 
         <!-- Date & Priority -->
         <div>
-          <div class="text-sm text-gray-600 mb-1">วันที่</div>
-          <div class="text-lg font-semibold text-gray-700">
+          <div class="text-sm text-slate-600 mb-1">วันที่</div>
+          <div class="text-lg font-semibold text-slate-800">
             {{ formatDateTime(queueData?.createdAt) }}
           </div>
         </div>
 
         <!-- Doctor Info -->
         <div>
-          <div class="text-sm text-gray-600 mb-1">แพทย์ผู้ตรวจ</div>
+          <div class="text-sm text-slate-600 mb-1">แพทย์ผู้ตรวจ</div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-              <UserRound class="w-3 h-3 text-blue-600" />
+            <div class="w-6 h-6 bg-emerald-50 rounded-full flex items-center justify-center">
+              <UserRound class="w-3 h-3 text-emerald-500" />
             </div>
-            <div class="text-sm text-gray-700">
+            <div class="text-sm text-slate-700">
               {{ queueData?.registration?.doctor?.name || '-' }}
             </div>
-            <div class="text-xs text-gray-500">แพทย์</div>
+            <div class="text-xs text-slate-500">แพทย์</div>
           </div>
         </div>
       </div>
@@ -41,111 +41,132 @@
     <!-- Patient Info Cards -->
     <div class="grid grid-cols-1 lg:grid-cols-9 gap-6">
       <!-- Patient Basic Info Card -->
-      <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-start gap-4">
+      <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
+          <div class="flex items-start gap-4">
           <div
-            class="w-12 h-12 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0"
+            class="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center flex-shrink-0"
           >
             <UserRound class="w-6 h-6 text-white" />
           </div>
           <div class="flex-1">
-            <div class="text-lg font-semibold text-gray-700">{{ patientData?.hn || '-' }}</div>
-            <div class="text-sm font-medium text-gray-700 mt-2">
+            <div class="flex items-center gap-2">
+              <div class="text-lg font-semibold text-slate-800">HN</div>
+              <span
+                class="inline-flex items-center gap-2 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-sm font-semibold"
+              >
+                {{ patientData?.hn || '-' }}
+                <button
+                  v-if="patientData?.hn"
+                  class="text-emerald-600 hover:text-emerald-700"
+                  @click="copyToClipboard(patientData.hn, 'HN')"
+                  v-tooltip:top="'คัดลอก'"
+                >
+                  <Copy class="w-3.5 h-3.5" />
+                </button>
+              </span>
+            </div>
+            <div class="text-sm font-medium text-slate-800 mt-2">
               {{ patientData?.prefix || '' }} {{ patientData?.first_name || '' }}
               {{ patientData?.last_name || '' }}
             </div>
-            <div class="text-sm text-gray-600 mt-2">
+            <div class="text-sm text-slate-600 mt-2">
               วันเกิด: {{ formatDate(patientData?.birth_date) }}
             </div>
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-slate-600">
               อายุ: {{ calculateAge(patientData?.birth_date) }}
             </div>
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-slate-600">
               เพศ:
-              {{ patientData?.gender === 'M' ? 'ชาย' : patientData?.gender === 'F' ? 'หญิง' : '-' }}
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs">
+                {{ patientData?.gender || '-' }}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Treatment & Insurance Card -->
-      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <FileText class="w-4 h-4 text-blue-600" />
+          <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center">
+            <FileText class="w-4 h-4 text-emerald-500" />
           </div>
-          <h3 class="text-sm font-semibold text-gray-900">การรักษา & สิทธิ์</h3>
+          <h3 class="text-sm font-semibold text-slate-900">การรักษา & สิทธิ์</h3>
         </div>
         <div class="space-y-3">
           <div>
-            <div class="text-sm text-gray-600 mb-1">ประเภทการรักษา</div>
-            <div class="text-sm font-medium text-gray-900">OPD ผู้ป่วยนอก</div>
+            <div class="text-sm text-slate-600 mb-1">ประเภทการรักษา</div>
+            <div class="text-sm font-medium text-slate-900">OPD ผู้ป่วยนอก</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">ประเภทสิทธิ์การรักษา</div>
-            <div class="text-sm font-medium text-gray-900">
-              {{ patientData?.insuranceType?.name || 'อื่นๆ (รอยืนยันสิทธิ)' }}
+            <div class="text-sm text-slate-600 mb-1">ประเภทสิทธิ์การรักษา</div>
+            <div class="text-sm font-medium text-slate-900">
+              <span class="inline-flex px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs">
+                {{ patientData?.insuranceType?.name || 'อื่นๆ (รอยืนยันสิทธิ)' }}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Physical Info Card -->
-      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-            <UserRound class="w-4 h-4 text-green-600" />
+          <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center">
+            <UserRound class="w-4 h-4 text-emerald-500" />
           </div>
-          <h3 class="text-sm font-semibold text-gray-900">ข้อมูลร่างกาย</h3>
+          <h3 class="text-sm font-semibold text-slate-900">ข้อมูลร่างกาย</h3>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <div class="text-sm text-gray-600 mb-1">น้ำหนัก</div>
-            <div class="text-sm font-medium text-gray-900">{{ patientData?.weight || '0' }} kg</div>
+            <div class="text-sm text-slate-600 mb-1">น้ำหนัก</div>
+            <div class="text-sm font-medium text-slate-900">{{ patientData?.weight || '0' }} kg</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">ส่วนสูง</div>
-            <div class="text-sm font-medium text-gray-900">{{ patientData?.height || '0' }} cm</div>
+            <div class="text-sm text-slate-600 mb-1">ส่วนสูง</div>
+            <div class="text-sm font-medium text-slate-900">{{ patientData?.height || '0' }} cm</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">รอบเอว</div>
-            <div class="text-sm font-medium text-gray-900">{{ patientData?.waist || '0' }} cm</div>
+            <div class="text-sm text-slate-600 mb-1">รอบเอว</div>
+            <div class="text-sm font-medium text-slate-900">{{ patientData?.waist || '0' }} cm</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">รอบอก</div>
-            <div class="text-sm font-medium text-gray-900">{{ patientData?.chest || '0' }} cm</div>
+            <div class="text-sm text-slate-600 mb-1">รอบอก</div>
+            <div class="text-sm font-medium text-slate-900">{{ patientData?.chest || '0' }} cm</div>
           </div>
           <div class="col-span-2">
-            <div class="text-sm text-gray-600 mb-1">กรุ๊บเลือด</div>
-            <div class="text-sm font-medium text-gray-900">
-              {{ patientData?.blood_group || 'ไม่ระบุ' }}
+            <div class="text-sm text-slate-600 mb-1">กรุ๊บเลือด</div>
+            <div class="text-sm font-medium text-slate-900">
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs">
+                {{ patientData?.blood_group || 'ไม่ระบุ' }}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Medical History Card -->
-      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-            <Stethoscope class="w-4 h-4 text-red-600" />
+          <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center">
+            <Stethoscope class="w-4 h-4 text-emerald-500" />
           </div>
-          <h3 class="text-sm font-semibold text-gray-900">ประวัติการแพทย์</h3>
+          <h3 class="text-sm font-semibold text-slate-900">ประวัติการแพทย์</h3>
         </div>
         <div class="space-y-3">
           <div>
-            <div class="text-sm text-gray-600 mb-1">ประวัติการแพ้ยา</div>
-            <div class="text-sm font-medium text-gray-900">{{ patientData?.allergies || '-' }}</div>
+            <div class="text-sm text-slate-600 mb-1">ประวัติการแพ้ยา</div>
+            <div class="text-sm font-medium text-slate-900">{{ patientData?.allergies || '-' }}</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">ประวัติสุขภาพจิต</div>
-            <div class="text-sm font-medium text-gray-900">
+            <div class="text-sm text-slate-600 mb-1">ประวัติสุขภาพจิต</div>
+            <div class="text-sm font-medium text-slate-900">
               {{ patientData?.mental_health_history || '-' }}
             </div>
           </div>
           <div>
-            <div class="text-sm text-gray-600 mb-1">โรคประจำตัว</div>
-            <div class="text-sm font-medium text-gray-900">
+            <div class="text-sm text-slate-600 mb-1">โรคประจำตัว</div>
+            <div class="text-sm font-medium text-slate-900">
               {{ patientData?.chronic_diseases || '-' }}
             </div>
           </div>
@@ -154,9 +175,9 @@
     </div>
 
     <!-- Tabs and Action Buttons -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50">
       <!-- Tabs and Action Buttons in same row -->
-      <div class="border-b border-gray-200 px-6 py-4">
+      <div class="border-b border-slate-200/50 px-6 py-4">
         <div class="flex items-center justify-between">
           <!-- Tabs -->
           <nav class="flex space-x-8" aria-label="Tabs">
@@ -167,7 +188,7 @@
               :class="[
                 activeTab === tab.id
                   ? 'border-emerald-500 text-emerald-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300',
                 'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2',
               ]"
             >
@@ -180,7 +201,7 @@
           <div class="flex gap-3">
             <button
               @click="openVitalsSign"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-white bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
             >
               <Plus class="w-4 h-4" />
               Vitals Sign
@@ -188,7 +209,7 @@
 
             <button
               @click="goBack"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
             >
               <X class="w-4 h-4" />
               ปิด
@@ -199,7 +220,7 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50">
       <!-- Diagnosis Tab -->
       <div v-if="activeTab === 'diagnosis'" class="p-6">
         <DiagnosisTable :items="medicalHistory" :loading="loadingHistory" @edit="openEditVisit" @cancel="onCancelVisit" />
@@ -207,28 +228,28 @@
 
       <!-- History Tab -->
       <div v-if="activeTab === 'history'" class="p-6">
-        <div class="text-center text-gray-500 py-8">
-          <Clock class="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div class="text-center text-slate-500 py-8">
+          <Clock class="w-12 h-12 mx-auto mb-4 text-slate-300" />
           <p>ส่วนรายการประวัติ</p>
-          <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
+          <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
         </div>
       </div>
 
       <!-- Images Tab -->
       <div v-if="activeTab === 'images'" class="p-6">
-        <div class="text-center text-gray-500 py-8">
-          <ImageIcon class="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div class="text-center text-slate-500 py-8">
+          <ImageIcon class="w-12 h-12 mx-auto mb-4 text-slate-300" />
           <p>ส่วนรูปภาพ/PDF</p>
-          <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
+          <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
         </div>
       </div>
 
       <!-- Certificate Tab -->
       <div v-if="activeTab === 'certificate'" class="p-6">
-        <div class="text-center text-gray-500 py-8">
-          <FileText class="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div class="text-center text-slate-500 py-8">
+          <FileText class="w-12 h-12 mx-auto mb-4 text-slate-300" />
           <p>ส่วนใบรับรองแพทย์</p>
-          <p class="text-sm text-gray-400">กำลังพัฒนา...</p>
+          <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
         </div>
       </div>
     </div>
@@ -266,6 +287,7 @@ import {
   Image as ImageIcon,
   FileText,
   Camera,
+  Copy,
 } from 'lucide-vue-next'
 import opdService from '@/services/opd.js'
 import Swal from 'sweetalert2'
@@ -289,6 +311,7 @@ export default {
     ImageIcon,
     FileText,
     Camera,
+    Copy,
     VitalsSignModal,
     DiagnosisTable,
   },
@@ -325,6 +348,23 @@ export default {
     },
   },
   methods: {
+    copyToClipboard(text, label = '') {
+      if (!text) return
+      try {
+        navigator.clipboard?.writeText(String(text))
+        Swal.fire({
+          icon: 'success',
+          title: 'คัดลอกแล้ว',
+          text: label ? `${label}: ${text}` : String(text),
+          toast: true,
+          showConfirmButton: false,
+          timer: 1500,
+          position: 'top-end'
+        })
+      } catch {
+        Swal.fire({ icon: 'error', title: 'คัดลอกไม่สำเร็จ' })
+      }
+    },
     async loadQueueData() {
       if (!this.queueId) return
 

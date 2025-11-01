@@ -209,8 +209,8 @@
                   <span
                     :class="
                       group.isActive
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-gray-100 text-gray-600 border border-gray-200'
                     "
                     class="px-2 py-1 rounded-md text-xs font-medium"
                   >

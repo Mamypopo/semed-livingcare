@@ -1,23 +1,20 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div>
-        <p class="text-md text-slate-600">จัดการข้อมูลแผนกทั้งหมดในระบบ</p>
-      </div>
+    <!-- Filters -->
+    <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
+        <!-- Search -->
         <div class="relative">
-          <SearchIcon
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"
-          />
+          <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             v-model.trim="query"
             @input="onFilterInput"
             type="text"
-            placeholder="ค้นหาชื่อแผนก..."
-            class="w-56 px-3 py-2 text-sm border border-gray-200 rounded-lg shadow-sm pl-10 pr-4 bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+            placeholder="ค้นหา รหัส/ชื่อโรค..."
+            class="w-64 px-3 py-2 pl-10 pr-4 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
           />
         </div>
+
         <!-- Status dropdown -->
         <Listbox v-model="statusOption" as="div" class="relative">
           <div>
@@ -99,89 +96,99 @@
             </ListboxOptions>
           </transition>
         </Listbox>
-
-        <!-- Add button -->
-        <button
-          @click="openCreateModal"
-          class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
-        >
-          เพิ่มแผนก
-        </button>
       </div>
+
+      <!-- Add button -->
+      <button
+        @click="openCreate"
+        class="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-white hover:from-emerald-500 hover:to-teal-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+      >
+        เพิ่มรายการวินิจฉัย
+      </button>
     </div>
 
-
-    <!-- Table Card -->
+    <!-- ICD10 Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">
-                ชื่อแผนก
-              </th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">สถานะ</th>
-              <th class="px-4 py-2 text-left text-xs font-semibold text-slate-600">วันที่สร้าง</th>
-              <th class="px-4 py-2 text-right text-xs font-semibold text-slate-600">จัดการ</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">รหัส ICD10</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">ชื่อโรค (ไทย)</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">ชื่อโรค (อังกฤษ)</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">หมวดหมู่</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">รหัสกลุ่ม</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">สถานะ</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <!-- Loading skeleton -->
             <template v-if="loading">
-              <tr v-for="n in 6" :key="'skeleton-' + n">
+              <tr v-for="n in 6" :key="'skeleton-diagnosis-' + n">
                 <td class="px-4 py-3">
-                  <div class="h-4 w-40 bg-gray-100 animate-pulse rounded"></div>
+                  <div class="h-4 w-24 bg-gray-100 animate-pulse rounded"></div>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="h-5 w-24 bg-gray-100 animate-pulse rounded-full"></div>
+                  <div class="h-4 w-64 bg-gray-100 animate-pulse rounded"></div>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="h-4 w-28 bg-gray-100 animate-pulse rounded"></div>
+                  <div class="h-4 w-64 bg-gray-100 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-5 w-28 bg-gray-100 animate-pulse rounded-full"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-20 bg-gray-100 animate-pulse rounded"></div>
+                </td>
+               
+                <td class="px-4 py-3">
+                  <div class="h-5 w-20 bg-gray-100 animate-pulse rounded-full"></div>
                 </td>
                 <td class="px-4 py-3 text-right">
-                  <div class="h-8 w-24 bg-gray-100 animate-pulse rounded ml-auto"></div>
+                  <div class="h-8 w-32 bg-gray-100 animate-pulse rounded ml-auto"></div>
                 </td>
               </tr>
             </template>
-            <tr v-else-if="departments.length === 0">
-              <td colspan="4" class="px-4 py-10 text-center text-slate-500 text-sm">
-                <div class="flex flex-col items-center">
-                  <Building class="w-12 h-12 text-slate-300 mb-4" />
-                  <p class="text-lg font-medium text-slate-800 mb-2">ไม่มีข้อมูลแผนก</p>
-                  <p class="text-sm text-slate-600">เริ่มต้นด้วยการเพิ่มแผนกใหม่</p>
-                </div>
-              </td>
+
+            <!-- Empty state -->
+            <tr v-else-if="items.length === 0">
+              <td colspan="8" class="px-4 py-10 text-center text-slate-500 text-sm">ไม่พบข้อมูล</td>
             </tr>
-            <tr v-else v-for="department in departments" :key="department.id" class="hover:bg-slate-50 transition-colors">
-              <td class="px-4 py-2 text-sm text-slate-800 font-medium">
-                <div class="flex items-center">
-                  <div class="p-2 bg-emerald-50 rounded-lg mr-3 border border-emerald-100">
-                    <Building class="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-slate-800">{{ department.name }}</div>
-                  </div>
-                </div>
+
+            <!-- Data rows -->
+            <tr v-else v-for="item in items" :key="item.id" class="hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-3 text-sm font-semibold text-slate-800 whitespace-nowrap">{{ item.code }}</td>
+              <td class="px-4 py-3 text-sm text-slate-700">
+                <div class="line-clamp-2">{{ item.nameTh }}</div>
               </td>
-              <td class="px-4 py-2 text-sm">
+              <td class="px-4 py-3 text-sm text-slate-700">
+                <div class="line-clamp-2">{{ item.nameEn || '-' }}</div>
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-700">
+                <span v-if="item.category?.name" class="text-slate-800">
+                  {{ item.category.name }}
+                </span>
+                <span v-else class="text-slate-400">-</span>
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-700 whitespace-nowrap">{{ item.groupCode || '-' }}</td>
+           
+              <td class="px-4 py-3 text-sm">
                 <span
                   :class="
-                    department.isActive
+                    item.isActive
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       : 'bg-gray-100 text-gray-600 border border-gray-200'
                   "
                   class="px-2 py-1 rounded-md text-xs font-medium"
                 >
-                  {{ department.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
+                  {{ item.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
                 </span>
               </td>
-              <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
-                {{ formatDate(department.createdAt) }}
-              </td>
-              <td class="px-4 py-2 text-sm text-right whitespace-nowrap">
+              <td class="px-4 py-3 text-sm text-right whitespace-nowrap">
                 <div class="flex items-center justify-end gap-2">
                   <button
-                    @click="openEditModal(department)"
+                    @click="openEdit(item)"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-sky-200 text-sky-700 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     title="แก้ไข"
                   >
@@ -189,18 +196,18 @@
                     แก้ไข
                   </button>
                   <button
-                    @click="toggleActive(department)"
+                    @click="toggleActive(item)"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md ml-2 transition-colors"
                     :class="
-                      department.isActive
+                      item.isActive
                         ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
                         : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'
                     "
-                    :title="department.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
+                    :title="item.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
                   >
-                    <ToggleRight v-if="department.isActive" class="w-3.5 h-3.5" />
+                    <ToggleRight v-if="item.isActive" class="w-3.5 h-3.5" />
                     <ToggleLeft v-else class="w-3.5 h-3.5" />
-                    {{ department.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
+                    {{ item.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
                   </button>
                 </div>
               </td>
@@ -209,7 +216,7 @@
         </table>
       </div>
 
-      <!-- Footer: pagination (เหมือน Users.vue) -->
+      <!-- Footer: pagination -->
       <div
         class="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-gray-100 text-sm"
       >
@@ -248,10 +255,10 @@
       </div>
     </div>
 
-    <!-- Department Modal -->
-    <DepartmentModal
+    <!-- ICD10 Modal -->
+    <Icd10Modal
       v-model="modalOpen"
-      :initialData="editingDepartment"
+      :initialData="editing"
       :loading="modalLoading"
       @save="handleSave"
       @update:modelValue="onModalClose"
@@ -260,27 +267,25 @@
 </template>
 
 <script>
-import { 
-  Search, 
-  Pencil, 
-  Building,
+import {
+  Search as SearchIcon,
+  Pencil,
   ToggleRight,
   ToggleLeft,
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
-import DepartmentModal from './components/modals/DepartmentModal.vue'
-import departmentService from '@/services/department.js'
+import icd10Service from '@/services/icd10.js'
+import Icd10Modal from '@/views/medical/components/modals/Icd10Modal.vue'
 import Swal from 'sweetalert2'
 
 export default {
-  name: 'DepartmentsPage',
+  name: 'Icd10Tab',
   components: {
-    SearchIcon: Search,
+    SearchIcon,
     Pencil,
-    Building,
     ToggleRight,
     ToggleLeft,
     ChevronDown,
@@ -290,26 +295,26 @@ export default {
     ListboxButton,
     ListboxOptions,
     ListboxOption,
-    DepartmentModal
+    Icd10Modal,
   },
   data() {
     return {
       query: '',
       searchQuery: '', // สำหรับ debounce
       loading: false,
-      modalOpen: false,
-      modalLoading: false,
-      editingDepartment: null,
-      departments: [],
+      items: [],
       meta: { page: 1, totalPages: 1, total: 0 },
       searchTimer: null,
-      
+      modalOpen: false,
+      modalLoading: false,
+      editing: null,
+
       // Filter options
       statusOption: { label: 'ทั้งหมด', value: '' },
       statusOptions: [
         { label: 'ทั้งหมด', value: '' },
         { label: 'ใช้งาน', value: true },
-        { label: 'ปิดใช้งาน', value: false }
+        { label: 'ปิดใช้งาน', value: false },
       ],
 
       // Pagination options
@@ -318,8 +323,8 @@ export default {
         { label: '10 ต่อหน้า', value: 10 },
         { label: '20 ต่อหน้า', value: 20 },
         { label: '50 ต่อหน้า', value: 50 },
-        { label: '100 ต่อหน้า', value: 100 }
-      ]
+        { label: '100 ต่อหน้า', value: 100 },
+      ],
     }
   },
   computed: {
@@ -334,73 +339,73 @@ export default {
     to() {
       return Math.min(this.meta.page * this.pageSizeOption.value, this.meta.total)
     },
-    departmentParams() {
+    params() {
       return {
         search: this.searchQuery || undefined,
         isActive: this.statusOption.value === '' ? undefined : this.statusOption.value,
         page: this.meta.page,
-        pageSize: this.pageSizeOption.value
+        limit: this.pageSizeOption.value,
+        sort: 'createdAt',
+        order: 'desc',
       }
-    }
+    },
   },
   methods: {
     onFilterInput() {
-      // Debounce search
       clearTimeout(this.searchTimer)
       this.searchTimer = setTimeout(() => {
         this.searchQuery = this.query
         this.meta.page = 1
       }, 500)
     },
-    async loadDepartments() {
+    async loadItems() {
       try {
         this.loading = true
-        const params = this.departmentParams
-        
-        const response = await departmentService.getAll(params)
-        
-        this.departments = response.data
-        this.meta.total = response.meta.total
-        this.meta.page = response.meta.page
-        this.meta.totalPages = Math.max(1, Math.ceil((response.meta.total || 0) / (this.pageSizeOption.value || 10)))
+        const params = this.params
+
+        const response = await icd10Service.list(params)
+        const body = response?.data || {}
+
+        this.items = Array.isArray(body.data) ? body.data : []
+        this.meta.total = body.pagination?.total || 0
+        this.meta.totalPages = body.pagination?.totalPages || 1
+        this.meta.page = body.pagination?.page || this.meta.page
       } catch (error) {
-        console.error('Error loading departments:', error)
-        this.departments = []
+        console.error('Error loading ICD10 items:', error)
+        this.items = []
         this.meta.total = 0
         this.meta.totalPages = 1
-        
+
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: 'ไม่สามารถโหลดข้อมูลแผนกได้'
+          text: 'ไม่สามารถโหลดข้อมูลรายการวินิจฉัยได้',
         })
       } finally {
         this.loading = false
       }
     },
-    openCreateModal() {
-      this.editingDepartment = null
+    openCreate() {
+      this.editing = null
       this.modalOpen = true
     },
-    openEditModal(department) {
-      this.editingDepartment = { ...department }
+    openEdit(item) {
+      this.editing = { ...item }
       this.modalOpen = true
     },
     onModalClose(isOpen) {
       if (!isOpen) {
-        // Modal ปิด - reset editingDepartment
-        this.editingDepartment = null
+        this.editing = null
         this.modalLoading = false
       }
     },
-    async handleSave(data) {
-      // Confirm before action
-      const isEdit = !!data.id
+    async handleSave(payload) {
+      const isEdit = !!payload.id
       const confirm = await Swal.fire({
-        title: isEdit ? 'ยืนยันการแก้ไขแผนก?' : 'ยืนยันการสร้างแผนกใหม่?',
+        title: isEdit ? 'ยืนยันการแก้ไขรายการวินิจฉัย?' : 'ยืนยันการสร้างรายการวินิจฉัย?',
         text: isEdit
-          ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${data.name}" หรือไม่`
-          : `ต้องการสร้างแผนก "${data.name}" หรือไม่`,
+          ? `ต้องการบันทึกการเปลี่ยนแปลงของ "${payload.code} - ${payload.nameTh}" หรือไม่`
+          : `ต้องการสร้างรายการวินิจฉัย "${payload.code} - ${payload.nameTh}" หรือไม่`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'บันทึก',
@@ -412,70 +417,71 @@ export default {
       this.modalLoading = true
       try {
         if (isEdit) {
-          await departmentService.update(data.id, data)
+          await icd10Service.update(payload.id, payload)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
             icon: 'success',
-            title: 'แก้ไขแผนกสำเร็จ',
-            timer: 1600,
+            title: 'แก้ไขสำเร็จ',
+            timer: 1400,
             showConfirmButton: false,
             toast: true,
             position: 'top-end',
           })
-          await this.loadDepartments()
         } else {
-          await departmentService.create(data)
+          const data = { ...payload }
+          delete data.id
+          await icd10Service.create(data)
           this.modalOpen = false
           this.modalLoading = false
           Swal.fire({
             icon: 'success',
-            title: 'สร้างแผนกสำเร็จ',
-            timer: 1600,
+            title: 'สร้างสำเร็จ',
+            timer: 1400,
             showConfirmButton: false,
             toast: true,
             position: 'top-end',
           })
-          await this.loadDepartments()
         }
+        await this.loadItems()
       } catch (e) {
         this.modalLoading = false
         Swal.fire({
           icon: 'error',
-          title: 'เกิดข้อผิดพลาด',
-          text: e?.response?.data?.message || e.message || 'ไม่สามารถบันทึกข้อมูลได้',
+          title: 'บันทึกไม่สำเร็จ',
+          text: e?.response?.data?.message || e.message,
         })
       }
     },
-    async toggleActive(department) {
-      const desired = !department.isActive
+    async toggleActive(item) {
+      const desired = !item.isActive
       const res = await Swal.fire({
-        title: desired ? 'เปิดใช้งานแผนก?' : 'ปิดใช้งานแผนก?',
-        text: `${desired ? 'เปิดให้ใช้งาน' : 'ปิดการใช้งาน'} "${department.name}" หรือไม่`,
+        title: desired ? 'เปิดใช้งานรายการวินิจฉัย?' : 'ปิดใช้งานรายการวินิจฉัย?',
+        text: `${desired ? 'เปิดให้ใช้งาน' : 'ปิดการใช้งาน'} "${item.code} - ${item.nameTh}" หรือไม่`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: desired ? 'เปิดใช้งาน' : 'ปิดใช้งาน',
         cancelButtonText: 'ยกเลิก',
-        reverseButtons: true
+        reverseButtons: true,
       })
       if (!res.isConfirmed) return
 
       try {
-        await departmentService.updateActive(department.id, desired)
+        await icd10Service.toggleActive(item.id)
         Swal.fire({
           icon: 'success',
           title: desired ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานแล้ว',
           timer: 1200,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
         })
-        await this.loadDepartments()
+        await this.loadItems()
       } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'อัปเดตสถานะไม่สำเร็จ',
-          text: error?.response?.data?.message || error.message || 'กรุณาลองใหม่อีกครั้ง'
+          text: error?.response?.data?.message || error.message || 'กรุณาลองใหม่อีกครั้ง',
         })
       }
     },
@@ -483,43 +489,36 @@ export default {
       if (page < 1 || page > this.totalPages) return
       this.meta.page = page
     },
-    formatDate(dateString) {
-      if (!dateString) return '-'
-      const date = new Date(dateString)
-      return date.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    }
   },
   watch: {
-    departmentParams: {
+    params: {
       handler(newParams, oldParams) {
         if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
-          this.loadDepartments()
+          this.loadItems()
         }
       },
       deep: true,
-      immediate: false
+      immediate: false,
     },
     'pageSizeOption.value'() {
       this.meta.page = 1
     },
     searchQuery(newQuery, oldQuery) {
       if (newQuery !== oldQuery) {
-        // This will trigger departmentParams watcher automatically
+        // This will trigger params watcher automatically
       }
-    }
+    },
   },
   mounted() {
-    this.loadDepartments()
+    this.loadItems()
   },
   beforeUnmount() {
-    // Cleanup search timer
     if (this.searchTimer) {
       clearTimeout(this.searchTimer)
     }
-  }
+  },
 }
 </script>
+
+<style scoped></style>
+

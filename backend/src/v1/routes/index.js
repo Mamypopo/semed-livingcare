@@ -13,6 +13,8 @@ import queueRoutes from "../queue/queue.routes.js";
 import opdRoutes from "../opd/opd.routes.js";
 import icd10Routes from "../icd10/icd10.routes.js";
 import visitRoutes from "../visit/visit.routes.js";
+import medicalItemRoutes from "../medical-item/medical-item.routes.js";
+import itemCategoryRoutes from "../item-category/item-category.routes.js";
 
 const router = express.Router();
 
@@ -30,6 +32,8 @@ router.use("/queues", queueRoutes);
 router.use("/opd", opdRoutes);
 router.use("/icd10", icd10Routes);
 router.use("/visits", visitRoutes);
+router.use("/medical-items", medicalItemRoutes);
+router.use("/item-categories", itemCategoryRoutes);
 router.use("/", fileRoutes);
 
 export default router;

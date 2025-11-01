@@ -22,7 +22,7 @@
           />
         </div>
         <div v-if="!isCollapsed" class="flex flex-col transition-opacity duration-300 min-w-0">
-          <span class="text-lg font-bold text-slate-800 truncate">SEMed</span>
+          <span class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent truncate">SEMed</span>
           <span class="text-xs text-slate-500 font-medium">Livingcare</span>
         </div>
       </div>
@@ -280,7 +280,9 @@ export default {
           icon: 'Settings',
           submenu: [
             { name: 'ผู้ใช้งาน', href: '/main/users' },
-            { name: 'แผนก', href: '/main/departments' }
+            { name: 'แผนก', href: '/main/departments' },
+            { name: 'หมวดหมู่', href: '/main/categories' },
+            { name: 'รายการตรวจ', href: '/main/medical/items' }
           ]
         }
       ]

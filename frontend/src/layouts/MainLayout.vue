@@ -15,7 +15,7 @@
       <!-- Top Navigation -->
       <header class="bg-white shadow-sm border-b border-slate-200/50 sticky top-0 z-40">
         <div class="px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16">
+          <div class="flex items-center h-16">
             <!-- Mobile menu button -->
             <button
               v-if="showSidebar"
@@ -25,37 +25,27 @@
               <MenuIcon class="w-5 h-5" />
             </button>
 
-            <!-- Page Title -->
-            <div class="flex-1 lg:flex-none">
-              <h1 class="text-xl font-semibold text-slate-800">
-                {{ $route.path === '/main/lobby' ? 'SEMed Livingcare' : (authStore.currentBranch?.name || pageTitle) }}
-              </h1>
-            </div>
+            <!-- Global Search (Left) -->
+            <div v-if="$route.path !== '/main/lobby'" class="hidden sm:block flex-1">
+              <div class="relative inline-block">
+                <input
+                  ref="searchInput"
+                  v-model="searchQuery"
+                  @keydown="handleSearchKeydown"
+                  @focus="showSearchResults = true"
+                  @blur="hideSearchResults"
+                  type="text"
+                  placeholder="ค้นหา..."
+                  class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
+                />
+                <SearchIcon
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                />
 
-            <!-- Right side items -->
-            <div class="flex items-center space-x-2 sm:space-x-4">
-              <!-- Global Search -->
-              <div v-if="$route.path !== '/main/lobby'" class="relative hidden sm:block">
-                <div class="relative">
-                  <input
-                    ref="searchInput"
-                    v-model="searchQuery"
-                    @keydown="handleSearchKeydown"
-                    @focus="showSearchResults = true"
-                    @blur="hideSearchResults"
-                    type="text"
-                    placeholder="ค้นหา..."
-                    class="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg shadow-sm bg-white text-gray-700 placeholder-gray-400 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300/80 focus:outline-none transition-colors duration-200 hover:border-emerald-400"
-                  />
-                  <SearchIcon
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-                  />
-                </div>
-
-                <!-- Search Results Dropdown -->
+                <!-- Search Results Dropdown (width matches input) -->
                 <div
                   v-if="showSearchResults && (searchQuery || searchResults.length > 0)"
-                  class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200/50 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
+                  class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200/50 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto"
                 >
                   <div
                     v-if="searchResults.length === 0 && searchQuery"
@@ -84,7 +74,10 @@
                   </div>
                 </div>
               </div>
+            </div>
 
+            <!-- Right side items (User Menu at far right) -->
+            <div class="flex items-center space-x-2 sm:space-x-4 ml-auto">
               <!-- Search Button for Mobile -->
               <button
                 v-if="$route.path !== '/main/lobby'"

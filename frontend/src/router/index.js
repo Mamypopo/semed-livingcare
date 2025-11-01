@@ -36,6 +36,18 @@ const router = createRouter({
           redirect: '/main/lobby'
         },
         {
+          path: 'categories',
+          name: 'ItemCategories',
+          component: () => import('@/views/ItemCategories/ItemCategories.vue'),
+          meta: { requiresBranch: true, title: 'หมวดหมู่กลาง' }
+        },
+        {
+          path: 'medical/items',
+          name: 'MedicalItems',
+          component: () => import('@/views/medical/MedicalItems.vue'),
+          meta: { requiresBranch: true, title: 'รายการตรวจ' }
+        },
+        {
           path: 'lobby',
           name: 'Lobby',
           component: () => import('@/views/main/Lobby.vue')

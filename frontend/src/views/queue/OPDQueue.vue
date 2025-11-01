@@ -484,14 +484,14 @@
                       :class="[
                         'px-3 py-1 text-xs font-medium rounded-md',
                         queue.status === 'CANCELLED'
-                          ? 'bg-red-100 text-red-800'
+                          ? 'bg-red-100 text-red-800 border border-red-200'
                           : queue.status === 'COMPLETED'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-green-100 text-green-800 border border-green-200'
                             : queue.status === 'EXAMINING'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
                               : queue.status === 'WAITING'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800',
+                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                : 'bg-gray-100 text-gray-800 border border-gray-200',
                       ]"
                     >
                       {{ getStatusLabel(queue.status) }}
@@ -628,7 +628,9 @@ export default {
     return {
       loading: false,
       searchQuery: '',
+      searchQueryDebounced: '', // สำหรับ debounce search query
       searchTimer: null,
+      reloadTimer: null,
       patientSearchQuery: '',
       patientSearchTimer: null,
       patientSearchResults: [],
@@ -685,7 +687,7 @@ export default {
       return {
         page: this.meta.page,
         limit: this.pageSizeOption.value,
-        search: this.searchQuery,
+        search: this.searchQueryDebounced,
         status: this.selectedStatus?.value || 'all',
         queueType: 'OPD',
         branchId: currentBranchId,
@@ -696,9 +698,10 @@ export default {
   },
   methods: {
     onSearchInput() {
+      // Debounce search query update เพื่อไม่ให้ watcher เรียก API ทันที
       clearTimeout(this.searchTimer)
       this.searchTimer = setTimeout(() => {
-        this.loadQueues()
+        this.searchQueryDebounced = this.searchQuery
       }, 300)
     },
     onPatientSearchInput(event) {
@@ -1082,7 +1085,6 @@ export default {
     go(page) {
       if (page < 1 || page > this.totalPages) return
       this.meta.page = page
-      // No need to call loadQueues() - watcher will handle it automatically
     },
     async loadDepartments() {
       try {
@@ -1120,11 +1122,14 @@ export default {
     queueParams: {
       handler(newParams, oldParams) {
         if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
-          this.loadQueues()
+          if (this.reloadTimer) clearTimeout(this.reloadTimer)
+          this.reloadTimer = setTimeout(() => {
+            this.loadQueues()
+          }, 100)
         }
       },
       deep: true,
-      immediate: false, // Don't run on initial load
+      immediate: false,
     },
   },
   mounted() {
@@ -1146,6 +1151,9 @@ export default {
     }
     if (this.patientSearchTimer) {
       clearTimeout(this.patientSearchTimer)
+    }
+    if (this.reloadTimer) {
+      clearTimeout(this.reloadTimer)
     }
   },
 }

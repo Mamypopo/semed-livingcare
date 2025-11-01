@@ -202,7 +202,19 @@
             <template v-if="!loading">
               <tr v-for="patient in patients" :key="patient.id" class="hover:bg-slate-50 transition-colors">
                 <td class="px-4 py-2 text-sm text-slate-800 font-medium">
-                  {{ patient.hn }}
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-2 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                      {{ patient.hn }}
+                    </span>
+                    <button
+                      v-if="patient.hn"
+                      @click="copyToClipboard(patient.hn, 'HN')"
+                      class="text-slate-400 hover:text-slate-600 transition-colors"
+                      v-tooltip.bottom="'คัดลอก HN'"
+                    >
+                      <Copy class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </td>
                 <td class="px-4 py-2 text-sm text-slate-800">
                   <div class="flex items-center">
@@ -226,10 +238,11 @@
                 <td class="px-4 py-2 text-sm">
                   <span
                     v-if="patient.patientGroup"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
                     :style="{
                       backgroundColor: patient.patientGroup.color + '20',
-                      color: patient.patientGroup.color
+                      color: patient.patientGroup.color,
+                      borderColor: patient.patientGroup.color + '20'
                     }"
                   >
                     {{ patient.patientGroup.name }}
@@ -240,8 +253,8 @@
                   <span
                     :class="
                       patient.isActive
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-gray-100 text-gray-600 border border-gray-200'
                     "
                     class="px-2 py-1 rounded-md text-xs font-medium"
                   >
@@ -398,7 +411,8 @@ import {
   ToggleLeft,
   ToggleRight,
   SearchIcon,
-  Eye
+  Eye,
+  Copy
 } from 'lucide-vue-next'
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import Swal from 'sweetalert2'
@@ -422,7 +436,8 @@ export default {
     PatientModal,
     PatientDetailModal,
     SearchIcon,
-    Eye
+    Eye,
+    Copy
   },
   data() {
     return {
@@ -487,6 +502,27 @@ export default {
     }
   },
   methods: {
+    async copyToClipboard(text, label = 'ข้อมูล') {
+      try {
+        await navigator.clipboard.writeText(String(text))
+        // แสดง Toast แจ้งเตือน
+        Swal.fire({
+          icon: 'success',
+          title: `${label} ถูกคัดลอกแล้ว`,
+          text: String(text),
+          timer: 1400,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        })
+      } catch {
+        Swal.fire({
+          icon: 'error',
+          title: 'คัดลอกไม่สำเร็จ',
+          text: 'กรุณาลองใหม่อีกครั้ง'
+        })
+      }
+    },
     async reload() {       
       this.loading = true
       try {

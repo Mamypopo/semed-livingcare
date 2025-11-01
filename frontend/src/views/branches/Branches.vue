@@ -189,7 +189,7 @@
               <td class="px-4 py-2 text-sm">
                 <span
                   :class="
-                    b.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                    b.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
                   "
                   class="px-2 py-1 rounded-md text-xs font-medium"
                 >
@@ -199,7 +199,7 @@
               <td class="px-4 py-2 text-sm">
                 <span
                   :class="
-                    b.isMainBranch ? 'bg-purple-50 text-purple-700' : 'bg-amber-50 text-amber-700'
+                    b.isMainBranch ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
                   "
                   class="px-2 py-1 rounded-md text-xs font-medium"
                 >
