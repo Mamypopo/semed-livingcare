@@ -714,7 +714,8 @@ model MedicalItem {
   asComponentOf     MedicalItemComponent[] @relation("PackageComponentsChild")
   
   // Visit relations
-  visitItems VisitItem[]
+  visitItemsAsMedicalItem VisitItem[] @relation("VisitItemMedicalItem")
+  visitItemsAsPackage     VisitItem[] @relation("VisitItemParentPackage")
 
   @@index([examType])
   @@index([categoryId])
@@ -773,7 +774,11 @@ model VisitItem {
   visit         Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   
   medicalItemId String
-  medicalItem   MedicalItem @relation(fields: [medicalItemId], references: [id], onDelete: Restrict)
+  medicalItem   MedicalItem @relation("VisitItemMedicalItem", fields: [medicalItemId], references: [id], onDelete: Restrict)
+  
+  // ถ้ามาจากแพคเกจ
+  parentPackageId String? // ID ของแพคเกจที่มาของรายการนี้ (null ถ้าไม่ใช่มาจากแพคเกจ)
+  parentPackage   MedicalItem? @relation("VisitItemParentPackage", fields: [parentPackageId], references: [id], onDelete: SetNull)
   
   // ข้อมูลการสั่งตรวจ
   quantity      Int      @default(1)
@@ -800,6 +805,7 @@ model VisitItem {
   
   @@index([visitId])
   @@index([medicalItemId])
+  @@index([parentPackageId])
   @@index([orderedAt])
   @@unique([visitId, medicalItemId]) // ห้ามสั่งซ้ำใน visit เดียว
 }

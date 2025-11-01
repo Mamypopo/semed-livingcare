@@ -35,6 +35,13 @@ export const visitItemService = {
             }
           }
         },
+        parentPackage: {
+          select: {
+            id: true,
+            code: true,
+            name: true
+          }
+        },
         orderedByUser: {
           select: {
             id: true,
@@ -267,6 +274,7 @@ export const visitItemService = {
           data: {
             visitId: String(visitId),
             medicalItemId: childItemId,
+            parentPackageId: String(medicalItemId), // เก็บ ID ของแพคเกจที่มา
             quantity: parseInt(quantity) || 1,
             price: price ? toDecimalOrNull(price) : null,
             discount: itemDiscount,
@@ -300,6 +308,13 @@ export const visitItemService = {
                     categoryType: true
                   }
                 }
+              }
+            },
+            parentPackage: {
+              select: {
+                id: true,
+                code: true,
+                name: true
               }
             },
             orderedByUser: {

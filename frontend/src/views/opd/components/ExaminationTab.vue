@@ -91,14 +91,21 @@
               {{ item.medicalItem?.code || '-' }}
             </td>
             <td class="px-4 py-3 text-sm text-gray-700">
-              <div class="flex items-center gap-2">
-                <span>{{ item.medicalItem?.name || '-' }}</span>
-                <span
-                  v-if="item.medicalItem?.examType === 'PACKAGE'"
-                  class="inline-flex px-2 py-0.5 rounded-md bg-green-50 text-green-700 text-xs font-medium"
-                >
-                  โปรแกรม
-                </span>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                  <span>{{ item.medicalItem?.name || '-' }}</span>
+                  <span
+                    v-if="item.medicalItem?.examType === 'PACKAGE'"
+                    class="inline-flex px-2 py-0.5 rounded-md bg-green-50 text-green-700 text-xs font-medium"
+                  >
+                    โปรแกรม
+                  </span>
+                </div>
+                <div v-if="item.parentPackage" class="text-xs text-gray-500">
+                  <span class="text-xs bg-teal-100 text-teal-700 w-fit font-medium rounded-md px-2 py-0.5">
+                    {{ item.parentPackage.name }}
+                  </span>
+                </div>
               </div>
             </td>
             <td class="px-4 py-3">
