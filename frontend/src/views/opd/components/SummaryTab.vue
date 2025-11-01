@@ -34,13 +34,19 @@
               <td class="px-4 py-3 text-sm text-gray-700 text-center">{{ index + 1 }}</td>
               <td class="px-4 py-3 text-sm font-medium text-gray-700">{{ item.medicalItem?.code || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span>{{ item.medicalItem?.name || '-' }}</span>
                   <span
                     v-if="item.medicalItem?.examType === 'PACKAGE'"
                     class="inline-flex px-2 py-0.5 rounded-md bg-green-50 text-green-700 text-xs font-medium"
                   >
                     โปรแกรม
+                  </span>
+                  <span
+                    v-if="item.parentPackage"
+                    class="text-[10px] bg-teal-100 text-teal-700 font-medium rounded-md px-1.5 py-0.5"
+                  >
+                    {{ item.parentPackage.name }}
                   </span>
                 </div>
               </td>
