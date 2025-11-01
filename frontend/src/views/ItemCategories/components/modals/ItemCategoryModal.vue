@@ -12,7 +12,14 @@
               <!-- Header -->
               <div class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white">
                 <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">{{ isEdit ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่' }}</DialogTitle>
-                <button @click="requestClose" class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors"><X class="w-5 h-5" /></button>
+                <button @click="requestClose" class="text-slate-400 hover:text-red-500 bg-slate-50 rounded-md p-1 transition-colors relative">
+                  <X class="w-5 h-5" />
+                  <ConfirmClosePopover
+                    v-if="showConfirmClose"
+                    @cancel="showConfirmClose = false"
+                    @confirm="forceClose"
+                  />
+                </button>
               </div>
 
               <!-- Body -->
@@ -69,16 +76,19 @@
 <script>
 import { Dialog as DialogModal, DialogPanel, DialogTitle, TransitionRoot, TransitionChild, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { X, ChevronDown } from 'lucide-vue-next'
+import ConfirmClosePopover from '@/components/ConfirmClosePopover.vue'
 
 export default {
   name: 'ItemCategoryModal',
-  components: { DialogModal, DialogPanel, DialogTitle, TransitionRoot, TransitionChild, Listbox, ListboxButton, ListboxOptions, ListboxOption, X, ChevronDown },
+  components: { DialogModal, DialogPanel, DialogTitle, TransitionRoot, TransitionChild, Listbox, ListboxButton, ListboxOptions, ListboxOption, X, ChevronDown, ConfirmClosePopover },
   props: { modelValue: { type: Boolean, required: true }, initialData: { type: Object, default: null }, loading: { type: Boolean, default: false } },
   emits: ['update:modelValue', 'save'],
   data() {
     return {
       form: { id: null, name: '', categoryType: '' },
       errors: {},
+      showConfirmClose: false,
+      originalSnapshot: '',
       typeOptions: [
         { label: 'ยา/อุปกรณ์', value: 'DRUG_SUPPLY', color: '#10b981' },
         { label: 'คอร์ส/โปรแกรม', value: 'COURSE', color: '#3b82f6' },
@@ -113,8 +123,20 @@ export default {
         this.form = { id: null, name: '', categoryType: '' }
       }
       this.errors = {}
+      this.originalSnapshot = JSON.stringify(this.form)
+      this.showConfirmClose = false
     },
     requestClose() {
+      const isDirty = JSON.stringify(this.form) !== this.originalSnapshot
+      if (isDirty) {
+        this.showConfirmClose = true
+        return
+      }
+      this.$emit('update:modelValue', false)
+    },
+    forceClose() {
+      this.showConfirmClose = false
+      this.resetForm()
       this.$emit('update:modelValue', false)
     },
     onSubmit() {
