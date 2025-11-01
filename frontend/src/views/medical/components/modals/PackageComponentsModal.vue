@@ -30,7 +30,7 @@
                 class="flex items-center justify-between px-6 pt-5 pb-4 rounded-t-2xl border-b border-slate-200/50 bg-white"
               >
                 <DialogTitle as="h3" class="text-slate-800 text-lg font-semibold">
-                  รายระเอียดแพ็คเกจ
+                  ข้อมูลรายการตรวจ
                 </DialogTitle>
                 <div class="flex items-center gap-2">
                   <button
@@ -189,10 +189,10 @@
                               {{ component.quantity || 1 }} {{ component.childItem?.unit || 'รายการ' }}
                             </td>
                             <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
-                              {{ formatPrice(component.childItem?.priceOpd) }}
+                              {{ formatPrice(component.priceOpd || component.childItem?.priceOpd) }}
                             </td>
                             <td class="px-4 py-2 text-sm text-slate-700 whitespace-nowrap">
-                              {{ formatPrice(component.childItem?.priceIpd) }}
+                              {{ formatPrice(component.priceIpd || component.childItem?.priceIpd) }}
                             </td>
                             <td v-if="isPackageType" class="px-4 py-2 text-right">
                               <button
@@ -294,15 +294,27 @@
                               <span v-else class="text-sm text-slate-400">-</span>
                             </td>
                             <td class="px-4 py-2">
-                              <span v-if="row.selectedItem" class="text-sm text-slate-700">
-                                {{ formatPrice(row.selectedItem.priceOpd) }}
-                              </span>
+                              <input
+                                v-if="row.selectedItem"
+                                v-model.number="row.priceOpd"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                class="w-full px-2 py-1 text-sm border border-gray-200 rounded text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 focus:outline-none"
+                                placeholder="0.00"
+                              />
                               <span v-else class="text-sm text-slate-400">-</span>
                             </td>
                             <td class="px-4 py-2">
-                              <span v-if="row.selectedItem" class="text-sm text-slate-700">
-                                {{ formatPrice(row.selectedItem.priceIpd) }}
-                              </span>
+                              <input
+                                v-if="row.selectedItem"
+                                v-model.number="row.priceIpd"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                class="w-full px-2 py-1 text-sm border border-gray-200 rounded text-gray-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-300 focus:outline-none"
+                                placeholder="0.00"
+                              />
                               <span v-else class="text-sm text-slate-400">-</span>
                             </td>
                             <td class="px-4 py-2 text-right">
@@ -426,13 +438,13 @@ export default {
   computed: {
     totalPriceOpd() {
       return this.visibleComponents.reduce((sum, comp) => {
-        const price = parseFloat(comp.childItem?.priceOpd) || 0
+        const price = parseFloat(comp.priceOpd || comp.childItem?.priceOpd) || 0
         return sum + price * (comp.quantity || 1)
       }, 0)
     },
     totalPriceIpd() {
       return this.visibleComponents.reduce((sum, comp) => {
-        const price = parseFloat(comp.childItem?.priceIpd) || 0
+        const price = parseFloat(comp.priceIpd || comp.childItem?.priceIpd) || 0
         return sum + price * (comp.quantity || 1)
       }, 0)
     },
@@ -553,6 +565,8 @@ export default {
         searchQuery: '',
         selectedItem: null,
         quantity: 1,
+        priceOpd: null,
+        priceIpd: null,
         searchResults: [],
         showDropdown: false,
         loading: false,
@@ -619,6 +633,9 @@ export default {
 
       row.selectedItem = item
       row.searchQuery = this.getDisplayText(item)
+      // ตั้งราคาเริ่มต้นจาก item
+      row.priceOpd = item.priceOpd || null
+      row.priceIpd = item.priceIpd || null
       row.showDropdown = false
     },
     showSearchDropdown(index) {
@@ -699,6 +716,9 @@ export default {
         parentItemId: this.parentItemId,
         childItemId: selectedItemData.id,
         quantity: quantity,
+        // ใช้ราคาจาก input (ถ้าไม่กรอกให้ใช้ราคาจาก item)
+        priceOpd: row.priceOpd !== null && row.priceOpd !== undefined ? row.priceOpd : (selectedItemData.priceOpd || null),
+        priceIpd: row.priceIpd !== null && row.priceIpd !== undefined ? row.priceIpd : (selectedItemData.priceIpd || null),
         childItem: {
           ...selectedItemData,
         },
@@ -712,6 +732,8 @@ export default {
         searchQuery: '',
         selectedItem: null,
         quantity: 1,
+        priceOpd: null,
+        priceIpd: null,
         searchResults: [],
         showDropdown: false,
         loading: false,
@@ -732,6 +754,8 @@ export default {
       const pendingItems = this.pendingComponents.map((c) => ({
         childItemId: c.childItemId,
         quantity: c.quantity || 1,
+        priceOpd: c.priceOpd !== undefined ? c.priceOpd : null,
+        priceIpd: c.priceIpd !== undefined ? c.priceIpd : null,
       }))
 
       const deletedIds = [...this.deletedComponentIds]
@@ -794,7 +818,7 @@ export default {
         
         // Add a new empty row if no rows exist
         if (this.searchRows.length === 0) {
-          this.searchRows = [{ searchQuery: '', selectedItem: null, quantity: 1, searchResults: [], showDropdown: false, loading: false }]
+          this.searchRows = [{ searchQuery: '', selectedItem: null, quantity: 1, priceOpd: null, priceIpd: null, searchResults: [], showDropdown: false, loading: false }]
         }
 
         // Emit updated event

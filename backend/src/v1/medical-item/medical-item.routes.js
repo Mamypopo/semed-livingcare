@@ -9,6 +9,9 @@ router.use(authenticateToken)
 // Search for dropdown (เฉพาะ SINGLE items)
 router.get('/search', medicalItemController.searchForDropdown)
 
+// Search for visit (รวมทั้ง SINGLE items และ PACKAGE)
+router.get('/search-for-visit', medicalItemController.searchForVisit)
+
 // Get items for package (GENERAL, LAB, XRAY - ไม่ใช่ PACKAGE)
 router.get('/for-package', medicalItemController.getForPackage)
 
@@ -35,9 +38,6 @@ router.put('/:id', medicalItemController.update)
 
 // Toggle active status
 router.patch('/:id/toggle-active', medicalItemController.toggleActive)
-
-// Delete medical item
-router.delete('/:id', medicalItemController.delete)
 
 export default router
 

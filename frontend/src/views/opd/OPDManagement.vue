@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 pb-64">
     <!-- Header with Queue Info -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -254,7 +254,83 @@
       </div>
     </div>
 
-    
+    <!-- Summary Section (สรุปรายการ) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 mb-64">
+      <!-- Summary Tabs Header -->
+      <div class="border-b border-slate-200/50 px-6 py-4">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">สรุปรายการ</h3>
+        <nav class="flex space-x-8" aria-label="Summary Tabs">
+          <button
+            v-for="tab in summaryTabs"
+            :key="tab.id"
+            @click="activeSummaryTab = tab.id"
+            :class="[
+              activeSummaryTab === tab.id
+                ? 'border-emerald-500 text-emerald-600'
+                : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300',
+              'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2',
+            ]"
+          >
+            <component :is="tab.icon" class="w-4 h-4" />
+            {{ tab.name }}
+          </button>
+        </nav>
+      </div>
+
+      <!-- Summary Tab Content -->
+      <div class="pb-8">
+        <!-- Summary Tab -->
+        <div v-if="activeSummaryTab === 'summary'">
+          <SummaryTab 
+            v-if="currentVisitId"
+            :visit-id="currentVisitId" 
+            @updated="handleSummaryUpdated"
+          />
+          <div v-else class="p-6 text-center text-gray-500">
+            <p>กรุณาสร้าง Visit ก่อนเพื่อดูสรุปรายการ</p>
+          </div>
+        </div>
+
+        <!-- Examination Tab -->
+        <div v-if="activeSummaryTab === 'examination'">
+          <ExaminationTab 
+            v-if="currentVisitId"
+            :visit-id="currentVisitId" 
+            @updated="handleExaminationUpdated"
+          />
+          <div v-else class="p-6 text-center text-gray-500">
+            <p>กรุณาสร้าง Visit ก่อนเพื่อสั่งรายการตรวจ</p>
+          </div>
+        </div>
+
+        <!-- Medication Tab -->
+        <div v-if="activeSummaryTab === 'medication'" class="p-6">
+          <div class="text-center text-slate-500 py-8">
+            <FileText class="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <p>ส่วนสั่งยา/อุปกรณ์</p>
+            <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
+          </div>
+        </div>
+
+        <!-- Service Tab -->
+        <div v-if="activeSummaryTab === 'service'" class="p-6">
+          <div class="text-center text-slate-500 py-8">
+            <Clock class="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <p>ส่วนใช้บริการ</p>
+            <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
+          </div>
+        </div>
+
+        <!-- Medication Use Tab -->
+        <div v-if="activeSummaryTab === 'medication-use'" class="p-6">
+          <div class="text-center text-slate-500 py-8">
+            <FileText class="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <p>ส่วนใช้ยา/อุปกรณ์</p>
+            <p class="text-sm text-slate-400">กำลังพัฒนา...</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Vitals Sign Modal -->
     <VitalsSignModal
@@ -288,11 +364,15 @@ import {
   FileText,
   Camera,
   Copy,
+  Beaker,
+  ClipboardList,
 } from 'lucide-vue-next'
 import opdService from '@/services/opd.js'
 import Swal from 'sweetalert2'
 import VitalsSignModal from '@/views/opd/components/VitalsSignModal.vue'
 import DiagnosisTable from '@/views/opd/components/DiagnosisTable.vue'
+import ExaminationTab from '@/views/opd/components/ExaminationTab.vue'
+import SummaryTab from '@/views/opd/components/SummaryTab.vue'
 import { useAuthStore } from '@/stores/auth.js'
 import visitService from '@/services/visit.js'
 
@@ -312,8 +392,12 @@ export default {
     FileText,
     Camera,
     Copy,
+    Beaker,
+    ClipboardList,
     VitalsSignModal,
     DiagnosisTable,
+    ExaminationTab,
+    SummaryTab,
   },
   data() {
     return {
@@ -325,12 +409,22 @@ export default {
       activeTab: 'diagnosis',
       showVitalsModal: false,
       editingVisitId: null,
+      currentVisitId: null, // Visit ID for examination tab
       tabs: [
         { id: 'diagnosis', name: 'การวินิจฉัยโรค', icon: Stethoscope },
         { id: 'history', name: 'รายการประวัติ', icon: Clock },
         { id: 'images', name: 'รูปภาพ/PDF', icon: ImageIcon },
         { id: 'certificate', name: 'ใบรับรองแพทย์', icon: FileText },
       ],
+      // Tabs สำหรับส่วนสรุปรายการ
+      summaryTabs: [
+        { id: 'summary', name: 'สรุปรายการ', icon: ClipboardList },
+        { id: 'examination', name: 'ตรวจ/LAB/X-Ray', icon: Beaker },
+        { id: 'medication', name: 'สั่งยา/อุปกรณ์', icon: FileText },
+        { id: 'service', name: 'ใช้บริการ', icon: Clock },
+        { id: 'medication-use', name: 'ใช้ยา/อุปกรณ์', icon: FileText },
+      ],
+      activeSummaryTab: 'summary',
     }
   },
   computed: {
@@ -418,6 +512,23 @@ export default {
         const { data } = await visitService.listByPatient(id, currentRegId)
         const items = data?.data?.items || []
         this.medicalHistory = items
+        
+        // Set currentVisitId to the latest visit of current registration
+        if (items && items.length > 0 && currentRegId) {
+          // Find visit for current registration
+          const currentVisit = items.find(v => v.registration?.id === currentRegId || v.registrationId === currentRegId)
+          if (currentVisit) {
+            this.currentVisitId = currentVisit.id
+          } else {
+            // Use the latest visit if no visit for current registration
+            this.currentVisitId = items[0].id
+          }
+        } else if (items && items.length > 0) {
+          // Use latest visit if no registration filter
+          this.currentVisitId = items[0].id
+        } else {
+          this.currentVisitId = null
+        }
       } catch (error) {
         console.error('Error loading medical history:', error)
       } finally {
@@ -461,6 +572,17 @@ export default {
       this.editingVisitId = null
       // reload history after save/edit
       this.loadMedicalHistory()
+    },
+    
+    async handleExaminationUpdated() {
+      // Reload summary tab เมื่อมีการอัปเดตใน ExaminationTab
+      if (this.$refs.summaryTabRef && this.activeSummaryTab === 'summary') {
+        await this.$refs.summaryTabRef.loadItems()
+      }
+    },
+
+    handleSummaryUpdated() {
+      // Handle summary tab update event
     },
 
     formatDateTime(iso) {
@@ -514,6 +636,10 @@ export default {
       const base = `${vn.padStart(4, '0')}`
       const ord = rec?._ordinal || 1
       return `${base}-${ord}`
+    },
+
+    handleSummaryTabChange(tabId) {
+      this.activeSummaryTab = tabId
     }
   },
 

@@ -55,6 +55,7 @@ model Branch {
   visits    Visit[]
   visitLogs VisitLog[]
   opdCounters OpdCounter[]
+  visitItems VisitItem[]
 }
 
 model User {
@@ -102,6 +103,8 @@ model User {
   visitLogs VisitLog[]
   visitsAsDoctor Visit[] @relation("VisitDoctor")
   visitsAsOperator Visit[] @relation("VisitOperator")
+  visitItemsOrdered VisitItem[] @relation("VisitItemOrderedBy")
+  
 }
 
 model Patient {
@@ -550,6 +553,7 @@ model Visit {
   // Relations
   diagnoses VisitDiagnosis[]
   logs VisitLog[]
+  items VisitItem[]
 
   @@index([patientId, visitAt])
   @@unique([registrationId, visitSeq])
@@ -708,6 +712,9 @@ model MedicalItem {
   // Package relations
   packageComponents MedicalItemComponent[] @relation("PackageComponentsParent")
   asComponentOf     MedicalItemComponent[] @relation("PackageComponentsChild")
+  
+  // Visit relations
+  visitItems VisitItem[]
 
   @@index([examType])
   @@index([categoryId])
@@ -728,6 +735,10 @@ model MedicalItemComponent {
 
   quantity     Int         // ฟรอนต์ส่ง 1 เสมอ ณ ตอนนี้
 
+  // ราคา snapshot ตอนเพิ่มเข้าแพ็คเกจ (เก็บราคาตอนสร้างแพ็คเกจ)
+  priceOpd     Decimal?    @db.Decimal(10, 2)
+  priceIpd     Decimal?    @db.Decimal(10, 2)
+
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -744,4 +755,51 @@ model ItemCodeCounter {
   current  Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// VisitItem - รายการตรวจที่สั่งในแต่ละ Visit
+// ==========================================
+enum DiscountType {
+  AMOUNT    // ส่วนลดเป็นจำนวนเงิน
+  PERCENTAGE // ส่วนลดเป็นเปอร์เซ็นต์
+}
+
+model VisitItem {
+  id            String   @id @default(cuid())
+  
+  // Relations
+  visitId       String
+  visit         Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  
+  medicalItemId String
+  medicalItem   MedicalItem @relation(fields: [medicalItemId], references: [id], onDelete: Restrict)
+  
+  // ข้อมูลการสั่งตรวจ
+  quantity      Int      @default(1)
+  
+  // ราคา (snapshot ตอนสั่ง)
+  price         Decimal? @db.Decimal(10, 2)
+  
+  // ส่วนลด
+  discount      Decimal? @db.Decimal(10, 2) @default(0)
+  discountType  DiscountType @default(AMOUNT) // ประเภทส่วนลด: จำนวนเงิน หรือ เปอร์เซ็นต์
+  
+  // ผู้เกี่ยวข้อง
+  orderedBy     Int?     // ใครสั่ง (Doctor/Staff)
+  orderedByUser User?    @relation("VisitItemOrderedBy", fields: [orderedBy], references: [id])
+  
+  // Timestamps
+  orderedAt     DateTime  @default(now())
+  
+  // Audit
+  branchId      Int?
+  branch        Branch?  @relation(fields: [branchId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([visitId])
+  @@index([medicalItemId])
+  @@index([orderedAt])
+  @@unique([visitId, medicalItemId]) // ห้ามสั่งซ้ำใน visit เดียว
 }

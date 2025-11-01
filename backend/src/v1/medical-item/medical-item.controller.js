@@ -129,32 +129,25 @@ export const medicalItemController = {
     }
   },
 
-  async delete(req, res, next) {
-    try {
-      // ดึงข้อมูลก่อน delete (เพื่อ log)
-      const existing = await medicalItemService.getById(req.params.id)
-      
-      const result = await medicalItemService.delete(req.params.id)
-      
-      // บันทึก log
-      await createSystemLog(req, 'DELETE_MEDICAL_ITEM', {
-        itemId: existing.id,
-        code: existing.code,
-        name: existing.name,
-        examType: existing.examType
-      })
-
-      res.json({ success: true, data: result })
-    } catch (err) {
-      next(err)
-    }
-  },
-
   async searchForDropdown(req, res, next) {
     try {
       const searchQuery = req.query.search || ''
       const limit = parseInt(req.query.limit) || 20
       const items = await medicalItemService.searchForDropdown(searchQuery, limit)
+      res.json({ success: true, data: items })
+    } catch (err) {
+      next(err)
+    }
+  },
+
+  /**
+   * ค้นหารายการตรวจสำหรับ Visit (รวมทั้ง SINGLE items และ PACKAGE)
+   */
+  async searchForVisit(req, res, next) {
+    try {
+      const searchQuery = req.query.search || ''
+      const limit = parseInt(req.query.limit) || 20
+      const items = await medicalItemService.searchForVisit(searchQuery, limit)
       res.json({ success: true, data: items })
     } catch (err) {
       next(err)
@@ -198,7 +191,27 @@ export const medicalItemController = {
       if (!Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ success: false, message: 'items array is required' })
       }
+      
+      // ดึงข้อมูล parent item ก่อน (เพื่อ log)
+      const parentItem = await medicalItemService.getById(req.params.id)
+      
       const components = await medicalItemService.addComponents(req.params.id, items)
+      
+      // บันทึก log
+      await createSystemLog(req, 'ADD_PACKAGE_COMPONENTS', {
+        parentItemId: req.params.id,
+        parentItemCode: parentItem?.code,
+        parentItemName: parentItem?.name,
+        componentCount: components.length,
+        components: components.map(c => ({
+          componentId: c.id,
+          childItemId: c.childItemId,
+          childItemCode: c.childItem?.code,
+          childItemName: c.childItem?.name,
+          quantity: c.quantity
+        }))
+      })
+      
       res.json({ success: true, data: components })
     } catch (err) {
       next(err)
@@ -214,7 +227,29 @@ export const medicalItemController = {
       if (!Array.isArray(componentIds) || componentIds.length === 0) {
         return res.status(400).json({ success: false, message: 'componentIds array is required' })
       }
+      
+      // ดึงข้อมูล parent item และ components ที่จะลบก่อน (เพื่อ log)
+      const parentItem = await medicalItemService.getById(req.params.id)
+      const componentsToDelete = await medicalItemService.getComponents(req.params.id)
+      const filteredComponents = componentsToDelete.filter(c => componentIds.includes(String(c.id)))
+      
       const result = await medicalItemService.removeComponents(req.params.id, componentIds)
+      
+      // บันทึก log
+      await createSystemLog(req, 'REMOVE_PACKAGE_COMPONENTS', {
+        parentItemId: req.params.id,
+        parentItemCode: parentItem?.code,
+        parentItemName: parentItem?.name,
+        deletedCount: result.deletedCount,
+        components: filteredComponents.map(c => ({
+          componentId: c.id,
+          childItemId: c.childItemId,
+          childItemCode: c.childItem?.code,
+          childItemName: c.childItem?.name,
+          quantity: c.quantity
+        }))
+      })
+      
       res.json({ success: true, data: result })
     } catch (err) {
       next(err)

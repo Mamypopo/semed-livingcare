@@ -21,12 +21,16 @@ export default {
     const { data } = await apiClient.patch(`/medical-items/${id}/toggle-active`)
     return data?.data
   },
-  async remove(id) {
-    const { data } = await apiClient.delete(`/medical-items/${id}`)
-    return data?.data
-  },
+
   async searchSingleItems(search = '', limit = 20) {
     const { data } = await apiClient.get('/medical-items/search', { search, limit })
+    return data?.data || []
+  },
+  /**
+   * ค้นหารายการตรวจสำหรับ Visit (รวมทั้ง SINGLE items และ PACKAGE)
+   */
+  async searchForVisit(search = '', limit = 20) {
+    const { data } = await apiClient.get('/medical-items/search-for-visit', { search, limit })
     return data?.data || []
   },
   /**

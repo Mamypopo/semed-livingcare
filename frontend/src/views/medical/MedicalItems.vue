@@ -272,20 +272,43 @@
                       <Pencil class="w-3.5 h-3.5" />
                       แก้ไข
                     </button>
-                    <button
-                      @click="toggleActive(item)"
-                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md ml-2 transition-colors"
-                      :class="
-                        item.isActive
-                          ? 'border-orange-200 bg-white text-orange-600 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
-                          : 'border-green-200 bg-white text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500'
-                      "
-                      :title="item.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
-                    >
-                      <ToggleRight v-if="item.isActive" class="w-3.5 h-3.5" />
-                      <ToggleLeft v-else class="w-3.5 h-3.5" />
-                      {{ item.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
-                    </button>
+                    
+                    <!-- Action Dropdown -->
+                    <div class="relative inline-block text-left">
+                      <div>
+                        <button
+                          @click="toggleActionMenu(item.id)"
+                          :data-item-id="item.id"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md bg-white transition-colors border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          title="จัดการ"
+                        >
+                          จัดการ
+                          <ChevronDown class="w-3 h-3 ml-1" />
+                        </button>
+                      </div>
+
+                      <!-- Dropdown Menu using Teleport -->
+                      <Teleport to="body">
+                        <div
+                          v-if="activeActionMenu === item.id"
+                          class="fixed z-50 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                          :style="getDropdownPosition(item.id)"
+                          @click-outside="closeActionMenu"
+                        >
+                          <div class="py-1">
+                            <button
+                              @click="toggleActive(item); closeActionMenu()"
+                              class="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-orange-50 hover:text-orange-700"
+                              :class="item.isActive ? 'text-orange-600' : 'text-green-600'"
+                            >
+                              <ToggleRight v-if="item.isActive" class="w-4 h-4" />
+                              <ToggleLeft v-else class="w-4 h-4" />
+                              {{ item.isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน' }}
+                            </button>
+                          </div>
+                        </div>
+                      </Teleport>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -390,10 +413,10 @@ export default {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
-    FileText,
-    ClipboardList,
-    Package,
-    Listbox,
+  FileText,
+  ClipboardList,
+  Package,
+  Listbox,
     ListboxButton,
     ListboxOptions,
     ListboxOption,
@@ -420,6 +443,7 @@ export default {
       showComponentsModal: false,
       selectedPackageId: null,
       selectedItemExamType: null,
+      activeActionMenu: null,
 
       // Filter options
       examTypeOption: { label: 'ทั้งหมด', value: '' },
@@ -617,6 +641,22 @@ export default {
     onComponentsUpdated() {
       // Reload items when components are updated
       this.loadItems()
+    },
+    toggleActionMenu(itemId) {
+      this.activeActionMenu = this.activeActionMenu === itemId ? null : itemId
+    },
+    closeActionMenu() {
+      this.activeActionMenu = null
+    },
+    getDropdownPosition(itemId) {
+      const button = document.querySelector(`[data-item-id="${itemId}"]`)
+      if (!button) return {}
+      
+      const rect = button.getBoundingClientRect()
+      return {
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.right - 192}px` // 192px = w-48 (12rem)
+      }
     }
   },
   watch: {

@@ -270,40 +270,6 @@ export const medicalItemService = {
   },
 
   /**
-   * ลบรายการตรวจ (soft delete หรือ hard delete)
-   */
-  async delete(id) {
-    if (!id) throw new Error('id จำเป็น')
-
-    const existing = await prisma.medicalItem.findUnique({
-      where: { id: String(id) },
-      include: {
-        _count: {
-          select: {
-            packageComponents: true,
-            asComponentOf: true
-          }
-        }
-      }
-    })
-
-    if (!existing) {
-      throw new Error('ไม่พบรายการตรวจที่ระบุ')
-    }
-
-    // ถ้ามี components หรือถูกใช้ใน package อื่น ให้ soft delete
-    if (existing._count.packageComponents > 0 || existing._count.asComponentOf > 0) {
-      throw new Error('ไม่สามารถลบรายการตรวจที่ถูกใช้งานในแพ็กเกจ')
-    }
-
-    await prisma.medicalItem.delete({
-      where: { id: String(id) }
-    })
-
-    return { success: true }
-  },
-
-  /**
    * ค้นหารายการตรวจสำหรับ dropdown (เฉพาะ SINGLE items)
    */
   async searchForDropdown(searchQuery, limit = 20) {
@@ -326,6 +292,41 @@ export const medicalItemService = {
         id: true,
         code: true,
         name: true,
+        unit: true,
+        priceOpd: true,
+        priceIpd: true
+      },
+      orderBy: { code: 'asc' },
+      take: limit
+    })
+
+    return items
+  },
+
+  /**
+   * ค้นหารายการตรวจสำหรับ Visit (รวมทั้ง SINGLE items และ PACKAGE)
+   */
+  async searchForVisit(searchQuery, limit = 20) {
+    const where = {
+      isActive: true
+      // รวมทั้ง single items และ PACKAGE เพื่อให้สามารถเพิ่มเข้า Visit ได้
+    }
+
+    if (searchQuery && searchQuery.trim()) {
+      where.OR = [
+        { code: { contains: searchQuery.trim(), mode: 'insensitive' } },
+        { name: { contains: searchQuery.trim(), mode: 'insensitive' } },
+        { genericName: { contains: searchQuery.trim(), mode: 'insensitive' } }
+      ]
+    }
+
+    const items = await prisma.medicalItem.findMany({
+      where,
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        examType: true,
         unit: true,
         priceOpd: true,
         priceIpd: true
@@ -473,12 +474,40 @@ export const medicalItemService = {
       throw new Error(`มีรายการย่อยที่เพิ่มไปแล้ว: ${duplicateIds.join(', ')}`)
     }
 
+    // ดึงราคาของ childItems สำหรับเก็บ snapshot
+    const childItems = await prisma.medicalItem.findMany({
+      where: {
+        id: { in: childItemIds }
+      },
+      select: {
+        id: true,
+        priceOpd: true,
+        priceIpd: true
+      }
+    })
+
+    const priceMap = {}
+    childItems.forEach(item => {
+      priceMap[item.id] = {
+        priceOpd: item.priceOpd,
+        priceIpd: item.priceIpd
+      }
+    })
+
     // สร้าง components ทั้งหมดพร้อมกัน
-    const componentsToCreate = items.map(item => ({
-      parentItemId: String(parentItemId),
-      childItemId: String(item.childItemId),
-      quantity: parseInt(item.quantity) || 1
-    }))
+    const componentsToCreate = items.map(item => {
+      const childItemId = String(item.childItemId)
+      const prices = priceMap[childItemId] || {}
+      
+      // ใช้ราคาที่ส่งมาหรือราคาจาก childItem (snapshot)
+      return {
+        parentItemId: String(parentItemId),
+        childItemId: childItemId,
+        quantity: parseInt(item.quantity) || 1,
+        priceOpd: item.priceOpd !== undefined ? toDecimalOrNull(item.priceOpd) : (prices.priceOpd ? toDecimalOrNull(prices.priceOpd) : null),
+        priceIpd: item.priceIpd !== undefined ? toDecimalOrNull(item.priceIpd) : (prices.priceIpd ? toDecimalOrNull(prices.priceIpd) : null)
+      }
+    })
 
     // ใช้ transaction เพื่อบันทึกทั้งหมดพร้อมกัน
     const createdComponents = await prisma.$transaction(
